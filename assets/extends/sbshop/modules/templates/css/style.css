@@ -1,0 +1,152 @@
+div.sectionHeader {
+	margin-top: 10px;
+	padding-left: 10px;
+}
+
+.templates {
+	display: none;
+}
+
+
+.optiondel, .attributedel, .bundledel {
+	float: right;
+}
+
+.bundle_template, .option_template, .attribute_template {
+	display: none;
+}
+
+#bundles, #options {
+	visibility: hidden;
+}
+
+select {
+	padding: 3px 3px 2px 2px;
+}
+
+.values {
+	overflow: hidden;
+}
+
+.th {
+	overflow: hidden;
+}
+
+.th div {
+	font-weight: bold;
+}
+
+.values .id {
+	font-size: 10px;
+	color: #666;
+}
+
+.col1 {
+	width: 250px;
+	float: left;
+}
+
+.col2 {
+	width: 110px;
+	float: left;
+}
+
+.col3 {
+	/*width: 220px;*/
+	float: left;
+	margin-right: 5px;
+}
+
+.values .del {
+	width: 100px;
+	float: left;
+	padding-top: 5px;
+}
+
+.values .option_value_del, .values .filter_value_del {
+	opacity: 0.3;
+}
+
+.values .option_value_del:hover, .values .filter_value_del:hover {
+	opacity: 1;
+}
+
+.values .rng, .values .eqv {
+	display: none;
+}
+
+.values .visible {
+	display: block;
+}
+
+#options .option_del, #attributes .attribute_del, #bundles .bundle_del {
+	opacity: 0.3;
+}
+
+#options .option_del:hover, #attributes .attribute_del:hover, #bundles .bundle_del:hover {
+	opacity: 1;
+}
+
+.extend {
+	display: none;
+	clear: left;
+	padding: 5px;
+	border-left: 2px solid #c0c0c0;
+	margin: 5px 15px;
+}
+
+.extend .title {
+	margin: 0;
+}
+
+.extend.visible {
+	display: block;
+}
+
+.tipid {
+	font-size: 10px;
+	color: #666;
+}
+
+.tipclear {
+	width: 36px;
+	height: 27px;
+	margin-left: 170px;
+	text-decoration: none;
+	border-bottom: 1px dashed #c0c0c0;
+}
+
+#sortable {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	width: 60%;
+}
+#sortable li {
+	margin: 0 5px 5px 5px;
+	padding: 5px;
+	font-size: 12px;
+	height: 20px;
+	width: 200px;
+	list-style: none;
+	cursor: move;
+	line-height: 20px;
+}
+
+.ui-state-highlight {
+	height: 20px;
+	line-height: 20px;
+}
+
+.filter .ui-accordion-header, .filter .ui-accordion-content {
+	margin-left: 20px;
+}
+
+.filter .on {
+	float: left;
+	margin-top: 9px;
+}
+
+/*.filter .rng, .filter .eqv {
+	visibility: hidden;
+}*/
