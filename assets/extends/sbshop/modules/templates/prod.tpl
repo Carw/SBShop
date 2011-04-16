@@ -352,7 +352,8 @@
 			<p>
 				<label>
 					[+lang.product_options_image+]<br>
-					<input type="text" class="option_image" name="option_image[[+option.id+]]" value="[+option.image+]">
+					<input type="text" class="option_image" id="option_image_[+option.id+]]" name="option_image[[+option.id+]]" value="[+option.image+]">
+					<input type="button" value="Вставить" onclick="BrowseServer('option_image[[+option.id+]]')">
 				</label>
 			</p>
 			<p>
