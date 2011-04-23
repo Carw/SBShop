@@ -477,6 +477,10 @@ class checkout_mode {
 		 */
 		if($modx->sbshop->oOrder->getAttribute('user')) {
 			/**
+			 * Загружаем информацию о клиенте
+			 */
+			$modx->sbshop->oCustomer->loadById($modx->sbshop->oOrder->getAttribute('user'));
+			/**
 			 * Устанавливаем статус заказа
 			 */
 			$modx->sbshop->oOrder->setAttribute('status','10');
@@ -554,7 +558,6 @@ class checkout_mode {
 		/**
 		 * Готовим статистику для Google Analytics
 		 */
-		$modx->sbshop->oCustomer->loadById($modx->sbshop->oOrder->getAttribute('user'));
 		$sStatOut = "
 			_gaq.push(['_addTrans',
 				'{$modx->sbshop->oOrder->getAttribute('id')}',           // order ID - required
