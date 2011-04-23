@@ -521,6 +521,10 @@ class checkout_mode {
 			 */
 			$mail->send();
 			/**
+			 * Устанавливаем статистику
+			 */
+			$this->setStat();
+			/**
 			 * Очищаем заказ
 			 */
 			$modx->sbshop->oOrder->reset();
@@ -540,6 +544,93 @@ class checkout_mode {
 		}
 
 	}
+
+	/**
+	 * @todo Нужно будет убрать отсюда это безобразие и вынести в плагин
+	 * @return void
+	 */
+	protected function setStat() {
+		global $modx;
+		/**
+		 * Готовим статистику для Google Analytics
+		 */
+		$modx->sbshop->oCustomer->loadById($modx->sbshop->oOrder->getAttribute('user'));
+		$sStatOut = "
+			_gaq.push(['_addTrans',
+				'{$modx->sbshop->oOrder->getAttribute('id')}',           // order ID - required
+				'',  // affiliation or store name
+				'{$modx->sbshop->oOrder->getFullPrice()}',          // total - required
+				'',           // tax
+				'',              // shipping
+				'{$modx->sbshop->oCustomer->getAttribute('city')}',       // city
+				'Свердловская область',     // state or province
+				'Россия'             // country
+			]);";
+		/**
+		 * Получаем список позиций
+		 */
+		$aIds = $modx->sbshop->oOrder->getProductSetIds();
+		foreach($aIds as $iSetId) {
+			/**
+			 * Получаем товар из списка заказа
+			 */
+			$oProduct = $modx->sbshop->oOrder->getProduct($iSetId);
+			/**
+			 * Получаем информацию о количестве и прочих условиях заказа товара
+			 */
+			$aOrderInfo = $modx->sbshop->oOrder->getOrderSetInfo($iSetId);
+			/**
+			 * Если установлены опции
+			 */
+			/**
+			 * Разделитель между опцией и значением
+			 */
+			$sTitle = $oProduct->getAttribute('title');
+			if(isset($aOrderInfo['sboptions']) and count($aOrderInfo['sboptions']) > 0) {
+				foreach ($aOrderInfo['sboptions'] as $sOptKeyId => $sOptValId) {
+					$aOpt = $oProduct->getNamesByNameIdAndValId($sOptKeyId,$sOptValId);
+					/**
+					 * Разделитель между опцией и значением
+					 */
+					$aOpt['separator'] = $modx->sbshop->config['option_separator'];
+					/**
+					 * Если значение находится в списке скрываемых
+					 */
+					if(in_array($sOptValId, $modx->sbshop->config['hide_option_values'])) {
+						/**
+						 * Очищаем разделитель и значение
+						 */
+						$aOpt['value'] = '';
+						$aOpt['separator'] = '';
+					}
+					/**
+					 * Добавляем опцию к заголовку
+					 */
+					$sTitle .= ' + ' . $aOpt['title'] . $aOpt['separator'] . $aOpt['value'];
+				}
+			}
+			$aProdCat = $oProduct->getExtendAttribute('Группа');
+			$sStatOut .= "
+				_gaq.push(['_addItem',
+					'{$modx->sbshop->oOrder->getAttribute('id')}',           // order ID - required
+					'{$iSetId}',           // SKU/code - required
+					'{$sTitle}',        // product name
+					'{$aProdCat['value']}',   // category or variation
+					'{$modx->sbshop->oOrder->getProductPriceBySetId($iSetId)}',          // unit price - required
+					'{$aOrderInfo['quantity']}'               // quantity - required
+				  ]);";
+
+		}
+		/**
+		 * Заключительная часть кода
+		 */
+		$sStatOut .= "\n_gaq.push(['_trackTrans']);";
+		/**
+		 * Устанавливаем глобальный плейсхолдер
+		 */
+		$modx->setPlaceholder('sb.stat', $sStatOut);
+	}
+
 }
 
 ?>

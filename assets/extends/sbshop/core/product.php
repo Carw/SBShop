@@ -196,6 +196,13 @@ class SBProduct {
 	}
 
 	/**
+	 * Получение конкретного расширенного параметра
+	 */
+	public function getExtendAttribute($sParamName) {
+		return $this->oProductExtendData->getAttribute($sParamName);
+	}
+
+	/**
 	 * Получение видимых параметров
 	 */
 	public function getExtendVisibleAttributes() {
