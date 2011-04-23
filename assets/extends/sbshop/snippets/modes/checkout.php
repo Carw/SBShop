@@ -452,6 +452,10 @@ class checkout_mode {
 			 */
 			$modx->sbshop->oOrder->setAttribute('user',$modx->sbshop->oCustomer->getAttribute('id'));
 			/**
+			 * Сохраняем данные заказа
+			 */
+			$modx->sbshop->oOrder->save();
+			/**
 			 * Редирект на следующий шаг
 			 */
 			$sUrl = $modx->sbshop->sBaseUrl . 'checkout/ok' . $modx->sbshop->config['url_suffix'];
