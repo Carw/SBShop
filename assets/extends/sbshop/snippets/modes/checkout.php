@@ -452,6 +452,27 @@ class checkout_mode {
 			 */
 			$modx->sbshop->oOrder->setAttribute('user',$modx->sbshop->oCustomer->getAttribute('id'));
 			/**
+			 * Редирект на следующий шаг
+			 */
+			$sUrl = $modx->sbshop->sBaseUrl . 'checkout/ok' . $modx->sbshop->config['url_suffix'];
+			header('Location: ' . $sUrl);
+		}
+	}
+
+	/**
+	 * Завершение оформления заказа
+	 */
+	public function okCheckout() {
+		global $modx;
+		/**
+		 * Заголовок
+		 */
+		$modx->setPlaceholder('sb.longtitle',$modx->sbshop->lang['checkout_cart_title']);
+		/**
+		 * Если данные пользователя установлены
+		 */
+		if($modx->sbshop->oOrder->getAttribute('user')) {
+			/**
 			 * Устанавливаем статус заказа
 			 */
 			$modx->sbshop->oOrder->setAttribute('status','10');
@@ -500,34 +521,20 @@ class checkout_mode {
 			 */
 			$modx->sbshop->oOrder->reset();
 			/**
-			 * Редирект на следующий шаг
+			 * Инициализируем переменную для вывода результата
 			 */
-			$sUrl = $modx->sbshop->sBaseUrl . 'checkout/ok' . $modx->sbshop->config['url_suffix'];
-			header('Location: ' . $sUrl);
+			$sOutput = $this->aTemplates['register_ok'];
+			/**
+			 * Выводим
+			 */
+			echo $sOutput;
+		} else {
+			/**
+			 * Пользователь явно попал куда-то не туда, отправляем на главную
+			 */
+			header('Location: ' . MODX_SITE_URL);
 		}
-	}
 
-	/**
-	 * Завершение оформления заказа
-	 */
-	public function okCheckout() {
-		global $modx;
-		/**
-		 * Заголовок
-		 */
-		$modx->setPlaceholder('sb.longtitle',$modx->sbshop->lang['checkout_cart_title']);
-		/**
-		 * Инициализируем переменную для вывода результата
-		 */
-		$sOutput = '';
-		/**
-		 * Добавляем информацию из шаблона
-		 */
-		$sOutput = $this->aTemplates['register_ok'];
-		/**
-		 * Выводим
-		 */
-		echo $sOutput;
 	}
 }
 
