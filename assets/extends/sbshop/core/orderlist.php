@@ -47,7 +47,7 @@ class SBOrderList {
 	 * Загрузка списка заказов по указанному статусу
 	 * @param <type> $iStatus
 	 */
-	public function loadOrdersByStatusIds($iStatusIds = array(), $sWhere = '', $sSort='date_edit') {
+	public function loadOrdersByStatusIds($iStatusIds = array(), $sWhere = '', $sSort='date_add') {
 		global $modx;
 		/**
 		 * Если нет идентификаторов

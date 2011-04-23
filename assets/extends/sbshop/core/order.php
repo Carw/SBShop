@@ -56,9 +56,18 @@ class SBOrder {
 		 */
 		$this->oComments = new SBTimeList();
 		/**
-		 * Устанавливаем параметры заказа по переданному массиву
+		 * Если переданы параметры
 		 */
-		$this->setAttributes($aParam);
+		if(is_array($aParam)) {
+			/**
+			 * Устанавливаем параметры заказа по переданному массиву
+			 */
+			$this->setAttributes($aParam);
+			/**
+			 * Загружаем список заказанных товаров
+			 */
+			$this->oProductList = new SBProductList('',$this->getProductIds());
+		}
 	}
 	
 	/**
@@ -461,6 +470,24 @@ class SBOrder {
 	}
 
 	/**
+	 * Получение количества товара в позиции по идентификатору
+	 * @param  $iSetId
+	 * @return
+	 */
+	public function getProductQuantityBySetId($iSetId) {
+		return $this->aProducts[$iSetId]['quantity'];
+	}
+
+	/**
+	 * Получение суммы позиции по идентификатору
+	 * @param  $iSetId
+	 * @return
+	 */
+	public function getProductSummBySetId($iSetId) {
+		return $this->getProductPriceBySetId($iSetId) * $this->getProductQuantityBySetId($iSetId);
+	}
+
+	/**
 	 * Получение полной стоимости заказанных товаров
 	 * @return float
 	 */
@@ -495,8 +522,7 @@ class SBOrder {
 			 * Обрабатываем каждую позицию из идентификаторов товара
 			 */
 			foreach ($aProductSetIds as $iSetId) {
-				$iId = $this->getProductIdBySetId($iSetId);
-				$aResPrices[$iSetId] = $this->getProductPriceBySetId($iSetId) * $this->aProducts[$iSetId]['quantity'];
+				$aResPrices[$iSetId] = $this->getProductPriceBySetId($iSetId) * $this->getProductQuantityBySetId($iSetId);
 			}
 			$fPrice = array_sum($aResPrices);
 		}
