@@ -1,5 +1,7 @@
 <!--# category_outer: Контейнер для вывода разделов #-->
 [+sb.wrapper+]
+<!--# category_group: Шаблон для группировки товаров. С его помощью можно организовать нормальную таблицу #-->
+<div class="group">[+sb.wrapper+]</div>
 <!--# category_row: Шаблон конкретного раздела #-->
 <div class="products">
 	<h2><a href="[+sb.url+]">[+sb.title+]</a></h2>

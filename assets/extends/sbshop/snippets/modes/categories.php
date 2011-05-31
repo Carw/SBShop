@@ -282,17 +282,96 @@ class categories_mode {
 			 */
 			$aProducts = $this->oProductList->getProductList();
 			/**
-			 * Переменная для сбора информации о рядах
+			 * Формируем список товаров
 			 */
-			$sRows = '';
+			$sOutput = $this->getProductList($aProducts);
 			/**
-			 * Если есть записи
+			 * Отдаем результат
 			 */
-			if(count($aProducts) > 0) {
+			return $sOutput;
+		}
+	}
+
+	/**
+	 * Вывод вложенных в категорию товаров
+	 * @param <type> $iProductId
+	 */
+	public function outputInnerProducts($iCatId) {
+		global $modx;
+		/**
+		 * Получаем лимит количества товаров на категорию
+		 */
+		$iLimit = $modx->sbshop->config['innercat_products'];
+		/**
+		 * Если лимит равен 0
+		 */
+		if($iLimit == 0) {
+			/**
+			 * Возвращаем пустоту
+			 */
+			return '';
+		}
+		/**
+		 * Переменная для вывода
+		 */
+		$sOutput = '';
+		/**
+		 * Получаем список товаров
+		 */
+		$oProducts = new SBProductList($iCatId, false, $iLimit);
+		/**
+		 * Получение списка товаров
+		 */
+		$aProducts = $oProducts->getProductList();
+		/**
+		 * Формируем список товаров
+		 */
+		$sOutput = $this->getProductList($aProducts);
+		/**
+		 * Отдаем результат
+		 */
+		return $sOutput;
+	}
+
+	/**
+	 * Формирование списка товаров
+	 */
+	public function getProductList($aProducts) {
+		global $modx;
+		/**
+		 * Если есть записи
+		 */
+		if(count($aProducts) > 0) {
+			/**
+			 * Если используется группировка
+			 */
+			if($modx->sbshop->config['category_columns'] > 0) {
+				/**
+				 * Разбиваем массив товаров на группы
+				 */
+				$aProductGroups = array_chunk($aProducts, $modx->sbshop->config['category_columns'], true);
+			} else {
+				/**
+				 * Делаем одну группу, где содержатся все товары
+				 */
+				$aProductGroups = array($aProducts);
+			}
+			/**
+			 * Массив групп
+			 */
+			$aGroupRows = array();
+			/**
+			 * Обрабатываем каждую группу
+			 */
+			foreach($aProductGroups as $aGroup) {
+				/**
+				 * Переменная для сбора информации о рядах
+				 */
+				$aRows = array();
 				/**
 				 * Обрабатываем каждую запись для вывода
 				 */
-				foreach ($aProducts as $oProduct) {
+				foreach ($aGroup as $oProduct) {
 					/**
 					 * Подготавливаем информацию для вставки в шаблон
 					 */
@@ -341,131 +420,44 @@ class categories_mode {
 					 * Если товар в наличии
 					 */
 					if($oProduct->getAttribute('existence')) {
-						$sRows .= str_replace(array_keys($aRepl),array_values($aRepl),$this->aTemplates['product_row']);
+						$aRows[] = str_replace(array_keys($aRepl),array_values($aRepl),$this->aTemplates['product_row']);
 					} else {
-						$sRows .= str_replace(array_keys($aRepl),array_values($aRepl),$this->aTemplates['product_absent_row']);
+						$aRows[] = str_replace(array_keys($aRepl),array_values($aRepl),$this->aTemplates['product_absent_row']);
 					}
 				}
 				/**
-				 * Информация о текущей категории
+				 * Вставляем ряды в шаблон группы
 				 */
-				$aCategory = $modx->sbshop->oGeneralCategory->getAttributes();
-				/**
-				 * Если расширенный заголовок не установлен
-				 */
-				if($aCategory['longtitle'] == '') {
-					/**
-					 * Используем обычный
-					 */
-					$aCategory['longtitle'] = $aCategory['title'];
-				}
-				/**
-				 * Готовим плейсхолдеры
-				 */
-				$aRepl = $modx->sbshop->arrayToPlaceholders($aCategory);
-				$aRepl['[+sb.wrapper+]'] = $sRows;
-				/**
-				 * Делаем замену плейсхолдеров в контейнере
-				 */
-				$sOutput = str_replace(array_keys($aRepl), array_values($aRepl), $this->aTemplates['product_list']);
-			} elseif($this->oCategory->getFilterSelected()) {
-				$sOutput = $this->aTemplates['products_absent'];
+				$aGroupRows[] = str_replace('[+sb.wrapper+]', implode($aRows), $this->aTemplates['category_group']);
 			}
 			/**
-			 * Отдаем результат
+			 * Информация о текущей категории
 			 */
-			return $sOutput;
-		}
-	}
-
-	/**
-	 * Вывод вложенных в категорию товаров
-	 * @param <type> $iProductId
-	 */
-	public function outputInnerProducts($iCatId) {
-		global $modx;
-		/**
-		 * Получаем лимит количества товаров на категорию
-		 */
-		$iLimit = $modx->sbshop->config['innercat_products'];
-		/**
-		 * Если лимит равен 0
-		 */
-		if($iLimit == 0) {
+			$aCategory = $modx->sbshop->oGeneralCategory->getAttributes();
 			/**
-			 * Возвращаем пустоту
+			 * Если расширенный заголовок не установлен
 			 */
-			return '';
-		}
-		/**
-		 * Переменная для вывода. Забрасываем туда шаблон
-		 */
-		$sOutput = $this->aTemplates['products_outer'];
-		/**
-		 * Получаем список товаров
-		 */
-		$oProducts = new SBProductList($iCatId,false,$iLimit);
-		/**
-		 * Получение списка товаров
-		 */
-		$aProducts = $oProducts->getProductList();
-		/**
-		 * Переменная для сбора информации о рядах
-		 */
-		$sRows = '';
-		/**
-		 * Если есть записи
-		 */
-		if(count($aProducts) > 0) {
-			/**
-			 * Обрабатываем каждую запись для вывода
-			 */
-			foreach ($aProducts as $oProduct) {
+			if($aCategory['longtitle'] == '') {
 				/**
-				 * Подготавливаем информацию для вставки в шаблон
+				 * Используем обычный
 				 */
-				$aRepl = $modx->sbshop->arrayToPlaceholders($oProduct->getAttributes());
-				/**
-				 * Получаем набор характеристик
-				 */
-				$aAttributes = $oProduct->getExtendPrimaryAttributes();
-				/**
-				 * Ряды значений
-				 */
-				$sAttrRows = '';
-				/**
-				 * Обрабатываем каждый параметр
-				 */
-				foreach ($aAttributes as $aAttrVal) {
-					$aAttrRepl = $modx->sbshop->arrayToPlaceholders($aAttrVal);
-					/**
-					 * Формируем ряд
-					 */
-					$sAttrRows .= str_replace(array_keys($aAttrRepl), array_values($aAttrRepl), $this->aTemplates['attribute_row']);
-				}
-				/**
-				 * Вставляем параметры в контейнер
-				 */
-				$aRepl['[+sb.attributes+]'] = str_replace('[+sb.wrapper+]', $sAttrRows, $this->aTemplates['attribute_outer']);
-				/**
-				 * Добавляем изображения
-				 */
-				$aRepl = array_merge($aRepl,$modx->sbshop->multiarrayToPlaceholders($oProduct->getAllImages(),'num','sb.image.'));
-				/**
-				 * Делаем подстановку
-				 */
-				$sRows .= str_replace(array_keys($aRepl),array_values($aRepl),$this->aTemplates['product_row']);
+				$aCategory['longtitle'] = $aCategory['title'];
 			}
+			/**
+			 * Готовим плейсхолдеры
+			 */
+			$aRepl = $modx->sbshop->arrayToPlaceholders($aCategory);
+			$aRepl['[+sb.wrapper+]'] = implode($aGroupRows);
+			/**
+			 * Делаем замену плейсхолдеров в контейнере
+			 */
+			$sOutput = str_replace(array_keys($aRepl), array_values($aRepl), $this->aTemplates['product_list']);
+		} elseif($this->oCategory->getFilterSelected()) {
+			$sOutput = $this->aTemplates['products_absent'];
 		}
-		/**
-		 * Вставляем информацию о рядах в контейнер
-		 */
-		$sOutput = str_replace('[+sb.wrapper+]', $sRows, $sOutput);
-		/**
-		 * Отдаем результат
-		 */
 		return $sOutput;
 	}
+
 }
 
 ?>
