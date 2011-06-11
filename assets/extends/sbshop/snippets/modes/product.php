@@ -126,6 +126,13 @@ class product_mode {
 				 */
 				$sOptRaw = '';
 				/**
+				 * Если есть изображение
+				 */
+				if($aOption['image']) {
+					$aOption['image.url'] = $aOption['image'];
+					$aOption['image'] = '<img src="' . $aOption['image'] . '">';
+				}
+				/**
 				 * Массив значений
 				 */
 				$aValues = $modx->sbshop->oGeneralProduct->getValuesByOptionName($aOption['title']);
@@ -144,29 +151,35 @@ class product_mode {
 						$aValue['title'] = '';
 					}
 					/**
+					 * Если значение равно null, то устанавливаем цену опции
+					 */
+					if($aValue['value'] != 'null') {
+						$aValue['price'] = $aValue['value'];
+					} else {
+						$aValue['price'] = '';
+					}
+					/**
 					 * Создаем плейсхолдеры
 					 */
 					$aReplVal = $modx->sbshop->arrayToPlaceholders($aValue);
 					/**
-					 * Если значение равно null
+					 * Вставляем данные в шаблон
 					 */
-					if($aReplVal['[+sb.value+]'] != 'null') {
-						$aReplVal['[+sb.price+]'] = $aReplVal['[+sb.value+]'];
-					} else {
-						$aReplVal['[+sb.price+]'] = '';
-					}
 					$sOptRaw = str_replace(array_keys($aReplVal), array_values($aReplVal), $this->aTemplates['single_option_row']);
 				} else {
 					/**
 					 * Обрабатываем значения
 					 */
 					foreach ($aValues as $sValueKey => $sValueVal) {
-						$aReplVal = $modx->sbshop->arrayToPlaceholders($sValueVal);
-						if($aReplVal['[+sb.value+]'] != 'null') {
-							$aReplVal['[+sb.price+]'] = $aReplVal['[+sb.value+]'];
+						if($aValue['value'] != 'null') {
+							$aValue['price'] = $aValue['value'];
 						} else {
-							$aReplVal['[+sb.price+]'] = '';
+							$aValue['price'] = '';
 						}
+						$aReplVal = $modx->sbshop->arrayToPlaceholders($sValueVal);
+						/**
+						 * Вставляем данные в шаблон
+						 */
 						$sOptRaw .= str_replace(array_keys($aReplVal), array_values($aReplVal), $this->aTemplates['multi_option_row']);
 					}
 				}
