@@ -102,7 +102,7 @@ class sort_mode {
 		/**
 		 * Загружаем список разделов
 		 */
-		$oCatTree = new SBCatTree($oParentCategory, 2);
+		$oCatTree = new SBCatTree($oParentCategory, 2, true);
 		/**
 		 * Получаем список разделов
 		 */

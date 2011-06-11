@@ -669,85 +669,90 @@ class cat_mode {
 			SBAttributeCollection::setAttributeCollection(array_keys($this->oCategory->getExtendAttributes()));
 		}
 		/**
-		 * Обрабатываем включенные фильтры
+		 * Если есть включенные фильтры
 		 */
-		foreach(array_keys($_POST['filter_on']) as $sKey) {
+		if($_POST['filter_on']) {
 			/**
-			 * Если есть значения
+			 * Обрабатываем каждый
 			 */
-			if(is_array($_POST['filter_value_title'][$sKey]) and count($_POST['filter_value_title'][$sKey]) > 0) {
+			foreach(array_keys($_POST['filter_on']) as $sKey) {
 				/**
-				 * Массив значений фильтра
+				 * Если есть значения
 				 */
-				$aValues = array();
-				/**
-				 * Обрабатываем каждое значение
-				 */
-				foreach($_POST['filter_value_title'][$sKey] as $iValueId => $sValueTitle) {
+				if(is_array($_POST['filter_value_title'][$sKey]) and count($_POST['filter_value_title'][$sKey]) > 0) {
 					/**
-					 * Если заголовок значения фильтра не пуст
+					 * Массив значений фильтра
 					 */
-					if($sValueTitle != '') {
+					$aValues = array();
+					/**
+					 * Обрабатываем каждое значение
+					 */
+					foreach($_POST['filter_value_title'][$sKey] as $iValueId => $sValueTitle) {
 						/**
-						 * Если указан вариант "диапазон значений"
+						 * Если заголовок значения фильтра не пуст
 						 */
-						if($_POST['filter_type'][$sKey] == 'rng') {
+						if($sValueTitle != '') {
 							/**
-							 * Если есть минимальное или максимальное значений
+							 * Если указан вариант "диапазон значений"
 							 */
-							if($_POST['filter_value_min'][$sKey][$iValueId] != '' and $_POST['filter_value_max'][$sKey][$iValueId] != '') {
-								$aValues[intval($_POST['filter_value_min'][$sKey][$iValueId]) . '-' . intval($_POST['filter_value_max'][$sKey][$iValueId])] = array(
+							if($_POST['filter_type'][$sKey] == 'rng') {
+								/**
+								 * Если есть минимальное или максимальное значений
+								 */
+								if($_POST['filter_value_min'][$sKey][$iValueId] != '' and $_POST['filter_value_max'][$sKey][$iValueId] != '') {
+									$aValues[intval($_POST['filter_value_min'][$sKey][$iValueId]) . '-' . intval($_POST['filter_value_max'][$sKey][$iValueId])] = array(
+										'title' => $sValueTitle,
+										'min' => intval($_POST['filter_value_min'][$sKey][$iValueId]),
+										'max' => intval($_POST['filter_value_max'][$sKey][$iValueId]),
+									);
+								} elseif($_POST['filter_value_min'][$sKey][$iValueId] != '') {
+									$aValues[intval($_POST['filter_value_min'][$sKey][$iValueId]) . '-'] = array(
+										'title' => $sValueTitle,
+										'min' => intval($_POST['filter_value_min'][$sKey][$iValueId]),
+									);
+								} elseif($_POST['filter_value_max'][$sKey][$iValueId] != '') {
+									$aValues['-' . intval($_POST['filter_value_max'][$sKey][$iValueId])] = array(
+										'title' => $sValueTitle,
+										'max' => intval($_POST['filter_value_max'][$sKey][$iValueId]),
+									);
+								}
+							} else {
+								$aValues[mb_strtolower($_POST['filter_value_eqv'][$sKey][$iValueId])] = array(
 									'title' => $sValueTitle,
-									'min' => intval($_POST['filter_value_min'][$sKey][$iValueId]),
-									'max' => intval($_POST['filter_value_max'][$sKey][$iValueId]),
-								);
-							} elseif($_POST['filter_value_min'][$sKey][$iValueId] != '') {
-								$aValues[intval($_POST['filter_value_min'][$sKey][$iValueId]) . '-'] = array(
-									'title' => $sValueTitle,
-									'min' => intval($_POST['filter_value_min'][$sKey][$iValueId]),
-								);
-							} elseif($_POST['filter_value_max'][$sKey][$iValueId] != '') {
-								$aValues['-' . intval($_POST['filter_value_max'][$sKey][$iValueId])] = array(
-									'title' => $sValueTitle,
-									'max' => intval($_POST['filter_value_max'][$sKey][$iValueId]),
+									'eqv' => mb_strtolower($_POST['filter_value_eqv'][$sKey][$iValueId]),
 								);
 							}
-						} else {
-							$aValues[mb_strtolower($_POST['filter_value_eqv'][$sKey][$iValueId])] = array(
-								'title' => $sValueTitle,
-								'eqv' => mb_strtolower($_POST['filter_value_eqv'][$sKey][$iValueId]),
-							);
 						}
 					}
-				}
-				/**
-				 * Данные фильтра
-				 */
-				$aFilter = array(
-					'id' => $sKey,
-					'type' => $_POST['filter_type'][$sKey],
-				);
-				/**
-				 * Если идентификатор находится в списке основных полей или имеет числовой идентификатор
-				 */
-				if(in_array($sKey,$modx->sbshop->config['filter_general'])) {
 					/**
-					 * Добавляем фильтр
+					 * Данные фильтра
 					 */
-					$this->oCategory->addFilter($aFilter, $aValues);
-				} elseif(intval($sKey) > 0) {
+					$aFilter = array(
+						'id' => $sKey,
+						'type' => $_POST['filter_type'][$sKey],
+					);
 					/**
-					 * делаем перевод в число
+					 * Если идентификатор находится в списке основных полей или имеет числовой идентификатор
 					 */
-					$aFilter['id'] = intval($sKey);
-					/**
-					 * Добавляем фильтр
-					 */
-					$this->oCategory->addFilter($aFilter, $aValues);
+					if(in_array($sKey,$modx->sbshop->config['filter_general'])) {
+						/**
+						 * Добавляем фильтр
+						 */
+						$this->oCategory->addFilter($aFilter, $aValues);
+					} elseif(intval($sKey) > 0) {
+						/**
+						 * делаем перевод в число
+						 */
+						$aFilter['id'] = intval($sKey);
+						/**
+						 * Добавляем фильтр
+						 */
+						$this->oCategory->addFilter($aFilter, $aValues);
+					}
+
 				}
 
 			}
-
 		}
 		/**
 		 * Возвращаем результат проверки

@@ -86,6 +86,7 @@
 [+sb.wrapper+]
 <!--# single_option_outer: Контейнер для вывода конкретной опции #-->
 <div class="option [+sb.option.class+]">
+	<div class="image [+sb.option.tip+]">[+sb.option.image+]</div>
 	[+sb.wrapper+]
 	<script type="text/javascript">
 		notbundle['[+sb.option.id+]'] = '[+sb.option.notbundle+]';
@@ -101,12 +102,13 @@
 			[+sb.price+]
 		</div>
 		<div class="option_title">
-			[+sb.option.tip+][+sb.option.title+] [+sb.title+]
+			[+sb.option.title+] [+sb.title+]
 		</div>
 	</label>
 <!--# multi_option_outer: Контейнер для вывода конкретной опции #-->
 <div class="option [+sb.option.class+]">
-	<div class="option_title">[+sb.option.tip+][+sb.option.title+]</div>
+	<div class="image [+sb.option.tip+]">[+sb.option.image+]</div>
+	<div class="option_title">[+sb.option.title+]</div>
 	<div class="option_values">
 		<ul>
 			[+sb.wrapper+]
@@ -173,4 +175,4 @@
 <!--# bundle_option_row: Шаблон для вывода конкретной опции, связанной с комплектацией #-->
 <li>[+sb.title+][+sb.separator+] [+sb.value+]</li>
 <!--# option_tip: Шаблон вывода подсказки к опции #-->
-<div class="tips" rel="[+sb.id+]"></div>
+tips" rel="[+sb.id+]

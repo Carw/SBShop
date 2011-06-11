@@ -21,7 +21,7 @@ class SBCatTree {
 	protected $aCatTreeChildren; // Массив дерева категории
 	protected $aCatTreeLevels; // Массив дерева категории
 
-	public function  __construct($oParentCategory = false,$iLevel = false) {
+	public function  __construct($oParentCategory = false,$iLevel = false, $bDeleted = false) {
 		global $modx;
 		/**
 		 * Инициализируем основной массив
@@ -59,13 +59,13 @@ class SBCatTree {
 		/**
 		 * Делаем загрузку дерева категорий
 		 */
-		$this->load($sPath,$iLevel);
+		$this->load($sPath,$iLevel,$bDeleted);
 	}
 
 	/**
 	 * Загрузка дерева категорий
 	 */
-	public function load($sPath,$iLevel) {
+	public function load($sPath, $iLevel, $bDeleted = false) {
 		global $modx;
 		/**
 		 * Текущий уровень родительской категории
@@ -80,7 +80,11 @@ class SBCatTree {
 		 * Добавляем к пути необходимую маску для поиска дочерних элементов
 		 */
 		$sPath .= '.%';
-		$rs = $modx->db->select('*',$modx->getFullTableName('sbshop_categories'),' category_deleted = 0 AND category_published = 1 AND category_path like "' . $sPath . '" AND category_level < ' . $iEndLevel,'category_order');
+		if(!$bDeleted) {
+			$rs = $modx->db->select('*',$modx->getFullTableName('sbshop_categories'),' category_deleted = 0 AND category_published = 1 AND category_path like "' . $sPath . '" AND category_level < ' . $iEndLevel,'category_order');
+		} else {
+			$rs = $modx->db->select('*',$modx->getFullTableName('sbshop_categories'),' category_path like "' . $sPath . '" AND category_level < ' . $iEndLevel,'category_order');
+		}
 		$aRaws = $modx->db->makeArray($rs);
 		/**
 		 * Обрабатываем все записи

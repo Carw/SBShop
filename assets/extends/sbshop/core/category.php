@@ -179,13 +179,18 @@ class SBCategory {
 		 */
 		$aOutput = array();
 		/**
-		 * Получаем данные из базы
+		 * Если указан идентификатор раздела
 		 */
-		$rs = $modx->db->select('b.*',$modx->getFullTableName('sbshop_category_attributes') . ' as a, ' . $modx->getFullTableName('sbshop_attributes') . ' as b', 'a.category_id = ' . $this->getAttribute('id') . ' and a.attribute_id = b.attribute_id');
-		$cnt = $modx->db->getRecordCount($rs);
-      	for ($i = 0; $i < $cnt; $i++) {
-			$aRow = $modx->db->getRow($rs);
-			$aOutput[$aRow['attribute_name']] = $aRow['attribute_id'];
+		if($this->getAttribute('id')) {
+			/**
+			 * Получаем данные из базы
+			 */
+			$rs = $modx->db->select('b.*',$modx->getFullTableName('sbshop_category_attributes') . ' as a, ' . $modx->getFullTableName('sbshop_attributes') . ' as b', 'a.category_id = ' . $this->getAttribute('id') . ' and a.attribute_id = b.attribute_id');
+			$cnt = $modx->db->getRecordCount($rs);
+			for ($i = 0; $i < $cnt; $i++) {
+				$aRow = $modx->db->getRow($rs);
+				$aOutput[$aRow['attribute_name']] = $aRow['attribute_id'];
+			}
 		}
 		/**
 		 * Возвращаем

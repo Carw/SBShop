@@ -133,7 +133,6 @@ select {
 	padding: 5px;
 	font-size: 12px;
 	height: 20px;
-	width: 200px;
 	list-style: none;
 	cursor: move;
 	line-height: 20px;
@@ -197,7 +196,7 @@ select {
 }
 
 .order.opened .outer {
-	display: block;
+	display: table-row;
 }
 
 .order .outer .col {
