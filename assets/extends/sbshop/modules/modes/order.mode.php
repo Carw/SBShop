@@ -196,7 +196,7 @@ class order_mode {
 			/**
 			 * Статус товара
 			 */
-			$aOrderRepl['[+sb.status+]'] = $modx->sbshop->lang['order_status_' . $oOrder->getAttribute('status')];
+			$aOrderRepl['[+sb.status.txt+]'] = $modx->sbshop->lang['order_status_' . $oOrder->getAttribute('status')];
 			/**
 			 * Идентификатор заказчика
 			 */

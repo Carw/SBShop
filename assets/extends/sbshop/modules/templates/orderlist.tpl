@@ -20,11 +20,11 @@
 <!--# order_row: Шаблон для вывода конкретного заказа #-->
 <form method="post" action="">
 
-<table class="order">
+<table class="order status[+sb.status+]">
 	<tr>
 		<td class="header" colspan="2">
 			<div class="opener"></div>
-			Заказ № <span>[+sb.id+]</span> | Дата: <span>[+sb.date_edit+]</span> | <div class="status">[+sb.status+]</div>
+			Заказ № <span>[+sb.id+]</span> | Дата: <span>[+sb.date_edit+]</span> | <div class="status">[+sb.status.txt+]</div>
 		</td>
 	</tr>
 	<tr class="outer">

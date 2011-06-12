@@ -250,6 +250,31 @@ select {
 	font-size: 12px;
 }
 
+.order.status10 .header {
+	border-top: 2px solid #2a8010;
+	border-right: 6px solid #2a8010;
+}
+
+.order.status10 .header {
+	border-top: 2px solid #2a8010;
+	border-right: 6px solid #2a8010;
+}
+
+.order.status20 .header {
+	border-top: 2px solid #ff9c00;
+	border-right: 6px solid #ff9c00;
+}
+
+.order.status-30 .header {
+	border-top: 2px solid #ec2327;
+	border-right: 6px solid #ec2327;
+}
+
+.order.status30 .header {
+	border-top: 2px solid #5a5a5a;
+	border-right: 6px solid #5a5a5a;
+}
+
 #add_comment {
 	width: 100%;
 }
