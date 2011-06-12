@@ -68,7 +68,6 @@ class order_mode {
 	 * Основной список текущих заказов
 	 */
 	public function workList() {
-		global $modx;
 		/**
 		 * Переменная для вывода
 		 */
@@ -219,20 +218,25 @@ class order_mode {
 			 */
 			$sComments = '';
 			/**
-			 * Обрабатываем каждый комментарий
+			 * Если комментарии есть
 			 */
-			foreach ($aComments as $iTime => $sVal) {
+			if($aComments) {
 				/**
-				 * Плейсхолдеры ряда
+				 * Обрабатываем каждый комментарий
 				 */
-				$aCommRepl = array(
-					'[+sb.time+]' => date('d.m.y - H:i:s', $iTime),
-					'[+sb.comment+]' => $sVal
-				);
-				/**
-				 * Добавляем ряд
-				 */
-				$sComments .= str_replace(array_keys($aCommRepl), array_values($aCommRepl), $aTemplates['comment_row']);
+				foreach ($aComments as $iTime => $sVal) {
+					/**
+					 * Плейсхолдеры ряда
+					 */
+					$aCommRepl = array(
+						'[+sb.time+]' => date('d.m.y - H:i:s', $iTime),
+						'[+sb.comment+]' => $sVal
+					);
+					/**
+					 * Добавляем ряд
+					 */
+					$sComments .= str_replace(array_keys($aCommRepl), array_values($aCommRepl), $aTemplates['comment_row']);
+				}
 			}
 			/**
 			 * Добавляем плейсхолдер комментариев

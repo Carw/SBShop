@@ -327,7 +327,7 @@ class SBProductList {
 		/**
 		 * Получаем информацию из базы
 		 */
-		$rs = $modx->db->select('*',$modx->getFullTableName('sbshop_products'),' product_deleted = 0 AND product_published = 1 AND product_id in(' . $sProductIds . ')','',$iLimit);
+		$rs = $modx->db->select('*',$modx->getFullTableName('sbshop_products'),' product_id in(' . $sProductIds . ')','',$iLimit);
 		$aRaws = $modx->db->makeArray($rs);
 		/**
 		 * Устанавливаем список
