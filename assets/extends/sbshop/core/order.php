@@ -32,6 +32,7 @@ class SBOrder {
 			'user' => null,
 			'date_add' => null,
 			'date_edit' => null,
+			'date_next' => null,
 			'ip' => null,
 			'status' => null,
 			'price' => null,

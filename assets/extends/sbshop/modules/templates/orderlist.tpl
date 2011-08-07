@@ -1,10 +1,15 @@
 <!--# order_outer: Контейнер списка заказов #-->
+<style type="text/css">
+@import "[+site.url+]assets/libs/dyndatetime/css/calendar-blue.css";
+</style>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
 <script type="text/javascript">
 	if(typeof(jQuery) == "undefined") {
 		document.write("<scr" + "ipt type=\"text/javascript\" src=\"' . MODX_SITE_URL . 'assets/libs/javascript/jquery-1.3.2.min.js\"></scr" + "ipt>");
 	}
 </script>
+<script type="text/javascript" src="[+site.url+]assets/libs/dyndatetime/jquery.dynDateTime.js"></script>
+<script type="text/javascript" src="[+site.url+]assets/libs/dyndatetime/lang/calendar-ru-my.js"></script>
 <script type="text/javascript" src="[+site.url+]assets/extends/sbshop/modules/templates/js/orderlist.js"></script>
 
 <div class="sectionHeader">
@@ -24,7 +29,7 @@
 	<tr>
 		<td class="header" colspan="2">
 			<div class="opener"></div>
-			Заказ № <span>[+sb.id+]</span> | Дата: <span>[+sb.date_edit+]</span> | <div class="status">[+sb.status.txt+]</div>
+			Заказ № <span>[+sb.id+]</span> | Дата: <span>[+sb.date_edit+]</span> | Контакт: <span class="date_next">[+sb.date_next+]</span> | <div class="status">[+sb.status.txt+]</div>
 		</td>
 	</tr>
 	<tr class="outer">
@@ -60,9 +65,18 @@
 			<h2>Параметры заказа</h2>
 			<div class="content">
 				<p>
-					Состояние:
+					Состояние:<br>
 					<select name="sb_status_list[[+sb.id+]]">[+sb.action+]</select>
+                    <br>
 					<input type="submit" name="sb_set_status" value="Сохранить состояние" />
+				</p>
+				<p>
+					Дата следующего контакта:<br>
+				</p>
+				<input type="hidden" name="sb_date_next[[+sb.id+]]" class="sb_date_next" value="" />
+				<div class="sb_date_next_calend"></div>
+				<p>
+					<input type="submit" name="sb_set_status" value="Установить дату" />
 				</p>
 			</div>
 		</td>

@@ -23,3 +23,6 @@ ALTER TABLE  `modx_sbshop_categories` ADD  `category_longtitle` VARCHAR( 255 ) N
 ALTER TABLE  `modx_sbshop_products` ADD  `product_longtitle` VARCHAR( 255 ) NOT NULL AFTER  `product_title` ;
 ALTER TABLE  `modx_sbshop_product_attributes` ADD  `attribute_measure` VARCHAR( 10 ) NOT NULL ;
 ALTER TABLE  `modx_sbshop_categories` ADD  `category_filters` MEDIUMTEXT NOT NULL AFTER  `category_attributes` ;
+
+ALTER TABLE  `modx_sbshop_orders` CHANGE  `order_date_edit`  `order_date_edit` TIMESTAMP NULL DEFAULT NULL
+ALTER TABLE  `modx_sbshop_orders` ADD  `order_date_next` TIMESTAMP NULL DEFAULT NULL AFTER  `order_date_edit`

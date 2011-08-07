@@ -171,6 +171,27 @@ class order_mode {
 					$aOrderList[$sKey]->setAttribute('status', intval($_POST['sb_status_list'][$sKey]));
 				}
 				/**
+				 * Если изменилось время для следущего действия
+				 */
+				if($_POST['sb_date_next'][$sKey] != '') {
+					/**
+					 * Разбивает временные данные по значениям
+					 */
+					$aDateNext = explode(',', $_POST['sb_date_next'][$sKey]);
+					/**
+					 * Формируем дату
+					 */
+					$iDateNext = mktime($aDateNext[0],$aDateNext[1],0,$aDateNext[2],$aDateNext[3],$aDateNext[4]);
+					/**
+					 * Формируем дату
+					 */
+					$aOrderList[$sKey]->setAttribute('date_next',date('Y-m-d G:i:s', $iDateNext));
+					/**
+					 * Устанавливаем новый статус
+					 */
+					$aOrderList[$sKey]->setAttribute('status', intval($_POST['sb_status_list'][$sKey]));
+				}
+				/**
 				 * Добавляем комментарий
 				 */
 				$aOrderList[$sKey]->addComment($modx->db->escape($sComment));
@@ -198,6 +219,18 @@ class order_mode {
 			 */
 			$aOrderRepl['[+sb.status.txt+]'] = $modx->sbshop->lang['order_status_' . $oOrder->getAttribute('status')];
 			/**
+             * Форматируем дату заказа
+             */
+            $aOrderRepl['[+sb.date_edit+]'] = date($modx->sbshop->config['order_date_format'], strtotime($oOrder->getAttribute('date_edit')));
+			/**
+             * Форматируем дату заказа
+             */
+			if($oOrder->getAttribute('date_next')) {
+				$aOrderRepl['[+sb.date_next+]'] = date($modx->sbshop->config['order_date_format'], strtotime($oOrder->getAttribute('date_next')));
+			} else {
+				$aOrderRepl['[+sb.date_next+]'] = '---';
+			}
+            /**
 			 * Идентификатор заказчика
 			 */
 			$iCustomerId = $oOrder->getAttribute('user');
@@ -229,7 +262,7 @@ class order_mode {
 					 * Плейсхолдеры ряда
 					 */
 					$aCommRepl = array(
-						'[+sb.time+]' => date('d.m.y - H:i:s', $iTime),
+						'[+sb.time+]' => date($modx->sbshop->config['order_date_format'], $iTime),
 						'[+sb.comment+]' => $sVal
 					);
 					/**
