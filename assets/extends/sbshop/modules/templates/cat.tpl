@@ -71,12 +71,30 @@
 			<div class="tab-page" id="tabAttributes">
 				<h2 class="tab">[+lang.category_tab_attributes+]</h2>
 				<script type="text/javascript">tpResources.addTabPage(document.getElementById("tabAttributes"));</script>
-				Пока управление сделано в текстовом виде. Затем управление параметрами будет более умное.
-				<div class="sectionHeader">[+lang.category_attributes+]</div>
-				<div class="sectionBody">
-					<div>[+category.attribute_tips+]</div>
-					<div style="width:100%">
-						<textarea id="ta" name="attributes" style="width:100%; height: 400px;" onchange="documentDirty=true;">[+category.attributes+]</textarea>
+				<div id="attributes" style="width:100%">
+					<div class="attribute_group opened">
+						<div class="header">
+							<div class="opener"></div>
+							<div class="attribute_group_name">Общая группа</div>
+						</div>
+						<div class="attribute_group_outer">
+							[+sb.attributes+]
+						</div>
+						<button class="new_attribute_add">[+lang.product_attribute_add+]</button>
+					</div>
+				</div>
+				<div class="templates">
+					<div class="attribute attribute_template">
+						<div class="attributedel">
+							<input type="image" class="attribute_del" style="width: auto;" src="/manager/media/style/MODxCarbon/images/icons/delete.png">
+						</div>
+						<input type="text" class="attribute_name" name="attribute_name[]">
+						<input type="text" class="attribute_measure" name="attribute_measure[]">
+						<select name="attribute_type[]">
+							<option value="n" selected="selected">[+lang.product_attribute_type_normal+]</option>
+							<option value="p" style="color: green;">[+lang.product_attribute_type_primary+]</option>
+							<option value="h" style="color: silver;">[+lang.product_attribute_type_hidden+]</option>
+						</select>
 					</div>
 				</div>
 			</div>
@@ -158,4 +176,15 @@
 	<div class="del">
 		<input type="image" style="width: auto;" class="filter_value_del" src="/manager/media/style/MODxCarbon/images/icons/delete.png" title="[+lang.category_filter_del_hint+]">
 	</div>
+</div>
+<!--# attribute_outer: Контейнер для параметров #-->
+<div class="attribute">
+	<input type="hidden" name="attribute_id[]" value="[+attribute.id+]">
+	<input type="text" class="attribute_name" name="attribute_name[]" value="[+attribute.name+]">
+	<input type="text" class="attribute_measure" name="attribute_measure[]" value="[+attribute.measure+]">
+	<select name="attribute_type[]">
+		<option value="n" [+attribute.type.normal+]>[+lang.product_attribute_type_normal+]</option>
+		<option value="p" style="color: green" [+attribute.type.primary+]>[+lang.product_attribute_type_primary+]</option>
+		<option value="h" style="color: silver;" [+attribute.type.hidden+]>[+lang.product_attribute_type_hidden+]</option>
+	</select>
 </div>

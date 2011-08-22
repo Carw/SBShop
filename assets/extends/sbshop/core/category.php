@@ -185,11 +185,17 @@ class SBCategory {
 			/**
 			 * Получаем данные из базы
 			 */
-			$rs = $modx->db->select('b.*',$modx->getFullTableName('sbshop_category_attributes') . ' as a, ' . $modx->getFullTableName('sbshop_attributes') . ' as b', 'a.category_id = ' . $this->getAttribute('id') . ' and a.attribute_id = b.attribute_id');
+			$rs = $modx->db->select('*',$modx->getFullTableName('sbshop_category_attributes') . ' as a, ' . $modx->getFullTableName('sbshop_attributes') . ' as b', 'a.category_id = ' . $this->getAttribute('id') . ' and a.attribute_id = b.attribute_id');
 			$cnt = $modx->db->getRecordCount($rs);
 			for ($i = 0; $i < $cnt; $i++) {
 				$aRow = $modx->db->getRow($rs);
-				$aOutput[$aRow['attribute_name']] = $aRow['attribute_id'];
+				$aOutput[$aRow['attribute_name']] = array(
+					'id' => $aRow['attribute_id'],
+					'count' => $aRow['attribute_count'],
+					'measure' => $aRow['attribute_measure'],
+					'type' => $aRow['attribute_type'],
+					'name' => $aRow['attribute_name']
+				);
 			}
 		}
 		/**

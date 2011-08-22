@@ -95,7 +95,6 @@
 				<script type="text/javascript">tpResources.addTabPage(document.getElementById("tabImages"));</script>
 				<div class="sectionHeader">[+lang.product_images+]</div>
 				<div class="sectionBody">
-					<div>[+lang.product_images_tips+]</div>
 					<div style="width:100%">
 						<p><input type="file" name="img[]" onchange="documentDirty=true;" />[+product.images.1+]</p>
 						<p><input type="file" name="img[]" onchange="documentDirty=true;" />[+product.images.2+]</p>
@@ -112,56 +111,37 @@
 			<div class="tab-page" id="tabAttributes">
 				<h2 class="tab">[+lang.product_tab_attributes+]</h2>
 				<script type="text/javascript">tpResources.addTabPage(document.getElementById("tabAttributes"));</script>
-				<div class="sectionHeader">[+lang.product_attributes+]</div>
-				<div class="sectionBody">
-					<div class="option_toolbar">
-						[+lang.product_attribute_tips+]<br>
-						<input type="text" id="new_attribute_name" value=""> <button id="new_attribute_add">[+lang.product_attribute_add+]</button>
-					</div>
-					<div id="attributes" style="width:100%">
-						<div class="attribute attribute_template">
-							<h3><a href="#"></a></h3>
-							<div>
-								<div class="attributedel">
-									<input type="image" class="attribute_del" style="width: auto;" src="/manager/media/style/MODxCarbon/images/icons/delete.png">
-								</div>
-								<p>
-									<label>
-										[+lang.product_attribute_title+]<br>
-										<input type="text" class="attribute_name" name="attribute_name[]">
-									</label>
-								</p>
-								<p>
-									<label>
-										[+lang.product_attribute_value+]<br>
-										<input type="text" class="attribute_value" name="attribute_value[]">
-									</label>
-								</p>
-								<p>
-									<label>
-										[+lang.product_attribute_measure+]<br>
-										<input type="text" class="attribute_measure" name="attribute_measure[]">
-									</label>
-								</p>
-								<p>
-									<label>
-										[+lang.product_attribute_type+]
-										<select name="attribute_type[]">
-											<option value="n" selected="selected">[+lang.product_attribute_type_normal+]</option>
-											<option value="p">[+lang.product_attribute_type_primary+]</option>
-											<option value="h">[+lang.product_attribute_type_hidden+]</option>
-										</select>
-									</label>
-								</p>
-							</div>
+				<div id="attributes" style="width:100%">
+					<div class="attribute_group opened">
+						<div class="header">
+							<div class="opener"></div>
+							<div class="attribute_group_name">Общая группа</div>
 						</div>
-						[+attributes+]
+						<div class="attribute_group_outer">
+							[+attributes+]
+						</div>
+						<button class="new_attribute_add">[+lang.product_attribute_add+]</button>
 					</div>
-					<script type="text/javascript">
-						// Заголовок комплектации по умолчанию
-						attribute_name = '[+lang.product_attribute_name+]';
-					</script>
 				</div>
+				<div class="templates">
+					<div class="attribute attribute_template">
+						<div class="attributedel">
+							<input type="image" class="attribute_del" style="width: auto;" src="/manager/media/style/MODxCarbon/images/icons/delete.png">
+						</div>
+						<input type="text" class="attribute_name" name="attribute_name[]">
+						<input type="text" class="attribute_measure" name="attribute_measure[]">
+						<input type="text" class="attribute_value" name="attribute_value[]">
+						<select name="attribute_type[]">
+							<option value="n" selected="selected">[+lang.product_attribute_type_normal+]</option>
+							<option value="p" style="color: green;">[+lang.product_attribute_type_primary+]</option>
+							<option value="h" style="color: silver;">[+lang.product_attribute_type_hidden+]</option>
+						</select>
+					</div>
+				</div>
+				<script type="text/javascript">
+					// Заголовок комплектации по умолчанию
+					attribute_name = '[+lang.product_attribute_name+]';
+				</script>
 			</div>
 			<div class="tab-page" id="tabOptions">
 				<h2 class="tab">[+lang.product_tab_options+]</h2>
@@ -418,39 +398,16 @@
 </div>
 <!--# attribute_outer: Контейнер для параметров #-->
 <div class="attribute">
-	<h3><a href="#">[+attribute.title+]</a></h3>
-	<div>
-		<div class="attributedel">
-			<input type="image" class="attribute_del" style="width: auto;" src="/manager/media/style/MODxCarbon/images/icons/delete.png">
-		</div>
-		<input type="hidden" name="attribute_id[]" value="[+attribute.id+]">
-		<p>
-			<label>
-				[+lang.product_attribute_title+]<br>
-				<input type="text" class="attribute_name" name="attribute_name[]" value="[+attribute.title+]">
-			</label>
-		</p>
-		<p>
-			<label>
-				[+lang.product_attribute_value+]<br>
-				<input type="text" class="attribute_value" name="attribute_value[]" value="[+attribute.value+]">
-			</label>
-		</p>
-		<p>
-			<label>
-				[+lang.product_attribute_measure+]<br>
-				<input type="text" class="attribute_measure" name="attribute_measure[]" value="[+attribute.measure+]">
-			</label>
-		</p>
-		<p>
-			<label>
-				[+lang.product_attribute_type+]
-				<select name="attribute_type[]">
-					<option value="n" [+attribute.type.normal+]>[+lang.product_attribute_type_normal+]</option>
-					<option value="p" [+attribute.type.primary+]>[+lang.product_attribute_type_primary+]</option>
-					<option value="h" [+attribute.type.hidden+]>[+lang.product_attribute_type_hidden+]</option>
-				</select>
-			</label>
-		</p>
+	<input type="hidden" name="attribute_id[]" value="[+attribute.id+]">
+	<div class="attributedel">
+		<input type="image" class="attribute_del" style="width: auto;" src="/manager/media/style/MODxCarbon/images/icons/delete.png">
 	</div>
+	<input type="text" class="attribute_name" name="attribute_name[]" value="[+attribute.title+]">
+	<input type="text" class="attribute_measure" name="attribute_measure[]" value="[+attribute.measure+]">
+	<input type="text" class="attribute_value" name="attribute_value[]" value="[+attribute.value+]">
+	<select name="attribute_type[]">
+		<option value="n" [+attribute.type.normal+]>[+lang.product_attribute_type_normal+]</option>
+		<option value="p" style="color: green" [+attribute.type.primary+]>[+lang.product_attribute_type_primary+]</option>
+		<option value="h" style="color: silver;" [+attribute.type.hidden+]>[+lang.product_attribute_type_hidden+]</option>
+	</select>
 </div>

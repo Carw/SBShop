@@ -22,6 +22,84 @@ div.sectionHeader {
 	display: none;
 }
 
+.attribute_group {
+    border: 1px solid #b2baba;
+    padding-bottom: 15px;
+}
+
+.attribute_group .header {
+    font-size: 12px;
+    line-height: 28px;
+    color: #6d6d6d;
+    padding: 0 9px;
+    background: #EFEFEF url(images/fade.gif) repeat-x top;
+    border-bottom: 1px solid #b2baba;
+}
+
+.attribute_group .opener {
+    width: 13px;
+    height: 13px;
+    background: url(images/icons.gif) no-repeat;
+    float: left;
+    margin: 7px 10px 0 0;
+    cursor: pointer;
+}
+
+.attribute_group.opened .opener {
+    background: url(images/icons.gif) no-repeat -13px 0;
+}
+
+.attribute_outer {
+    display: none;
+}
+
+.attribute_group_outer {
+    margin: 15px;
+}
+
+.attribute {
+    margin: 7px 0;
+}
+
+#attributes input {
+    font-size: 10px;
+    padding: 3px 5px;
+}
+
+#attributes select {
+    font-size: 10px;
+    padding: 3px 3px 3px 5px;
+}
+
+#attributes input.attribute_name {
+    width: 200px;
+}
+
+#attributes input.attribute_measure {
+    width: 60px;
+}
+
+#attributes input.attribute_value {
+    width: 150px;
+}
+
+#attributes .new_attribute_add {
+    padding: 0 0 0 18px;
+    border: 0;
+    background: url(images/add.png) no-repeat;
+    margin: 0 0 0 15px;
+    color: #575555;
+    font-size: 10px;
+    font-family: Arial;
+    width: auto;
+    height: 15px;
+    opacity: 0.8;
+}
+
+#attributes .new_attribute_add:hover {
+    opacity: 1;
+}
+
 #bundles, #options {
 	visibility: hidden;
 }

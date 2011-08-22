@@ -153,90 +153,134 @@ class SBAttributeCollection {
 	}
 
 	/**
-	 * Установка обобщения параметров категории
-	 * @param unknown_type $aNewAttributes
-	 * @param unknown_type $aOldAttributes
+	 * Установка обобщения параметров раздела
+	 * @param SBCategory $oCategory
+	 * @param $aNewAttributes
+	 * @param $aOldAttributes
+	 * @return void
 	 */
-	public function setAttributeCategoryGeneralization($iCatId,$aInsAttributes,$aRemAttributes) {
+	public function attributeCategoryGeneralization($oCategory, $aNewAttributes, $aOldAttributes) {
 		global $modx;
 		/**
-		 * Если ничего обновлять не требуется
+		 * Получаем идентификаторы новых параметров
 		 */
-		if(count($aInsAttributes) == 0 and count($aRemAttributes) == 0) {
+		$aNewAttributeIds = SBAttributeCollection::getAttributeIdsByNames(array_keys($aNewAttributes));
+		/**
+		 * Массив добавляемых параметров
+		 */
+		$aAttrIns = array();
+		/**
+		 * Массив удаляемых параметров
+		 */
+		$aAttrRemoved = array();
+		/**
+		 * Запоминаем массив новых параметров
+		 */
+		$aNewAttributesBase = $aNewAttributes;
+		/**
+		 * Перерабатываем массив новых параметров для внесения идентификатора в качестве ключа
+		 */
+		$aNewAttributes = array();
+		foreach($aNewAttributesBase as $aNewAttribute) {
 			/**
-			 * Просто выходим
+			 * Добавляем идентификатор параметра
 			 */
-			return;
+			$aNewAttribute['id'] = $aNewAttributeIds[$aNewAttribute['title']];
+			$aNewAttributes[$aNewAttributeIds[$aNewAttribute['title']]] = $aNewAttribute;
 		}
 		/**
-		 * Совмещаем список параметров для последующего запроса в базу
+		 * Если старых параметров нет
 		 */
-		$aAttrIds = implode(',',array_merge($aInsAttributes, $aRemAttributes));
-		$rs = $modx->db->select('*',$modx->getFullTableName('sbshop_category_attributes'),'category_id = ' . $iCatId . ' and attribute_id in (' . $aAttrIds . ')');
-		$cnt = $modx->db->getRecordCount($rs);
-		for($i=0; $i<$cnt; $i++) {
-			$aRow = $modx->db->getRow($rs);
-			$aAttrExisted[$aRow['attribute_id']] = $aRow;
-		}
-		/**
-		 * Обрабатываем все добавляемые параметры
-		 */
-		foreach($aInsAttributes as $iAttrId) {
+		if(count($aOldAttributes) == 0) {
 			/**
-			 * Если такой параметр уже есть в разделе
+			 * Если есть новые
 			 */
-			if(isset($aAttrExisted[$iAttrId])) {
+			if(count($aNewAttributeIds) > 0) {
 				/**
-				 * Плюсуем счетчик
+				 * Собираем нужные значения для запроса
 				 */
-				$aUpd = array(
-					'attribute_count' => $aAttrExisted[$iAttrId]['attribute_count'] + 1
-				);
-				$modx->db->update($aUpd, $modx->getFullTableName('sbshop_category_attributes'), 'category_id = ' . $iCatId . ' and attribute_id = ' . $iAttrId);
-			} else {
+				$aAttrIds = array();
+				foreach ($aNewAttributeIds as $iId) {
+					$aAttrIds[] = "({$oCategory->getAttribute('id')}, $iId, 0, '{$aNewAttributes[$iId]['measure']}', '{$aNewAttributes[$iId]['type']}')";
+				}
+				$sAttrIds = implode(',',$aAttrIds);
+				$sql = 'INSERT INTO ' . $modx->getFullTableName('sbshop_category_attributes') . ' (`category_id`,`attribute_id`, `attribute_count`,`attribute_measure`,`attribute_type`) VALUES ' . $sAttrIds;
+				$modx->db->query($sql);
 				/**
-				 * Добавляем новый параметр
+				 * Задаем массив обновляемых параметров, куда попадают все имеющиеся параметры
 				 */
-				$aIns = array(
-					'category_id' => $iCatId,
-					'attribute_id' => $iAttrId,
-					'attribute_count' => 1
-				);
-				$modx->db->insert($aIns, $modx->getFullTableName('sbshop_category_attributes'));
+				$aAttrIns = $aNewAttributeIds;
 			}
-		}
-		/**
-		 * Обрабатываем все удаляемые параметры
-		 */
-		foreach($aRemAttributes as $iAttrId) {
+		} else {
 			/**
-			 * Если такой параметр уже есть в разделе
+			 * Получение списка связей
 			 */
-			if(isset($aAttrExisted[$iAttrId]) and $aAttrExisted[$iAttrId]['attribute_count'] > 1) {
+			$rs = $modx->db->select('*',$modx->getFullTableName('sbshop_category_attributes'),'category_id = ' . $oCategory->getAttribute('id'));
+			$aBinds = $modx->db->makeArray($rs);
+			/**
+			 * Обрабатываем все связи и получаем список имеющихся параметров
+			 * @todo добавить проверку единицы измерения
+			 */
+			$aAttrExisted = array();
+			foreach ($aBinds as $aBind) {
+				$aAttrExisted[$aBind['attribute_id']] = $aBind;
+			}
+			/**
+			 * Выделяем из массива добавленных параметров идентификаторы, которые есть в базе
+			 * Это даст нам массив для обновления
+			 */
+			$aAttrUpd = array_intersect($aNewAttributeIds,array_keys($aAttrExisted));
+			/**
+			 * Делаем обновление
+			 */
+			if(count($aAttrUpd) > 0) {
 				/**
-				 * Минусуем счетчик
+				 * Обрабатываем каждый элемент для обновления
 				 */
-				$aUpd = array(
-					'attribute_count' => $aAttrExisted[$iAttrId]['attribute_count'] - 1
-				);
-				$modx->db->update($aUpd, $modx->getFullTableName('sbshop_category_attributes'), 'category_id = ' . $iCatId . ' and attribute_id = ' . $iAttrId);
-			} else {
-				/**
-				 * Удаляем параметр полностью
-				 */
-				$modx->db->delete($modx->getFullTableName('sbshop_category_attributes'), 'category_id = ' . $iCatId . ' and attribute_id = ' . $iAttrId);
+				foreach ($aAttrUpd as $iId) {
+					/**
+					 * Нужно проверить не изменилась ли единица измерения или тип
+					 */
+					if($aAttrExisted[$iId]['attribute_measure'] != $aNewAttributes[$iId]['measure'] || $aAttrExisted[$iId]['attribute_type'] != $aNewAttributes[$iId]['type']) {
+						$aUpd = array(
+							'attribute_measure'=>$aNewAttributes[$iId]['measure'],
+							'attribute_type'=>$aNewAttributes[$iId]['type']
+						);
+						/**
+						 * Значения не совпадают, поэтому их нужно обновить
+						 */
+						$modx->db->update($aUpd, $modx->getFullTableName('sbshop_category_attributes'),'category_id = ' . $oCategory->getAttribute('id') . ' AND attribute_id = ' . $iId);
+					}
+				}
+			}
+			/**
+			 * Выделяем из добавленных параметров абсолютно новые, которых нет в связях
+			 * Это даст нам массив для, которого нужно создать новые связи
+			 */
+			$aAttrIns = array_diff($aNewAttributeIds,array_keys($aAttrExisted));
+			/**
+			 * Добавляем связи
+			 */
+			if(count($aAttrIns) > 0) {
+				$aAttrIds = array();
+				foreach ($aAttrIns as $iId) {
+					$aAttrIds[] = "({$oCategory->getAttribute('id')}, $iId, 0, '{$aNewAttributes[$iId]['measure']}', '{$aNewAttributes[$iId]['type']})";
+				}
+				$sAttrIds = implode(',',$aAttrIds);
+				$sql = 'INSERT INTO ' . $modx->getFullTableName('sbshop_category_attributes') . ' (`category_id`,`attribute_id`,`attribute_count`, `attribute_measure`, `attribute_type`) VALUES ' . $sAttrIds;
+				$modx->db->query($sql);
 			}
 		}
 	}
-	
+
 	/**
-	 * Установка обобщения параметров товаров 
-	 * @param unknown_type $iProdId
-	 * @param unknown_type $iCatId
+	 * Установка обобщения параметров товаров
+	 * @param SBProduct $oProduct
+	 * @param SBCategory $oCategory
 	 * @param unknown_type $aNewAttributes
 	 * @param unknown_type $aOldAttributes
 	 */
-	public function attributeProductGeneralization($iProdId,$iCatId,$aNewAttributes,$aOldAttributes) {
+	public function attributeProductGeneralization($oProduct, $oCategory, $aNewAttributes, $aOldAttributes) {
 		global $modx;
 		/**
 		 * Получаем идентификаторы новых параметров 
@@ -278,7 +322,7 @@ class SBAttributeCollection {
 				 */
 				$aAttrIds = array();
 				foreach ($aNewAttributeIds as $iId) {
-					$aAttrIds[] = "($iProdId, $iId, '{$aNewAttributes[$iId]['value']}', '{$aNewAttributes[$iId]['measure']}')";
+					$aAttrIds[] = "({$oProduct->getAttribute('id')}, $iId, '{$aNewAttributes[$iId]['value']}', '{$aNewAttributes[$iId]['measure']}')";
 				}
 				$sAttrIds = implode(',',$aAttrIds);
 				$sql = 'INSERT INTO ' . $modx->getFullTableName('sbshop_product_attributes') . ' (`product_id`,`attribute_id`,`attribute_value`,`attribute_measure`) VALUES ' . $sAttrIds;
@@ -292,7 +336,7 @@ class SBAttributeCollection {
 			/**
 			 * Получение списка связей
 			 */
-			$rs = $modx->db->select('*',$modx->getFullTableName('sbshop_product_attributes'),'product_id = ' . $iProdId);
+			$rs = $modx->db->select('*',$modx->getFullTableName('sbshop_product_attributes'),'product_id = ' . $oProduct->getAttribute('id'));
 			$aBinds = $modx->db->makeArray($rs);
 			/**
 			 * Обрабатываем все связи и получаем список имеющихся параметров
@@ -322,7 +366,7 @@ class SBAttributeCollection {
 						/**
 						 * Значения не совпадают, поэтому их нужно обновить
 						 */
-						$modx->db->update(array('attribute_value'=>$aNewAttributes[$iId]['value']),$modx->getFullTableName('sbshop_product_attributes'),'product_id = ' . $iProdId . ' AND attribute_id = ' . $iId);
+						$modx->db->update(array('attribute_value'=>$aNewAttributes[$iId]['value']),$modx->getFullTableName('sbshop_product_attributes'),'product_id = ' . $oProduct->getAttribute('id') . ' AND attribute_id = ' . $iId);
 					}
 				}
 			}
@@ -337,7 +381,7 @@ class SBAttributeCollection {
 			if(count($aAttrIns) > 0) {
 				$aAttrIds = array();
 				foreach ($aAttrIns as $iId) {
-					$aAttrIds[] = "($iProdId, $iId, '{$aNewAttributes[$iId]['value']}', '{$aNewAttributes[$iId]['measure']}')";
+					$aAttrIds[] = "({$oProduct->getAttribute('id')}, $iId, '{$aNewAttributes[$iId]['value']}', '{$aNewAttributes[$iId]['measure']}')";
 				}
 				$sAttrIds = implode(',',$aAttrIds);
 				$sql = 'INSERT INTO ' . $modx->getFullTableName('sbshop_product_attributes') . ' (`product_id`,`attribute_id`,`attribute_value`, `attribute_measure`) VALUES ' . $sAttrIds;
@@ -352,18 +396,94 @@ class SBAttributeCollection {
 			 */
 			if(count($aAttrRemoved) > 0) {
 				$sAttrDel = implode(',',$aAttrRemoved);
-				$modx->db->delete($modx->getFullTableName('sbshop_product_attributes'),'product_id = ' . $iProdId . ' AND attribute_id in (' . $sAttrDel . ')');
+				$modx->db->delete($modx->getFullTableName('sbshop_product_attributes'),'product_id = ' . $oProduct->getAttribute('id') . ' AND attribute_id in (' . $sAttrDel . ')');
 			}
 		}
 		/**
-		 * Делаем обобщение для категории
+		 * Если ничего обновлять не требуется
 		 */
-		SBAttributeCollection::setAttributeCategoryGeneralization($iCatId,$aAttrIns,$aAttrRemoved);
+		if(count($aAttrIns) == 0 and count($aAttrRemoved) == 0) {
+			/**
+			 * Просто выходим
+			 */
+			return;
+		}
+		/**
+		 * задаем расширенные параметры для раздела
+		 */
+		$oCategory->setExtendAttributes($aNewAttributes);
+		/**
+		 * Совмещаем список параметров для последующего запроса в базу
+		 */
+		$aAttrIds = implode(',',array_merge($aAttrIns, $aAttrRemoved));
+		/**
+		 * Получаем имеющиеся данные об обобщенных параметрах
+		 */
+		$rs = $modx->db->select('*',$modx->getFullTableName('sbshop_category_attributes'),'category_id = ' . $oCategory->getAttribute('id') . ' and attribute_id in (' . $aAttrIds . ')');
+		$cnt = $modx->db->getRecordCount($rs);
+		/**
+		 * Формируем массив имеющихся параметров
+		 */
+		for($i=0; $i<$cnt; $i++) {
+			$aRow = $modx->db->getRow($rs);
+			$aAttrExisted[$aRow['attribute_id']] = $aRow;
+		}
+		/**
+		 * Обрабатываем каждый добавленный параметр
+		 */
+		foreach($aAttrIns as $iAttrId) {
+			/**
+			 * Если такой параметр уже есть в разделе
+			 */
+			if(isset($aAttrExisted[$iAttrId])) {
+				/**
+				 * Плюсуем счетчик
+				 */
+				$aUpd = array(
+					'attribute_count' => $aAttrExisted[$iAttrId]['attribute_count'] + 1
+				);
+				$modx->db->update($aUpd, $modx->getFullTableName('sbshop_category_attributes'), 'category_id = ' . $oCategory->getAttribute('id') . ' and attribute_id = ' . $iAttrId);
+			} else {
+				/**
+				 * Добавляем новый параметр
+				 */
+				$aIns = array(
+					'category_id' => $oCategory->getAttribute('id'),
+					'attribute_id' => $iAttrId,
+					'attribute_count' => 1,
+					'attribute_measure' => $aNewAttributes[$iAttrId]['measure'],
+					'attribute_type' => $aNewAttributes[$iAttrId]['type']
+				);
+				$modx->db->insert($aIns, $modx->getFullTableName('sbshop_category_attributes'));
+			}
+		}
+		/**
+		 * Обрабатываем все удаляемые параметры
+		 */
+		foreach($aAttrRemoved as $iAttrId) {
+			/**
+			 * Если такой параметр уже есть в разделе
+			 */
+			if(isset($aAttrExisted[$iAttrId]) and $aAttrExisted[$iAttrId]['attribute_count'] > 1) {
+				/**
+				 * Минусуем счетчик
+				 */
+				$aUpd = array(
+					'attribute_count' => $aAttrExisted[$iAttrId]['attribute_count'] - 1
+				);
+				$modx->db->update($aUpd, $modx->getFullTableName('sbshop_category_attributes'), 'category_id = ' . $oCategory->getAttribute('id') . ' and attribute_id = ' . $iAttrId);
+			} else {
+				/**
+				 * Удаляем параметр полностью
+				 */
+				$modx->db->delete($modx->getFullTableName('sbshop_category_attributes'), 'category_id = ' . $oCategory->getAttribute('id') . ' and attribute_id = ' . $iAttrId);
+			}
+		}
 	}
 	
 	/**
 	 * Получить список типичных параметров для указанной категории, отсортированный по частоте использования
-	 * @param unknown_type $iCatId
+	 * @param unknown_type $oCategory
 	 */
 	public function getAttributeCategoryTip($iCatId) {
 		global $modx;

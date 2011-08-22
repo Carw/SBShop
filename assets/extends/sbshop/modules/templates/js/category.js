@@ -21,7 +21,7 @@ filter_reinit = function() {
 
 $(document).ready(function(){
 	// задаем кнопки
-	$('button').button();
+	//$('button').button();
 
 	$('#docManagerPane .tab').click(function(){
 		if($('#tabFilter').css('display') == 'block') {
@@ -54,6 +54,26 @@ $(document).ready(function(){
 		} else {
 			a.find('.eqv').addClass('visible');
 		}
+		return false;
+	});
+
+	$('.new_attribute_add').click(function(){
+		/**
+		 * Определяем контейнер для параметров
+		 */
+		attr = $(this).parents('div.attribute_group').find('div.attribute_group_outer');
+		/**
+		 * Клонируем шаблон параметра
+		 */
+		a = $(".attribute_template").clone();
+		/**
+		 * Добавляем шаблон параметра в контейнер
+		 */
+		attr.append(a);
+
+		a.removeClass('attribute_template');
+		a.css('display','block');
+		
 		return false;
 	});
 

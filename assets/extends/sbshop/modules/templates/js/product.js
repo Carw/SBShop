@@ -1,40 +1,3 @@
-/**
- * Инициализация параметров
- */
-attributes_init = function(){
-	var stop = false;
-	$("#attributes h3").click(function(event) {
-		if (stop) {
-			event.stopImmediatePropagation();
-			event.preventDefault();
-			stop = false;
-		}
-	});
-
-	$("#attributes").accordion({
-		collapsible: true,
-		active: false,
-		autoHeight: true,
-		header: "> div > h3"
-	}).sortable({
-		axis: "y",
-		handle: "h3",
-		stop: function(event, ui) {
-			stop = true;
-		}
-	});
-
-	$("#attributes input.attribute_name").keyup(function(event){
-		$(this).parents('div').children('h3').children('a').text($(this).val());
-	});
-};
-
-// Реинициализация аккордиона
-attributes_reinit = function() {
-	$("#attributes").accordion('option','active',false);
-	$("#attributes").accordion('destroy');
-	attributes_init();
-};
 
 // Инициализация опций
 option_init = function(){
@@ -63,10 +26,6 @@ option_init = function(){
 	$("#options input.option_name").keyup(function(event){
 		$(this).parents('div').children('h3').children('a').text($(this).val());
 	});
-};
-
-option_value_init = function() {
-
 };
 
 // Инициализация комплектаций
@@ -113,9 +72,6 @@ bundle_reinit = function() {
 };
 
 $(document).ready(function(){
-	// задаем кнопки
-	$('button').button();
-
 	// обработка клика на кнопку добавления новой опции
 	$("#new_option_add").click(function(){
 		/**
@@ -234,43 +190,37 @@ $(document).ready(function(){
 		return false;
 	});
 
-	$('#new_attribute_add').click(function(){
+	$('.new_attribute_add').click(function(){
+		/**
+		 * Определяем контейнер для параметров
+		 */
+		attr = $(this).parents('div.attribute_group').find('div.attribute_group_outer');
 		/**
 		 * Клонируем шаблон параметра
 		 */
 		a = $(".attribute_template").clone();
-		a.appendTo('#attributes');
+		/**
+		 * Добавляем шаблон параметра в контейнер
+		 */
+		attr.append(a);
+
 		a.removeClass('attribute_template');
 		a.css('display','block');
-		/**
-		 * Изменяем заголовок на указанный
-		 */
-		if($('#new_attribute_name').val() != '') {
-			title = $('#new_attribute_name').val();
-			$('#new_attribute_name').val('');
-		} else {
-			title = attribute_name;
-		}
-		a.find(".ui-accordion-header").children().filter("a").text(title);
-		a.find('.attribute_name').val(title);
+
 		a.find('input.attribute_del').click(function(){
 			$(this).parents('div.attribute').remove();
-			attributes_reinit();
 			return false;
 		});
-		attributes_reinit();
 		return false;
 	});
 
 	$('.attribute_del').click(function(){
 		$(this).parents('div.attribute').remove();
-		attributes_reinit();
 		return false;
 	});
 
 	$('#docManagerPane .tab').click(function(){
 		if($('#tabAttributes').css('display') == 'block') {
-			attributes_reinit();
 			$('#attributes').css('visibility', 'visible');
 		} else if($('#tabOptions').css('display') == 'block') {
 			option_reinit();
@@ -282,7 +232,6 @@ $(document).ready(function(){
 	});
 
 	if($('#tabAttributes').css('display') == 'block') {
-		attributes_init();
 		$('#attributes').css('visibility', 'visible');
 	} else if($('#tabOptions').css('display') == 'block') {
 		option_init();

@@ -82,6 +82,7 @@ class prod_mode {
 					 * Устанавливаем категорию куда будет помещен товар
 					 */
 					$iCatId = intval($_REQUEST['catid']);
+					$this->oCategory->load($iCatId, true);
 					$this->oProduct->setAttribute('category',$iCatId);
 					/**
 					 * Выводим форму для создания категории
@@ -231,6 +232,12 @@ class prod_mode {
 		 * Дополнительные параметры
 		 */
 		$aAttributes = $this->oProduct->getExtendAttributes();
+		/**
+		 * Если дополнительных параметров нет, то получаем шаблон от раздела
+		 */
+		if(count($aAttributes) == 0) {
+			$aAttributes = $this->oCategory->getExtendAttributes();
+		}
 		/**
 		 * Обрабатываем каждый параметр
 		 */
@@ -438,9 +445,9 @@ class prod_mode {
 		 */
 		$this->oProduct->save();
 		/**
-		 * Делаем обобщение параметров
+		 * Делаем обобщение параметров для товара
 		 */
-		SBAttributeCollection::attributeProductGeneralization($this->oProduct->getAttribute('id'),$this->oProduct->getAttribute('category'),$this->oProduct->getExtendAttributes(),$this->oOldProduct->getExtendAttributes());
+		SBAttributeCollection::attributeProductGeneralization($this->oProduct, $this->oCategory, $this->oProduct->getExtendAttributes(), $this->oOldProduct->getExtendAttributes());
 	}
 
 	/**
@@ -653,7 +660,11 @@ class prod_mode {
 			/**
 			 * Делаем обобщение параметров
 			 */
-			SBAttributeCollection::attributeProductGeneralization($this->oProduct->getAttribute('id'),$this->oProduct->getAttribute('category'),$this->oProduct->getExtendAttributes(),$this->oOldProduct->getExtendAttributes());
+			SBAttributeCollection::attributeProductGeneralization($this->oProduct, $this->oCategory, $this->oProduct->getExtendAttributes(), $this->oOldProduct->getExtendAttributes());
+			/**
+			 * Сохраняем раздел
+			 */
+			$this->oCategory->save();
 			return true;
 		} else {
 			/**

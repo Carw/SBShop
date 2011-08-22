@@ -97,6 +97,7 @@
 	<span class="price">
 		<small>[+sb.quantity+] x</small> [+sb.price+] = <span class="summ">[+sb.summ+] руб</span>
 	</span>
+	[+sb.sku+]
 	<br>
 	[+sb.options+]
 </div>

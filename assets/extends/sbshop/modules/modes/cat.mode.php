@@ -183,8 +183,7 @@ class cat_mode {
 		/**
 		 * Подготавливаем плейсхолдеры данных модуля
 		 */
-		$aModule = $this->oCategory->getAttributes();
-		$phModule = $modx->sbshop->arrayToPlaceholders($aModule,'category.');
+		$phModule = $modx->sbshop->arrayToPlaceholders($this->oCategory->getAttributes(), 'category.');
 		/**
 		 * Специально устанавливаем плейсхолдер для галочки опубликованности
 		 */
@@ -214,6 +213,30 @@ class cat_mode {
 		//$aAttrTip = SBAttributeCollection::getAttributeCategoryTip($this->oCategory->getAttribute('parent'));
 		//$phModule['[+category.attribute_tips+]'] = 'Предлагаемые параметры: <ul><li>' . implode('</li><li>',$aAttrTip) . '</li></ul>';
 		/**
+		 * Список основных параметров
+		 */
+		$aAttributes = $this->oCategory->getAggregatedAttributes();
+		/**
+		 * Обрабатываем параметры
+		 */
+		foreach($aAttributes as $aAttribute) {
+			$aRepl = $modx->sbshop->arrayToPlaceholders($aAttribute,'attribute.');
+			/**
+			 * Добавляем плейсхолдер для различных типов параметров
+			 */
+			if($aAttribute['type'] == 'p') {
+				$aRepl['[+attribute.type.primary+]'] = 'selected="selected"';
+			} elseif ($aAttribute['type'] == 'h') {
+				$aRepl['[+attribute.type.hidden+]'] = 'selected="selected"';
+			} else {
+				$aRepl['[+attribute.type.normal+]'] = 'selected="selected"';
+			}
+			/**
+			 * Вставляем данные параметра в шаблон
+			 */
+			$phModule['[+sb.attributes+]'] .= str_replace(array_keys($aRepl), array_values($aRepl), $this->aTemplates['attribute_outer']);
+		}
+		/**
 		 * Получаем информацию об основных параметрах для фильтра
 		 */
 		$aFilterGeneral = array();
@@ -221,13 +244,9 @@ class cat_mode {
 			$aFilterGeneral[$modx->sbshop->lang['product_' . $sFilterName]] = $sFilterName;
 		}
 		/**
-		 * Список основных параметров
-		 */
-		$aFilterAttributes = $this->oCategory->getAggregatedAttributes();
-		/**
 		 * Сливаем все типы фильтров
 		 */
-		$aFilterNames = array_merge($aFilterGeneral, $aFilterAttributes);
+		$aFilterNames = array_merge($aFilterGeneral, array_flip(array_keys($aAttributes)));
 		/**
 		 * Обрабатываем каждое значение
 		 */
@@ -498,13 +517,13 @@ class cat_mode {
 				$this->oCategory->setAttribute('date_edit',date('Y-m-d G:i:s'));
 			}
 			/**
+			 * Делаем обобщение параметров
+			 */
+			SBAttributeCollection::attributeCategoryGeneralization($this->oCategory, $this->oCategory->getExtendAttributes(), $this->oOldCategory->getExtendAttributes());
+			/**
 			 * Снова сохраняем.
 			 */
 			$this->oCategory->save();
-			/**
-			 * Делаем обобщение параметров
-			 */
-			SBAttributeCollection::setAttributeCategoryGeneralization($this->oCategory->getAttribute('id'), $this->oCategory->getExtendAttributes(), $this->oOldCategory->getExtendAttributes());
 			return true;
 		} else {
 			/**
@@ -651,23 +670,39 @@ class cat_mode {
 		 */
 		$this->oCategory->setAttribute('description',$_POST['description']);
 		/**
-		 * Установка расширенных параметров
-		 */
-		$this->oCategory->setAttribute('attributes',$_POST['attributes']);
-		/**
 		 * Разбираем параметры
 		 */
-		if($_POST['attributes'] != '') {
+		$aAttributes = array();
+		if($_POST['attribute_name']) {
 			/**
-			 * Делаем десериализацию
+			 * Разбираем каждый параметр
 			 */
-			$this->oCategory->unserializeAttributes($_POST['attributes']);
-			/**
-			 * Актуализируем коллекцию параметров.
-			 * Передаем только названия
-			 */
-			SBAttributeCollection::setAttributeCollection(array_keys($this->oCategory->getExtendAttributes()));
+			$cntAttributes = count($_POST['attribute_name']);
+			for($i=0;$i<$cntAttributes;$i++) {
+				/**
+				 * Если название параметра не пусто
+				 */
+				if($_POST['attribute_name'][$i] !== '') {
+					if($_POST['attribute_type'][$i] == 'p') {
+						$sType = 'p';
+					} elseif ($_POST['attribute_type'][$i] == 'h') {
+						$sType = 'h';
+					} else {
+						$sType = 'n';
+					}
+					$aAttribute = array(
+						'title' => $_POST['attribute_name'][$i],
+						'measure' => $_POST['attribute_measure'][$i],
+						'type' => $sType,
+					);
+					$aAttributes[$_POST['attribute_name'][$i]] = $aAttribute;
+				}
+			}
 		}
+		/**
+		 * Устанавливаем дополнительные параметры
+		 */
+		$this->oCategory->setExtendAttributes($aAttributes);
 		/**
 		 * Если есть включенные фильтры
 		 */
