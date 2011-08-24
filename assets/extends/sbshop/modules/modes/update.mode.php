@@ -36,9 +36,22 @@ class update_mode {
 
 		$this->aProductOptions = array();
 
-		//$this->updateOptions(); // Обновление старых опций
-		//$this->updateAttributes(); // Обновление старых параметров
-
+		/**
+		 * Обновление старых опций
+		 * Переход от записи всех опций вручную к интерфейсу
+		 */
+		//$this->updateOptions();
+		/**
+		 * Обновление старых параметров
+		 * Переход от записи всех опций вручную к интерфейсу
+		 */
+		//$this->updateAttributes();
+		/**
+		 * Обновление параметров до версии 2011-08-22 в репозитории на http://github.com
+		 * Изменение формата хранения параметров для добавления группировки
+		 */
+		//$this->groupAttributes();
+		
 		echo '<p>Если вы ожидали, что здесь скрывается автоматическое обновление, то зря. Для работы необхожимо раскомментировать необходимую строку у режима модуля "update".</p>';
 
 	}
@@ -63,7 +76,7 @@ class update_mode {
 			 * Обновляем в базе данных
 			 */
 			if($modx->db->update(array('product_options' => $sOptions),$modx->getFullTableName('sbshop_products'),'product_id = ' . $aRaw['product_id'])) {
-				var_dump('Обновлены опции у товара: ' . $aRaw['product_id']);
+				echo('<pre>Обновлены опции у товара: ' . $aRaw['product_id'] . '</pre>');
 			}
 
 		}
@@ -211,7 +224,7 @@ class update_mode {
 				 * Обновляем в базе данных
 				 */
 				if($modx->db->update(array('product_attributes' => $sAttribites),$modx->getFullTableName('sbshop_products'),'product_id = ' . $aRaw['product_id'])) {
-					var_dump('Обновлены опции у товара: ' . $aRaw['product_id']);
+					echo('<pre>Обновлены опции у товара: ' . $aRaw['product_id'] . '</pre>');
 				}
 			}
 		}
@@ -306,6 +319,119 @@ class update_mode {
 		$sSql = "INSERT IGNORE INTO " . $modx->getFullTableName('sbshop_attributes') . ' (`attribute_name`) VALUES ' . implode(',',$aAttrKeys);
 		$modx->db->query($sSql);
 		return $aAttributes;
+	}
+
+	/**
+	 * Обновление параметров для добавления возможности группировки
+	 * Также происходит обобщение всех параметров и запись в раздел
+	 * @return void
+	 */
+	protected function groupAttributes() {
+		global $modx;
+		/**
+		 * Получаем данные о всех имеющихся разделах
+		 */
+		$rs = $modx->db->select('*', $modx->getFullTableName('sbshop_categories'));
+		$aCategoryRaws = $modx->db->makeArray($rs);
+		/**
+		 * Очищаем таблицу от старых данных
+		 */
+		$sSql = 'TRUNCATE TABLE  ' . $modx->getFullTableName('sbshop_category_attributes');
+		$modx->db->query($sSql);
+		/**
+		 * Обрабатываем каждый
+		 */
+		foreach ($aCategoryRaws as $aCategoryRaw) {
+			/**
+			 * Массив обобщенных параметров для раздела
+			 */
+			$aCategoryAttrs = array();
+			$aCategoryAgregateAttrs = array();
+			/**
+			 * Загружаем данные о товарах
+			 */
+			$rs = $modx->db->select('*', $modx->getFullTableName('sbshop_products'),'product_category = ' . $aCategoryRaw['category_id']);
+			$aProductRaws = $modx->db->makeArray($rs);
+			/**
+			 * Обрабатываем информацию по каждому товару
+			 */
+			foreach($aProductRaws as $aProductRaw) {
+
+				$aProductAttrs = unserialize(base64_decode($aProductRaw['product_attributes']));
+				//var_dump('<pre>',$aProductAttrs,'</pre>');
+				/**
+				 * Получаем идентификаторы
+				 */
+				$aProductAttrKeys = SBAttributeCollection::getAttributeIdsByNames(array_keys($aProductAttrs));
+				/**
+				 * Актуализируем информацию о каждом параметре
+				 */
+				foreach ($aProductAttrs as $aProductAttr) {
+					/**
+					 * Данные для таблицы
+					 */
+					$sTitle = $aProductAttr['title'];
+
+					$aCategoryAttrs[$sTitle] = array(
+						'category_id' => $aCategoryRaw['category_id'],
+						'attribute_id' => $aProductAttrKeys[$sTitle],
+						'attribute_count' => $aCategoryAttrs[$sTitle]['attribute_count'] + 1,
+						'attribute_measure' => $aProductAttr['measure'],
+						'attribute_type' => $aProductAttr['type']
+					);
+					/**
+					 * Данные записываемые в раздел
+					 */
+					$aCategoryAgregateAttrs[$sTitle] = array(
+						'title' => $sTitle,
+						'count' => $aCategoryAttrs[$sTitle]['attribute_count'],
+						'measure' => $aCategoryAttrs[$sTitle]['attribute_measure'],
+						'type' => $aCategoryAttrs[$sTitle]['attribute_type'],
+					);
+				}
+				/**
+				 * Готовим локальную информацию об обобщении для товара
+				 */
+				$aUpd = array(
+					'groups' => array(),
+					'attributes' => $aProductAttrs
+				);
+				$sUpd = base64_encode(serialize($aUpd));
+				/**
+				 * Обновляем
+				 */
+				if($modx->db->update(array('product_attributes' => $sUpd), $modx->getFullTableName('sbshop_products'), 'product_id = ' . $aProductRaw['product_id'])) {
+					echo('<pre> * Товар "' . $aProductRaw['product_id'] . '" успешно обновлен.</pre>');
+				}
+			}
+			/**
+			 * Готовим локальную информацию об обобщении для раздела
+			 */
+			$aUpd = array(
+				'groups' => array(),
+				'attributes' => $aCategoryAgregateAttrs
+			);
+			$sUpd = base64_encode(serialize($aUpd));
+			/**
+			 * Обновляем
+			 */
+			if($modx->db->update(array('category_attributes' => $sUpd), $modx->getFullTableName('sbshop_categories'), 'category_id = ' . $aCategoryRaw['category_id'])) {
+				/**
+				 * Готовим данные для вставки в таблицу
+				 */
+				foreach ($aCategoryAttrs as $aCategoryAttr) {
+					$aIns[] = "({$aCategoryAttr['category_id']}, {$aCategoryAttr['attribute_id']}, {$aCategoryAttr['attribute_count']}, '{$aCategoryAttr['attribute_measure']}', '{$aCategoryAttr['attribute_type']}')";
+				}
+				/**
+				 * Вставляем
+				 */
+				$sIns = implode(',',$aIns);
+				$sql = 'INSERT INTO ' . $modx->getFullTableName('sbshop_category_attributes') . ' (`category_id`,`attribute_id`, `attribute_count`,`attribute_measure`,`attribute_type`) VALUES ' . $sIns;
+				if($modx->db->query($sql)) {
+					echo('<pre>Раздел "' . $aCategoryRaw['category_title'] . '" успешно обновлен.</pre>');
+				}
+			}
+		}
 	}
 
 }

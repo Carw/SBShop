@@ -20,10 +20,13 @@ class SBAttributeList {
 	 */
 	public function __construct() {
 		/**
-		 * Инициализируем
+		 * Массив параметров
 		 */
 		$this->aAttributes = array();
-		
+		/**
+		 * Массив групп
+		 */
+		$this->aGroups = array();
 	}
 	
 	/**
@@ -182,9 +185,17 @@ class SBAttributeList {
 	 */
 	public function serializeAttributes() {
 		/**
-		 * Возвращаем результат
+		 * Объединенный массив с данными о параметрах и группировки
 		 */
-		return base64_encode(serialize($this->aAttributes));
+		$aData = array(
+			'attributes' => $this->aAttributes,
+			'groups' => $this->aGroups
+		);
+		/**
+		 * Возвращаем результат
+		 * todo добавить массив
+		 */
+		return base64_encode(serialize($aData));
 	}
 	
 	/**
@@ -204,9 +215,13 @@ class SBAttributeList {
 		 */
 		$aParams = unserialize(base64_decode($sParams));
 		/**
-		 * Устанавливаем
+		 * Устанавливаем параметры
 		 */
-		$this->aAttributes = $aParams;
+		$this->aAttributes = $aParams['attributes'];
+		/**
+		 * Устанавливаем информацию о группировке
+		 */
+		$this->aGroups = $aParams['groups'];
 		/**
 		 * Возвращаем результат
 		 */
