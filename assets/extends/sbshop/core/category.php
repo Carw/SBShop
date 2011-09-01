@@ -17,6 +17,7 @@ class SBCategory {
 	protected $aCategoryDataKeys;
 	protected $oCategoryExtendData;
 	protected $oFilterList;
+	protected $oOptions; // Опции раздела
 	
 	/**
 	 * Конструктор
@@ -42,6 +43,7 @@ class SBCategory {
 			'order' => null, // позиция раздела
 			'parent' => null, // родительский раздел
 			'alias' => null, // псевдоним
+			'options' => null, // опции
 			'path' => null, // путь раздела
 			'level' => null, // уровень вложенности
 			'url' => null, // URL раздела
@@ -58,6 +60,10 @@ class SBCategory {
 		 * Инициализация фильтров
 		 */
 		$this->oFilterList = new SBFilterList();
+		/**
+		 * Опции
+		 */
+		$this->oOptions = new SBOptionList();
 		/**
 		 * Устанавливаем параметры товара по переданному массиву
 		 */
@@ -83,11 +89,16 @@ class SBCategory {
 					
 					$this->aCategoryData[$sKey] = $sVal;
 				}
-				if($sKey == 'attributes') {
-					$this->unserializeAttributes($sVal);
-				}
-				if($sKey == 'filters') {
-					$this->unserializeFilters($sVal);
+				switch ($sKey) {
+					case 'attributes':
+						$this->unserializeAttributes($sVal);
+					break;
+					case 'filters':
+						$this->unserializeFilters($sVal);
+					break;
+					case 'options':
+						$this->oOptions->unserializeOptions($sVal);
+					break;
 				}
 			}
 		}
@@ -113,6 +124,20 @@ class SBCategory {
 
 	public function addFilter($aFilter, $aValues) {
 		return $this->oFilterList->add($aFilter, $aValues);
+	}
+
+	/**
+	 * Получение списка опций
+	 */
+	public function getOptionNames() {
+		return $this->oOptions->getOptionNames();
+	}
+
+	/**
+	 * Получение списка значений опций
+	 */
+	public function getValuesByOptionName($sName) {
+		return $this->oOptions->getValuesByOptionName($sName);
 	}
 
 	/**
@@ -194,7 +219,7 @@ class SBCategory {
 					'count' => $aRow['attribute_count'],
 					'measure' => $aRow['attribute_measure'],
 					'type' => $aRow['attribute_type'],
-					'name' => $aRow['attribute_name']
+					'title' => $aRow['attribute_name']
 				);
 			}
 		}
@@ -289,6 +314,10 @@ class SBCategory {
 			 * Подготавливаем дополнительные параметры
 			 */
 			$this->unserializeAttributes($this->aCategoryData['attributes']);
+			/**
+			 * Опции
+			 */
+			$this->oOptions->unserializeOptions($this->aCategoryData['options']);
 			/**
 			 * Фильтры
 			 */

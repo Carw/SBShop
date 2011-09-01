@@ -30,7 +30,7 @@ class SBOptionList {
 		if(count($this->aOptionList) > 0) {
 			foreach ($this->aOptionList as $aOption) {
 				unset($aOption['values']);
-				$aNames[] = $aOption;
+				$aNames[$aOption['title']] = $aOption;
 			}
 		}
 		return $aNames;

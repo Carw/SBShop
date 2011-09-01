@@ -223,12 +223,6 @@ class prod_mode {
 		$phModule['[+module.link+]'] = $this->sModuleLink;
 		$phModule['[+module.act+]'] = $this->sAct;
 		/**
-		 * Подготавливаем плейсхолдеры вспомогательного список параметров
-		 * XXX: Предстоит переделать
-		 */
-		$aAttrTip = SBAttributeCollection::getAttributeCategoryTip($this->oProduct->getAttribute('category'));
-		$phModule['[+category.attribute_tips+]'] = 'Предлагаемые параметры: <ul><li>' . implode('</li><li>',$aAttrTip) . '</li></ul>';
-		/**
 		 * Дополнительные параметры
 		 */
 		$aAttributes = $this->oProduct->getExtendAttributes();

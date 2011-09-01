@@ -113,9 +113,16 @@ class product_mode {
 		 */
 		$sOptions = '';
 		/**
-		 * Обрабатываем все опции
+		 * Получаем опции товара
 		 */
 		$aOptions = $modx->sbshop->oGeneralProduct->getOptionNames();
+		/**
+		 * Опции раздела
+		 */
+		$aGeneralOptions = $modx->sbshop->oGeneralCategory->getOptionNames();
+		/**
+		 * Обрабатываем каждую опцию
+		 */
 		foreach ($aOptions as $aOption) {
 			/**
 			 * Если опция не является скрытой
@@ -131,6 +138,18 @@ class product_mode {
 				if($aOption['image']) {
 					$aOption['image.url'] = $aOption['image'];
 					$aOption['image'] = '<img src="' . $aOption['image'] . '">';
+				} elseif($aGeneralOptions[$aOption['title']]['image']) {
+					/**
+					 * Наследование изображения от раздела
+					 */
+					$aOption['image.url'] = $aGeneralOptions[$aOption['title']]['image'];
+					$aOption['image'] = '<img src="' . $aGeneralOptions[$aOption['title']]['image'] . '">';
+				}
+				/**
+				 * Если не указан класс и есть данные у раздела
+				 */
+				if(!$aOption['class'] && $aGeneralOptions[$aOption['title']]['class']) {
+					$aOption['class'] = $aGeneralOptions[$aOption['title']]['class'];
 				}
 				/**
 				 * Массив значений
@@ -195,10 +214,16 @@ class product_mode {
 					$aReplTip = array(
 						'[+sb.id+]' => $aOption['tip'],
 					);
-					$aReplOpt['[+sb.option.tip+]'] = str_replace(array_keys($aReplTip), array_values($aReplTip), $this->aTemplates['option_tip']);
+					$sReplOpt = str_replace(array_keys($aReplTip), array_values($aReplTip), $this->aTemplates['option_tip']);
+				} elseif ($aGeneralOptions[$aOption['title']]['tip']) {
+					$aReplTip = array(
+						'[+sb.id+]' => $aGeneralOptions[$aOption['title']]['tip'],
+					);
+					$sReplOpt = str_replace(array_keys($aReplTip), array_values($aReplTip), $this->aTemplates['option_tip']);
 				} else {
-					$aReplOpt['[+sb.option.tip+]'] = "";
+					$sReplOpt = "";
 				}
+				$aReplOpt['[+sb.option.tip+]'] = $sReplOpt;
 				/**
 				 * Если значение одно
 				 */
@@ -412,9 +437,32 @@ class product_mode {
 			$aReplBlocks['[+sb.base_bundle+]'] = str_replace('[+sb.bundle.options+]', $sBaseBundleRepl, $this->aTemplates['multi_bundle_base']);
 		}
 		/**
-		 * Получаем набор характеристик
+		 * Получаем набор параметров товара
 		 */
 		$aAttributes = $modx->sbshop->oGeneralProduct->getExtendVisibleAttributes();
+		/**
+		 * Получаем набор ключей параметров раздела
+		 */
+		$aGeneralAttributes = array_keys($modx->sbshop->oGeneralCategory->getExtendAttributes());
+		/**
+		 * Массив отсортированных параметров
+		 */
+		$aGeneralOrderAttrubutes = array();
+		/**
+		 * Обрабатываем каждый параметр раздела
+		 */
+		foreach ($aGeneralAttributes as $sKey) {
+			/**
+			 * Если параметр входит в список раздела
+			 */
+			if(isset($aAttributes[$sKey])) {
+				$aGeneralOrderAttrubutes[$sKey] = $aAttributes[$sKey];
+			}
+		}
+		/**
+		 * Обновляем массив параметров
+		 */
+		$aAttributes = $aGeneralOrderAttrubutes;
 		/**
 		 * Ряды значений
 		 */

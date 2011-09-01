@@ -57,8 +57,22 @@ div.sectionHeader {
     margin: 15px;
 }
 
+.dragHandle {
+    width: 13px;
+    background: url("images/draghandle.gif") no-repeat 0 5px;
+}
+
+.sorttable td {
+    margin: 0;
+    padding: 0;
+}
+
+.sorttable .dragHandle:hover {
+    cursor: move;
+}
+
 .attribute {
-    margin: 7px 0;
+    margin: 3px 0;
 }
 
 #attributes input {
@@ -71,7 +85,7 @@ div.sectionHeader {
     padding: 3px 3px 3px 5px;
 }
 
-#attributes input.attribute_name {
+#attributes input.attribute_title {
     width: 200px;
 }
 

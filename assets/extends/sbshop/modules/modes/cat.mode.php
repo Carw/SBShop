@@ -207,15 +207,9 @@ class cat_mode {
 		$phModule['[+module.link+]'] = $this->sModuleLink;
 		$phModule['[+module.act+]'] = $this->sAct;
 		/**
-		 * Подготавливаем плейсхолдеры вспомогательного список параметров
-		 * @todo: Предстоит переделать
-		 */
-		//$aAttrTip = SBAttributeCollection::getAttributeCategoryTip($this->oCategory->getAttribute('parent'));
-		//$phModule['[+category.attribute_tips+]'] = 'Предлагаемые параметры: <ul><li>' . implode('</li><li>',$aAttrTip) . '</li></ul>';
-		/**
 		 * Список основных параметров
 		 */
-		$aAttributes = $this->oCategory->getAggregatedAttributes();
+		$aAttributes = $this->oCategory->getExtendAttributes();
 		/**
 		 * Обрабатываем параметры
 		 */
@@ -236,6 +230,42 @@ class cat_mode {
 			 */
 			$phModule['[+sb.attributes+]'] .= str_replace(array_keys($aRepl), array_values($aRepl), $this->aTemplates['attribute_outer']);
 		}
+		/**
+		 * Массив для рядов опций
+		 */
+		$aOptions = array();
+		/**
+		 * Получаем список опций
+		 */
+		$aOptionList = $this->oCategory->getOptionNames();
+		/**
+		 * Обрабатываем каждую опцию
+		 */
+		$iOptionCnt = 0;
+		foreach ($aOptionList as $sKey => $aOption) {
+			/**
+			 * Готовим плейсхолдеры
+			 */
+			$aRepl = $modx->sbshop->arrayToPlaceholders($aOption,'option.');
+			$aRepl['[+option.key+]'] = $iOptionCnt;
+			/**
+			 * Увеличиваем счетчик
+			 */
+			$iOptionCnt++;
+			/**
+			 * Если установлена подсказка
+			 */
+			if($aOption['tip']) {
+				$oTip = new SBTip();
+				$oTip->load($aOption['tip']);
+				$aRepl = array_merge($aRepl,$modx->sbshop->arrayToPlaceholders($oTip->getAttributes(),'option.tip.'));
+			}
+			/**
+			 * Вставляем в шаблон
+			 */
+			$aOptions[] = str_replace(array_keys($aRepl), array_values($aRepl), $this->aTemplates['option_outer']);
+		}
+		$phModule['[+options+]'] = implode('', $aOptions);
 		/**
 		 * Получаем информацию об основных параметрах для фильтра
 		 */
@@ -691,7 +721,7 @@ class cat_mode {
 						$sType = 'n';
 					}
 					$aAttribute = array(
-						'title' => $_POST['attribute_name'][$i],
+						'title' => $_POST['attribute_title'][$i],
 						'measure' => $_POST['attribute_measure'][$i],
 						'type' => $sType,
 					);
@@ -703,6 +733,87 @@ class cat_mode {
 		 * Устанавливаем дополнительные параметры
 		 */
 		$this->oCategory->setExtendAttributes($aAttributes);
+		/**
+		 * Если установлены опции
+		 */
+		if($_POST['option_id'] != '') {
+			/**
+			 * Объект управления опциями
+			 */
+			$oOptions = new SBOptionList();
+			/**
+			 * Обрабатываем каждую полученную запись
+			 */
+			$cntOptions = count($_POST['option_id']);
+			for($i=0;$i<$cntOptions;$i++) {
+				/**
+				 * Создаем объект подсказки
+				 */
+				$oTip = new SBTip();
+				/**
+				 * Если в содержимом заметки первый символ ">"
+				 */
+				if(substr($_POST['option_tip_description'][$i], 0, 1) !== '>') {
+					/**
+					 * Данные заметки
+					 */
+					$aTipData = array(
+						'id' => intval($_POST['option_tip_id'][$i]),
+						'title' => $_POST['option_tip_title'][$i],
+						'description' => $_POST['option_tip_description'][$i]
+					);
+					/**
+					 * Устанавливаем данные
+					 */
+					$oTip->setAttributes($aTipData);
+					/**
+					 * Сохраняем заметку
+					 */
+					$oTip->save();
+				} else {
+					/**
+					 * Дальше идет идентификатор
+					 */
+					$iTipId = intval(substr($_POST['option_tip_description'][$i], 1));
+					/**
+					 * Устанавливаем указанный идентификатор. Мы верим, что менеджер вменяемый и ничего проверять не будем.
+					 */
+					$oTip->setAttribute('id', $iTipId);
+				}
+				/**
+				 * Данные опции
+				 */
+				$aOptionData = array(
+					'title' => $_POST['option_name'][$i],
+					'class' => $_POST['option_class'][$i],
+					'image' => $_POST['option_image'][$i],
+					/**
+					 * Записываем в опцию идентификатор подсказки
+					 */
+					'tip' => $oTip->getAttribute('id'),
+				);
+				/**
+				 * Массив значений
+				 */
+				$aValues = array();
+				/**
+				 * Добавляем опцию со значениями
+				 */
+				$oOptions->add($aOptionData,$aValues);
+			}
+			/**
+			 * Делаем обобщение значений
+			 */
+			$oOptions->optionGeneralization();
+			/**
+			 * Сериализуем
+			 */
+			$sOptions = $oOptions->serializeOptions();
+			/**
+			 * Устанавливаем строку для товара
+			 */
+			$this->oCategory->setAttribute('options',$sOptions);
+		}
 		/**
 		 * Если есть включенные фильтры
 		 */

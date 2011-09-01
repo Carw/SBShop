@@ -357,6 +357,10 @@ class categories_mode {
 				$aProductGroups = array($aProducts);
 			}
 			/**
+			 * Получаем набор ключей параметров раздела
+			 */
+			$aGeneralAttributes = array_keys($modx->sbshop->oGeneralCategory->getExtendAttributes());
+			/**
 			 * Массив групп
 			 */
 			$aGroupRows = array();
@@ -391,9 +395,28 @@ class categories_mode {
 						$aRepl['[+sb.existence+]'] = $modx->sbshop->lang['product_notexistence_title'];
 					}
 					/**
-					 * Получаем набор характеристик
+					 * Получаем набор параметров товара
 					 */
 					$aAttributes = $oProduct->getExtendPrimaryAttributes();
+					/**
+					 * Массив отсортированных параметров
+					 */
+					$aGeneralOrderAttrubutes = array();
+					/**
+					 * Обрабатываем каждый параметр раздела
+					 */
+					foreach ($aGeneralAttributes as $sKey) {
+						/**
+						 * Если параметр входит в список раздела
+						 */
+						if(isset($aAttributes[$sKey])) {
+							$aGeneralOrderAttrubutes[$sKey] = $aAttributes[$sKey];
+						}
+					}
+					/**
+					 * Обновляем массив параметров
+					 */
+					$aAttributes = $aGeneralOrderAttrubutes;
 					/**
 					 * Ряды значений
 					 */
