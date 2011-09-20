@@ -703,16 +703,16 @@ class cat_mode {
 		 * Разбираем параметры
 		 */
 		$aAttributes = array();
-		if($_POST['attribute_name']) {
+		if($_POST['attribute_title']) {
 			/**
 			 * Разбираем каждый параметр
 			 */
-			$cntAttributes = count($_POST['attribute_name']);
+			$cntAttributes = count($_POST['attribute_title']);
 			for($i=0;$i<$cntAttributes;$i++) {
 				/**
 				 * Если название параметра не пусто
 				 */
-				if($_POST['attribute_name'][$i] !== '') {
+				if($_POST['attribute_title'][$i] !== '') {
 					if($_POST['attribute_type'][$i] == 'p') {
 						$sType = 'p';
 					} elseif ($_POST['attribute_type'][$i] == 'h') {
@@ -725,7 +725,7 @@ class cat_mode {
 						'measure' => $_POST['attribute_measure'][$i],
 						'type' => $sType,
 					);
-					$aAttributes[$_POST['attribute_name'][$i]] = $aAttribute;
+					$aAttributes[$_POST['attribute_title'][$i]] = $aAttribute;
 				}
 			}
 		}
@@ -863,9 +863,9 @@ class cat_mode {
 									);
 								}
 							} else {
-								$aValues[mb_strtolower($_POST['filter_value_eqv'][$sKey][$iValueId])] = array(
+								$aValues[mb_strtolower($_POST['filter_value_eqv'][$sKey][$iValueId], 'UTF-8')] = array(
 									'title' => $sValueTitle,
-									'eqv' => mb_strtolower($_POST['filter_value_eqv'][$sKey][$iValueId]),
+									'eqv' => mb_strtolower($_POST['filter_value_eqv'][$sKey][$iValueId], 'UTF-8'),
 								);
 							}
 						}

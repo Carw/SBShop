@@ -120,7 +120,7 @@ class filter_mode {
 						 */
 						$aFilters = array();
 						foreach($aFilterURL as $sFilterKey => $sFilterValue) {
-							$aFilters[] = $sFilterKey . '::' . $sFilterValue;
+							$aFilters[] = $sFilterKey . '::' . urlencode($sFilterValue);
 						}
 						$sFilterLink = '?filter=' . implode(';', $aFilters);
 					} else {
@@ -130,7 +130,7 @@ class filter_mode {
 					if($aFilterValueId === 'all') {
 						$sFilterLink = '';
 					} else {
-						$sFilterLink = '?filter=' . $sFilterId . '::' . $aFilterValueId;
+						$sFilterLink = '?filter=' . $sFilterId . '::' . urlencode($aFilterValueId);
 					}
 				}
 				/**

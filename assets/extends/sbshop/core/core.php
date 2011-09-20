@@ -302,7 +302,17 @@ class SBShop {
 		/**
 		 * Текущий URL со всеми параметрами
 		 */
-		$aCurrentUrl = parse_url($_SERVER['REQUEST_URI']);
+		$sCurrentUrl = urldecode($_SERVER['REQUEST_URI']);
+		/**
+		 * Некоторые браузеры считают себя умнее других и отправляют все в win1251. Придется добавить кастыль. Надеюсь, что проблем с ним не будет.
+		 */
+		if(!preg_match('#.#u', $sCurrentUrl)) {
+			$sCurrentUrl = iconv("Windows-1251", "UTF-8", $sCurrentUrl);
+		}
+		/**
+		 * Разбираем
+		 */
+		$aCurrentUrl = parse_url($sCurrentUrl);
 		/**
 		 * Параметры запроса
 		 */

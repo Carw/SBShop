@@ -56,8 +56,10 @@
 		<input type="hidden" name="sb_order_add" value="[+sb.id+]">
 		<input type="hidden" name="sbprod[quantity]" value="1">
 		<input type="hidden" name="baseprice" value="[+sb.price+]" />
-		[+sb.base_bundle+]
-		[+sb.bundles+]
+		<div class="bundles" id="bundles">
+			[+sb.base_bundle+]
+			[+sb.bundles+]
+		</div>
 		[+sb.options+]
 		<div class="summary">
 			<div>

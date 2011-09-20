@@ -1,73 +1,25 @@
 
 // Инициализация опций
 option_init = function(){
-	var stop = false;
-	$("#options h3").click(function(event) {
-		if (stop) {
-			event.stopImmediatePropagation();
-			event.preventDefault();
-			stop = false;
-		}
-	});
-
-	$("#options").accordion({
-		collapsible: true,
-		active: false,
-		autoHeight: true,
-		header: "> div > h3"
-	}).sortable({
-		axis: "y",
-		handle: "h3",
-		stop: function(event, ui) {
-			stop = true;
-		}
-	});
-
 	$("#options input.option_name").keyup(function(event){
-		$(this).parents('div').children('h3').children('a').text($(this).val());
+		$(this).parents('tr.content').prev('tr.option_header').find('h3.title').text($(this).val());
 	});
 };
 
 // Инициализация комплектаций
 bundle_init = function(){
-	var stop = false;
-	$("#bundles h3").click(function(event) {
-		if (stop) {
-			event.stopImmediatePropagation();
-			event.preventDefault();
-			stop = false;
-		}
-	});
-
-	$("#bundles").accordion({
-		collapsible: true,
-		active: false,
-		autoHeight: true,
-		header: "> div > h3"
-	}).sortable({
-		axis: "y",
-		handle: "h3",
-		stop: function(event, ui) {
-			stop = true;
-		}
-	});
-
 	$("#bundles input.bundle_name").keyup(function(event){
-		$(this).parents('div').children('h3').children('a').text($(this).val());
+		$(this).parents('tr.content').prev('tr.bundle_header').find('h3.title').text($(this).val());
 	});
 };
 
 // Реинициализация аккордиона
 option_reinit = function() {
-	$("#options").accordion('option','active',false);
-	$("#options").accordion('destroy');
 	option_init();
 };
 
 // Реинициализация аккордиона
 bundle_reinit = function() {
-	$("#bundles").accordion('option','active',false);
-	$("#bundles").accordion('destroy');
 	bundle_init();
 };
 
@@ -77,10 +29,8 @@ $(document).ready(function(){
 		/**
 		 * Клонируем шаблон опции
 		 */
-		a = $(".option_template").clone();
-		a.appendTo('#options');
-		a.removeClass('option_template');
-		a.css('display','block');
+		a = $(".option_template .option").clone();
+		a.appendTo('#options .fastlist');
 		/**
 		 * Изменяем заголовок на указанный
 		 */
@@ -90,19 +40,33 @@ $(document).ready(function(){
 		} else {
 			title = option_name;
 		}
-		a.find(".ui-accordion-header").children().filter("a").text(title);
+		a.find("h3.title").text(title);
 		a.find('.option_name').val(title);
 		a.find('input.option_del').click(function(){
-			$(this).parents('div.option').remove();
+			$(this).parents('tr.option').remove();
 			option_reinit();
 			return false;
+		});
+		a.find('h3.title').click(function(){
+			elem = $(this).parents('tr.option_header').next();
+			if(elem.hasClass('visible')) {
+				elem.removeClass('visible');
+			} else {
+				elem.addClass('visible');
+			}
+		});
+		$('#options .sorttable').tableDnD({
+			dragHandle: "dragHandle"
 		});
 		option_reinit();
 		return false;
 	});
 
 	$('.option_del').click(function(){
-		$(this).parents('div.option').remove();
+		/**
+		 * Основное элемент
+		 */
+		$(this).parents('tr.option').remove();
 		option_reinit();
 		return false;
 	});
@@ -165,10 +129,8 @@ $(document).ready(function(){
 		/**
 		 * Клонируем шаблон комплектации
 		 */
-		a = $(".bundle_template").clone();
-		a.appendTo('#bundles');
-		a.removeClass('bundle_template');
-		a.css('display','block');
+		a = $(".bundle_template .bundle").clone();
+		a.appendTo('#bundles .fastlist');
 		/**
 		 * Изменяем заголовок на указанный
 		 */
@@ -178,14 +140,30 @@ $(document).ready(function(){
 		} else {
 			title = bundle_name;
 		}
-		a.find(".ui-accordion-header").children().filter("a").text(title);
+		a.find("h3.title").text(title);
 		a.find('.bundle_name').val(title);
+		a.find('input.bundle_del').click(function(){
+			$(this).parents('tr.bundle').remove();
+			bundle_reinit();
+			return false;
+		});
+		a.find("h3.title").click(function(){
+			elem = $(this).parents('tr.bundle_header').next();
+			if(elem.hasClass('visible')) {
+				elem.removeClass('visible');
+			} else {
+				elem.addClass('visible');
+			}
+		});
+		$('#bundles .sorttable').tableDnD({
+			dragHandle: "dragHandle"
+		});
 		bundle_reinit();
 		return false;
 	});
 
 	$('.bundle_del').click(function(){
-		$(this).parents('div.bundle').remove();
+		$(this).parents('tr.bundle').remove();
 		bundle_reinit();
 		return false;
 	});
@@ -250,6 +228,28 @@ $(document).ready(function(){
 		$('#' + tipId).val('');
 		$('#info_' + tipId).html(tipVal);
 		return false;
+	});
+	
+	$('#options .option_header h3').click(function(){
+		elem = $(this).parents('tr.option_header').next();
+		if(elem.hasClass('visible')) {
+			elem.removeClass('visible');
+		} else {
+			elem.addClass('visible');
+		}
+	});
+
+	$('#bundles .bundle_header h3').click(function(){
+		elem = $(this).parents('tr.bundle_header').next();
+		if(elem.hasClass('visible')) {
+			elem.removeClass('visible');
+		} else {
+			elem.addClass('visible');
+		}
+	});
+
+	$('.sorttable').tableDnD({
+		dragHandle: "dragHandle"
 	});
 
 });

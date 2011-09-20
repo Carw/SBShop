@@ -4,6 +4,10 @@ body, td {
 	line-height: 1.5;
 }
 
+td {
+    vertical-align: top;
+}
+
 div.sectionHeader {
 	margin-top: 10px;
 	padding-left: 10px;
@@ -58,8 +62,8 @@ div.sectionHeader {
 }
 
 .dragHandle {
-    width: 13px;
-    background: url("images/draghandle.gif") no-repeat 0 5px;
+    width: 16px;
+    background: url("images/draghandle.gif") no-repeat 3 4px;
 }
 
 .sorttable td {
@@ -76,12 +80,10 @@ div.sectionHeader {
 }
 
 #attributes input {
-    font-size: 10px;
     padding: 3px 5px;
 }
 
 #attributes select {
-    font-size: 10px;
     padding: 3px 3px 3px 5px;
 }
 
@@ -97,7 +99,7 @@ div.sectionHeader {
     width: 150px;
 }
 
-#attributes .new_attribute_add {
+.button_add {
     padding: 0 0 0 18px;
     border: 0;
     background: url(images/add.png) no-repeat;
@@ -110,7 +112,7 @@ div.sectionHeader {
     opacity: 0.8;
 }
 
-#attributes .new_attribute_add:hover {
+.button_add:hover {
     opacity: 1;
 }
 
@@ -169,6 +171,26 @@ select {
 	opacity: 1;
 }
 
+.option_value_add {
+    margin: 5px 0 0 0;
+}
+
+.fastlist .content {
+    display: none;
+}
+
+.fastlist .content.visible {
+    display: table-row;
+}
+
+.fastlist .content td {
+    padding: 9px;
+}
+
+.fastlist .actions {
+    padding: 0 9px;
+}
+
 .values .rng, .values .eqv {
 	display: none;
 }
@@ -183,6 +205,59 @@ select {
 
 #options .option_del:hover, #attributes .attribute_del:hover, #bundles .bundle_del:hover {
 	opacity: 1;
+}
+
+#new_option_name, #new_bundle_name {
+    width: 200px !important;
+    padding: 3px 5px;
+    margin-left: 16px;
+}
+
+.option_bundle_personal {
+    margin-left: 16px;
+}
+
+.fastlist .dragHandle div {
+    /*padding: 0;*/
+	line-height: 28px;
+	font-size: 12px;
+	color: #6d6d6d;
+}
+
+.fastlist, .fastlist .inner {
+    margin: 0 0 8px 0;
+    padding: 0;
+    border-spacing: 0;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.fastlist .inner tr {
+    padding: 0 9px;
+	background: #EFEFEF url(images/fade.gif) repeat-x top;
+	border: 1px solid #b2baba;
+	line-height: 28px;
+	font-size: 12px;
+	color: #6d6d6d;
+}
+
+.fastlist .inner td.header {
+    padding: 5px 9px;
+}
+
+.fastlist .inner td.header h3 {
+    margin: 0;
+    font-size: 14px;
+    color: #1A32C7;
+    border-bottom: 1px dashed #1A32C7;
+    line-height: 14px;
+    cursor: pointer;
+    display: inline;
+}
+
+.fastlist .inner td.header h3:hover {
+    color: #0f1e76;
+    border-bottom: 1px dashed #0f1e76;
 }
 
 .extend {

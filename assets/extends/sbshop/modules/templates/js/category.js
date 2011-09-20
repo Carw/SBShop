@@ -1,68 +1,27 @@
 // Инициализация опций
 option_init = function(){
-	var stop = false;
-	$("#options h3").click(function(event) {
-		if (stop) {
-			event.stopImmediatePropagation();
-			event.preventDefault();
-			stop = false;
-		}
-	});
-
-	$("#options").accordion({
-		collapsible: true,
-		active: false,
-		autoHeight: true,
-		header: "> div > h3"
-	}).sortable({
-		axis: "y",
-		handle: "h3",
-		stop: function(event, ui) {
-			stop = true;
-		}
-	});
-
 	$("#options input.option_name").keyup(function(event){
-		$(this).parents('div').children('h3').children('a').text($(this).val());
+		$(this).parents('tr.content').prev('tr.option_header').find('h3.title').text($(this).val());
 	});
 };
 
 // Реинициализация аккордиона
 option_reinit = function() {
-	$("#options").accordion('option','active',false);
-	$("#options").accordion('destroy');
 	option_init();
 };
 
 filter_init = function() {
-	$("#filter").accordion({
-		collapsible: true,
-		active: false,
-		autoHeight: true,
-		header: "> div > h3"
-	}).sortable({
-		axis: "y",
-		handle: "h3",
-		stop: function(event, ui) {
-			stop = true;
-		}
-	});
 }
 
 filter_reinit = function() {
-	$("#filter").accordion('option','active',false);
-	$("#filter").accordion('destroy');
-	filter_init();
 };
 
 $(document).ready(function(){
-	// задаем кнопки
-	//$('button').button();
 
 	$('#docManagerPane .tab').click(function(){
 		if($('#tabFilter').css('display') == 'block') {
 			filter_reinit();
-			$('#filter').css('visibility', 'visible');
+			$('#filters').css('visibility', 'visible');
 		} else if($('#tabOptions').css('display') == 'block') {
 			option_reinit();
 			$('#options').css('visibility', 'visible');
@@ -71,7 +30,7 @@ $(document).ready(function(){
 
 	if($('#tabFilter').css('display') == 'block') {
 		filter_init();
-		$('#filter').css('visibility', 'visible');
+		$('#filters').css('visibility', 'visible');
 	} else if($('#tabOptions').css('display') == 'block') {
 		option_init();
 		$('#options').css('visibility', 'visible');
@@ -79,7 +38,7 @@ $(document).ready(function(){
 
 	$('button.option_value_add').click(function(){
 		id = $(this).val();
-		a = $('.value_template').clone();
+		a = $('#tabFilters .value_template').clone();
 		a.appendTo('#values_' + id);
 		a.removeClass('value_template');
 		
@@ -135,22 +94,13 @@ $(document).ready(function(){
 		return false;
 	});
 
-	$('.sorttable').tableDnD({
-		dragHandle: "dragHandle"
-	});
-
+	// обработка клика на кнопку добавления новой опции
 	$("#new_option_add").click(function(){
-		/**
-		 * Новый идентификатор
-		 */
-		id = $('#options .option').size() - 1;
 		/**
 		 * Клонируем шаблон опции
 		 */
-		a = $(".option_template").clone();
-		a.appendTo('#options');
-		a.removeClass('option_template');
-		a.css('display','block');
+		a = $(".option_template .option").clone();
+		a.appendTo('#options .fastlist');
 		/**
 		 * Изменяем заголовок на указанный
 		 */
@@ -160,24 +110,33 @@ $(document).ready(function(){
 		} else {
 			title = option_name;
 		}
-
-
-		a.find(".ui-accordion-header").children().filter("a").text(title);
+		a.find("h3.title").text(title);
 		a.find('.option_name').val(title);
-
-		a.find('.option_id').attr('name', 'option_id[' + id + ']');
-		a.find('.option_name').attr('name', 'option_name[' + id + ']');
-		a.find('.option_class').attr('name', 'option_class[' + id + ']');
-		a.find('.option_image').attr('name', 'option_image[' + id + ']');
-		a.find('.option_image_button').click(function(){
-			BrowseServer('option_image[' + id + ']');
-		});
-
 		a.find('input.option_del').click(function(){
-			$(this).parents('div.option').remove();
+			$(this).parents('tr.option').remove();
 			option_reinit();
 			return false;
 		});
+		a.find('h3.title').click(function(){
+			elem = $(this).parents('tr.option_header').next();
+			if(elem.hasClass('visible')) {
+				elem.removeClass('visible');
+			} else {
+				elem.addClass('visible');
+			}
+		});
+		$('#options .sorttable').tableDnD({
+			dragHandle: "dragHandle"
+		});
+		option_reinit();
+		return false;
+	});
+
+	$('.option_del').click(function(){
+		/**
+		 * Основное элемент
+		 */
+		$(this).parents('tr.option').remove();
 		option_reinit();
 		return false;
 	});
@@ -188,7 +147,7 @@ $(document).ready(function(){
 	});
 
 	$('.filter_type').change(function(){
-		a = $(this).parents('div.filter');
+		a = $(this).parents('#filters .content');
 		if($(this).val() == 'rng') {
 			a.find('.eqv').removeClass('visible');
 			a.find('.rng').addClass('visible');
@@ -207,6 +166,28 @@ $(document).ready(function(){
 		$('#' + tipId).val('');
 		$('#info_' + tipId).html(tipVal);
 		return false;
+	});
+
+	$('#options .option_header h3').click(function(){
+		elem = $(this).parents('tr.option_header').next();
+		if(elem.hasClass('visible')) {
+			elem.removeClass('visible');
+		} else {
+			elem.addClass('visible');
+		}
+	});
+
+	$('#filters .filter_header h3').click(function(){
+		elem = $(this).parents('tr.filter_header').next();
+		if(elem.hasClass('visible')) {
+			elem.removeClass('visible');
+		} else {
+			elem.addClass('visible');
+		}
+	});
+
+	$('.sorttable').tableDnD({
+		dragHandle: "dragHandle"
 	});
 
 });
