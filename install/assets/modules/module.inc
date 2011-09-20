@@ -1,0 +1,1 @@
+include  MODX_BASE_PATH . 'assets/extends/sbshop/modules/module.inc.php';
