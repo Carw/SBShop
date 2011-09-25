@@ -449,19 +449,15 @@ class SBOrder {
 				 */
 				if($aBunpdling['price'] != 0) {
 					/**
-					 * Устанавливаем цену комплектации
+					 * Устанавливаем цену комплектации и прибавляем стоимость опций
 					 */
-					$fPrice = $aBunpdling['price'];
+					$fPrice = $aBunpdling['price'] + $aOrderInfo['options_price'];
 				} else {
 					/**
 					 * Используем обычный расчет
 					 */
 					$fPrice = $oProduct->getAttribute('price') + $aOrderInfo['options_price'];
 				}
-				/**
-				 * Прибавляем стоимость выбранных опций
-				 */
-				$fPrice += $aOrderInfo['options_price'];
 			}
 		}
 		/**

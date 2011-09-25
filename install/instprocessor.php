@@ -45,6 +45,7 @@ foreach($sql_array as $sql_entry) {
 	if (preg_match('/^\#/', $sql_do)) {
 		continue;
 	}
+	$sql_do = str_replace('{prefix}', $this->db->config['table_prefix'], $sql_do);
 	$num = $num + 1;
 	if ($sql_do) {
 		$modx->db->query($sql_do);

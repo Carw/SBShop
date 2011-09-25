@@ -3,9 +3,6 @@
 /**
  * 3b [build by burik] FileOrganizer tree
  *
- * ��������� ��������� ������, �������� ������ ���������� MODx
- * �� ������������ ���������� �������
- * 
  * @author 		Burov Alexander [burik] burikella@mail.ru
  * @cateatedOn	13.11.2009
  * @version 	1.0 (rc1)
@@ -14,7 +11,7 @@
 $confname = $_REQUEST['conf'];
 
 $siteURL = 'http://' . $_SERVER['HTTP_HOST'] . '/';
-$sitePath = eregi_replace('.assets.libs.treebuilder', '', dirname(__file__));
+$sitePath = preg_replace('/.assets.libs.treebuilder/i', '', dirname(__file__));
 
 define('MODX_SITE_URL', $siteURL);
 define('MODX_BASE_URL', '/');
@@ -24,8 +21,6 @@ include($sitePath . '/index.php');
 $modx->db->connect();
 $modx->getSettings();
 
-// ����� ���������� ����� ������ ����� modules
-// �� ��������� �� ���� ���� ��� ����� ������� :))
 $confname = str_replace('../', '', $confname);
 
 if(!preg_match("~^/?((([-\.a-z0-9]+)/)*[-\.a-z0-9]+\.php)$~i", $confname, $mathes)) {

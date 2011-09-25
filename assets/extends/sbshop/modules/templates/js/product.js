@@ -72,7 +72,7 @@ $(document).ready(function(){
 	});
 
 	$('.option_extend').click(function(){
-		var parent = $(this).parents('div.option');
+		var parent = $(this).parents('tr.content');
 		if(parent.find('.extend').hasClass('visible')) {
 			parent.find('.extend').removeClass('visible');
 		} else {

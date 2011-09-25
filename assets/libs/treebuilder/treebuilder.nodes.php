@@ -29,7 +29,7 @@ debugMess("Session start at " . strftime("%d.%m.%Y %H:%M:%S"));
 debugMess("Config name: {$confname}");
 
 $siteURL = 'http://' . $_SERVER['HTTP_HOST'] . '/';
-$sitePath = eregi_replace('.assets.libs.treebuilder', '', dirname(__file__));
+$sitePath = preg_replace('/.assets.libs.treebuilder/i', '', dirname(__file__));
 
 debugMess("\$siteURL = {$siteURL}");
 debugMess("\$sitePath = {$sitePath}");
