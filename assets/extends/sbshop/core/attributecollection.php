@@ -264,7 +264,7 @@ class SBAttributeCollection {
 			if(count($aAttrIns) > 0) {
 				$aAttrIds = array();
 				foreach ($aAttrIns as $iId) {
-					$aAttrIds[] = "({$oCategory->getAttribute('id')}, $iId, 0, '{$aNewAttributes[$iId]['measure']}', '{$aNewAttributes[$iId]['type']})";
+					$aAttrIds[] = "({$oCategory->getAttribute('id')}, $iId, 0, '{$aNewAttributes[$iId]['measure']}', '{$aNewAttributes[$iId]['type']}')";
 				}
 				$sAttrIds = implode(',',$aAttrIds);
 				$sql = 'INSERT INTO ' . $modx->getFullTableName('sbshop_category_attributes') . ' (`category_id`,`attribute_id`,`attribute_count`, `attribute_measure`, `attribute_type`) VALUES ' . $sAttrIds;
@@ -411,7 +411,7 @@ class SBAttributeCollection {
 		/**
 		 * задаем расширенные параметры для раздела
 		 */
-		$oCategory->setExtendAttributes($aNewAttributes);
+		$oCategory->setExtendAttributes($aNewAttributesBase);
 		/**
 		 * Совмещаем список параметров для последующего запроса в базу
 		 */

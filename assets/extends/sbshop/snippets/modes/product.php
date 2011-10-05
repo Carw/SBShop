@@ -189,13 +189,13 @@ class product_mode {
 					/**
 					 * Обрабатываем значения
 					 */
-					foreach ($aValues as $sValueKey => $sValueVal) {
+					foreach ($aValues as $aValue) {
 						if($aValue['value'] != 'null') {
 							$aValue['price'] = $aValue['value'];
 						} else {
 							$aValue['price'] = '';
 						}
-						$aReplVal = $modx->sbshop->arrayToPlaceholders($sValueVal);
+						$aReplVal = $modx->sbshop->arrayToPlaceholders($aValue);
 						/**
 						 * Вставляем данные в шаблон
 						 */

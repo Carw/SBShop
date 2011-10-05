@@ -602,7 +602,9 @@ class SBShop {
 						}
 					break;
 					case 'price':
-						$sVal = intval($sVal);
+						if($sVal !== '') {
+							$sVal = intval($sVal);
+						}
 					break;
 				}
 			}
