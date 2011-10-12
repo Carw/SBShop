@@ -36,7 +36,7 @@ class SBFilterList {
 		/**
 		 * Если не задан идентификатор или массив значений
 		 */
-		if($aFilter['id'] == '' || !is_array($aValues)) {
+		if($aFilter['id'] === '' || !is_array($aValues)) {
 			return false;
 		}
 		/**
