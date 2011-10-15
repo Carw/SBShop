@@ -214,6 +214,9 @@ class cat_mode {
 		 * Обрабатываем параметры
 		 */
 		foreach($aAttributes as $aAttribute) {
+			/**
+			 * Подготавливаем плейсхолдеры
+			 */
 			$aRepl = $modx->sbshop->arrayToPlaceholders($aAttribute,'attribute.');
 			/**
 			 * Добавляем плейсхолдер для различных типов параметров
@@ -274,9 +277,13 @@ class cat_mode {
 			$aFilterGeneral[$modx->sbshop->lang['product_' . $sFilterName]] = $sFilterName;
 		}
 		/**
+		 * Массив идентификаторов параметров
+		 */
+		$aAttributeIds = SBAttributeCollection::getAttributeIdsByNames(array_keys($aAttributes));
+		/**
 		 * Сливаем все типы фильтров
 		 */
-		$aFilterNames = array_merge($aFilterGeneral, array_flip(array_keys($aAttributes)));
+		$aFilterNames = array_merge($aFilterGeneral, $aAttributeIds);
 		/**
 		 * Обрабатываем каждое значение
 		 */

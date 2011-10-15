@@ -128,7 +128,7 @@ class SBAttributeCollection {
 		 */
 		$aAttr = array();
 		foreach ($aIds as $sId) {
-			if($sId != '') {
+			if($sId !== '') {
 				$aAttr[] = $modx->db->escape($sId);
 			}
 		}
