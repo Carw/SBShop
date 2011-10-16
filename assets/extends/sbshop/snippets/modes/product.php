@@ -315,6 +315,14 @@ class product_mode {
 					 * Определяем стоимость по факту - товар + опции
 					 */
 					$aBundle['price'] = $modx->sbshop->oGeneralProduct->getAttribute('price') + $modx->sbshop->oGeneralProduct->getPriceByOptions($aBundle['options']);
+				} else {
+					/**
+					 * Стоимость задана и нам нужно определить правило ее формирования.
+					 * Если первый символ - "+"
+					 */
+					if(substr($aBundle['price'],0,1) === '+') {
+						$aBundle['price'] = $modx->sbshop->oGeneralProduct->getAttribute('price') + substr($aBundle['price'], 1);
+					}
 				}
 				/**
 				 * Делаем набор плейсхолдеров
