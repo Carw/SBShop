@@ -29,6 +29,7 @@ class home_mode {
 		echo '<p><a href="' . $sModuleLink . '&mode=order' . '">Текущие заказы</a></p>';
 		echo '<p><a href="' . $sModuleLink . '&mode=order&act=arch' . '">Архив заказов</a></p>';
 		echo '<p><a href="' . $sModuleLink . '&mode=order&act=trash' . '">Брошенные заказы</a></p>';
+		echo '<p><a href="' . $sModuleLink . '&mode=pricing' . '">Управление ценами</a></p>';
 		echo '<p><a href="' . $sModuleLink . '&mode=update' . '">Обновление</a> (нажимать нежно!)</p>';
 		echo '<p><img src="' . MODX_BASE_URL . 'assets/cache/sbshop/week.png" /></p>';
 		echo '</div>';

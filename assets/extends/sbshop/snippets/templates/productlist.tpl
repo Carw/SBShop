@@ -17,7 +17,7 @@
 	<p class="vendor">[+sb.vendor+]</p>
 	[+sb.attributes+]
 	<p class="link"><a href="[+sb.url+]">Подробная информация</a></p>
-	<p class="price">[+sb.price+] руб</p>
+	<p class="price">[+sb.price_full+] руб</p>
 </div>
 <!--# product_absent_row: Шаблон неактивного товара в списке #-->
 <div class="prod absent">
@@ -26,7 +26,7 @@
 	<p class="vendor">[+sb.vendor+]</p>
 	[+sb.attributes+]
 	<p class="link"><a href="[+sb.url+]">Подробная информация</a></p>
-	<p class="price">[+sb.price+] руб <span class="existence">[+sb.existence+]</span></p>
+	<p class="price">[+sb.price_full+] руб <span class="existence">[+sb.existence+]</span></p>
 </div>
 <!--# attribute_outer: Контейнер для вывода характеристик товара #-->
 <ul>[+sb.wrapper+]</ul>

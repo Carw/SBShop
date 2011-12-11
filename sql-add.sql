@@ -1,0 +1,1 @@
+ALTER TABLE  `modx_sbshop_products` ADD  `product_price_add` VARCHAR( 10 ) NOT NULL AFTER  `product_price`;

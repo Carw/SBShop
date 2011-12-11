@@ -33,6 +33,7 @@ $config = array(
 	'route_pages' => array(
 		'checkout', // корзина
 		'yml',
+		'price'
 	),
 	/**
 	 * Сопоставление шаблонов для режимов
@@ -45,6 +46,7 @@ $config = array(
 		'cart' => 5,
 		'checkout' => 7,
 		'yml' => 8,
+		'price' => 12
 	),
 	/**
 	 * Настройка списка возможных действий
@@ -150,7 +152,7 @@ $config = array(
     /**
      * Форматирование даты в сприске заказов
      */
-    'order_date_format' => 'd.m - H:i',
+    'order_date_format' => 'd.m - H:m',
 	/**
 	 * Скрыть указанные значения опции из выбора
 	 */
@@ -169,6 +171,11 @@ $config = array(
 		'vendor',
 		'existence'
 	),
+	/**
+	 * До какого знака округлять стоимость
+	 */
+	'round_precision' => -1,
+
 );
 
 

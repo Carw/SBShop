@@ -262,78 +262,88 @@ class prod_mode {
 		 */
 		$aOptionList = $this->oProduct->getOptionNames();
 		/**
-		 * Обрабатываем каждую опцию
+		 * Если опции есть
 		 */
-		foreach ($aOptionList as $aOption) {
+		if ($aOptionList) {
 			/**
-			 * Массив для значений опций
+			 * Обрабатываем каждую опцию
 			 */
-			$aValues = array();
-			/**
-			 * Получаем значение опции
-			 */
-			$aValuesList = $this->oProduct->getValuesByOptionName($aOption['title']);
-			/**
-			 * Обрабатываем каждое значение
-			 */
-			foreach ($aValuesList as $aValue) {
+			foreach ($aOptionList as $aOption) {
 				/**
-				 * Подготавливаем плейсхолдеры
+				 * Массив для значений опций
 				 */
-				$aRepl = $modx->sbshop->arrayToPlaceholders($aValue,'value.');
-				$aRepl['[+option.id+]'] = $aOption['id'];
+				$aValues = array();
 				/**
-				 * Временное решение по очистке новых плейсхолдеров
+				 * Получаем значение опции
 				 */
-				if(!isset($aValue['class'])) {
-					$aRepl['[+value.class+]'] = '';
+				$aValuesList = $this->oProduct->getValuesByOptionName($aOption['title']);
+				/**
+				 * Если есть значения
+				 */
+				if ($aValuesList) {
+					/**
+					 * Обрабатываем каждое значение
+					 */
+					foreach ($aValuesList as $aValue) {
+						/**
+						 * Подготавливаем плейсхолдеры
+						 */
+						$aRepl = $modx->sbshop->arrayToPlaceholders($aValue, 'value.');
+						$aRepl['[+option.id+]'] = $aOption['id'];
+						/**
+						 * Временное решение по очистке новых плейсхолдеров
+						 */
+						if (!isset($aValue['class'])) {
+							$aRepl['[+value.class+]'] = '';
+						}
+						if (!isset($aValue['image'])) {
+							$aRepl['[+value.image+]'] = '';
+						}
+						/**
+						 * Делаем вставку в шаблон
+						 */
+						$aValues[] = str_replace(array_keys($aRepl), array_values($aRepl), $this->aTemplate['option_row']);
+					}
 				}
-				if(!isset($aValue['image'])) {
-					$aRepl['[+value.image+]'] = '';
+				/**
+				 * Готовим плейсхолдеры
+				 */
+				$aRepl = $modx->sbshop->arrayToPlaceholders($aOption, 'option.');
+				/**
+				 * Если исключение из комплектаций выбрано
+				 */
+				if ($aOption['notbundle']) {
+					/**
+					 * Настройка исключения из комплектаций
+					 */
+					$aRepl['[+option.notbundle.checked+]'] = 'checked="checked"';
 				}
 				/**
-				 * Делаем вставку в шаблон
+				 * Если исключение из комплектаций выбрано
 				 */
-				$aValues[] = str_replace(array_keys($aRepl), array_values($aRepl), $this->aTemplate['option_row']);
-			}
-			/**
-			 * Готовим плейсхолдеры
-			 */
-			$aRepl = $modx->sbshop->arrayToPlaceholders($aOption,'option.');
-			/**
-			 * Если исключение из комплектаций выбрано
-			 */
-			if($aOption['notbundle']) {
+				if ($aOption['hidden']) {
+					/**
+					 * Настройка скрытия опции
+					 */
+					$aRepl['[+option.hidden.checked+]'] = 'checked="checked"';
+				}
 				/**
-				 * Настройка исключения из комплектаций
+				 * Если установлена подсказка
 				 */
-				$aRepl['[+option.notbundle.checked+]'] = 'checked="checked"';
-			}
-			/**
-			 * Если исключение из комплектаций выбрано
-			 */
-			if($aOption['hidden']) {
+				if ($aOption['tip']) {
+					$oTip = new SBTip();
+					$oTip->load($aOption['tip']);
+					$aRepl = array_merge($aRepl, $modx->sbshop->arrayToPlaceholders($oTip->getAttributes(), 'option.tip.'));
+				}
 				/**
-				 * Настройка скрытия опции
+				 * Вставляем ряды
 				 */
-				$aRepl['[+option.hidden.checked+]'] = 'checked="checked"';
+				$aRepl['[+sb.wrapper+]'] = implode('', $aValues);
+				/**
+				 * Вставляем в шаблон
+				 */
+				$aOptions[] = str_replace(array_keys($aRepl), array_values($aRepl), $this->aTemplate['option_outer']);
 			}
-			/**
-			 * Если установлена подсказка
-			 */
-			if($aOption['tip']) {
-				$oTip = new SBTip();
-				$oTip->load($aOption['tip']);
-				$aRepl = array_merge($aRepl,$modx->sbshop->arrayToPlaceholders($oTip->getAttributes(),'option.tip.'));
-			}
-			/**
-			 * Вставляем ряды
-			 */
-			$aRepl['[+sb.wrapper+]'] = implode('',$aValues);
-			/**
-			 * Вставляем в шаблон
-			 */
-			$aOptions[] = str_replace(array_keys($aRepl), array_values($aRepl), $this->aTemplate['option_outer']);
 		}
 		$phModule['[+options+]'] = implode('', $aOptions);
 		/**
@@ -361,10 +371,12 @@ class prod_mode {
 				}
 				/**
 				 * Массив замен
+				 * @todo нужно привести везде название комплектации к одному виду. Сейчас используется name и title в разных местах.
 				 */
 				$aBundleRepl = array(
 					'[+bundle_name+]' => $aBundle['title'],
 					'[+bundle_price+]' => $aBundle['price'],
+					'[+bundle_price_add+]' => $aBundle['price_add'],
 					'[+bundle_settings+]' => implode(',', $aOptionRows),
 					'[+bundle_description+]' => $aBundle['description']
 				);
@@ -782,8 +794,14 @@ class prod_mode {
 		 * Устанавливаем цену, заменяя предварительно запятую на точку
 		 */
 		$sPrice = $_POST['price'];
-		$sPrice = str_replace(',','.',$sPrice);
+		$sPrice = str_replace(',', '.', $sPrice);
 		$this->oProduct->setAttribute('price',floatval($sPrice));
+		/**
+		 * Устанавливаем цену, заменяя предварительно запятую на точку
+		 */
+		$sPriceAdd = $_POST['price_add'];
+		$sPriceAdd = str_replace(',', '.', $sPriceAdd);
+		$this->oProduct->setAttribute('price_add',$modx->db->escape(trim($sPriceAdd)));
 		/**
 		 * Товар опубликован?
 		 */
@@ -952,6 +970,7 @@ class prod_mode {
 						if($_POST['option_values_title'][$iOptionId][$k] != '') {
 							$aValues[] = array(
 								'title' => $_POST['option_values_title'][$iOptionId][$k],
+								'price_add' => $_POST['option_values_add'][$iOptionId][$k],
 								'value' => $_POST['option_values_value'][$iOptionId][$k],
 								'class' => $_POST['option_values_class'][$iOptionId][$k],
 								'image' => $_POST['option_values_image'][$iOptionId][$k],
@@ -995,7 +1014,7 @@ class prod_mode {
 			 */
 			$cntBundle = count($_POST['bundle_name']);
 			for ($i=0; $i<$cntBundle; $i++) {
-				$this->oProduct->addBundle($modx->db->escape($_POST['bundle_name'][$i]), $_POST['bundle_settings'][$i], $_POST['bundle_price'][$i],$_POST['bundle_description'][$i]);
+				$this->oProduct->addBundle($modx->db->escape($_POST['bundle_name'][$i]), $_POST['bundle_settings'][$i], $_POST['bundle_price'][$i], $_POST['bundle_description'][$i], false, $modx->db->escape($_POST['bundle_price_add'][$i]));
 			}
 			/**
 			 * Если включена индивидуальная комплектация

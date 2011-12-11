@@ -580,32 +580,29 @@ class SBShop {
 				/**
 				 * Преобразование некоторых типов параметров для правильного вывода в шаблон
 				 */
-				switch ($sKey) {
-					case 'url':
+				if ($sKey === 'url') {
+					/**
+					 * Если адрес совпадает с базовым
+					 */
+					if($sVal == $this->sBaseUrl) {
 						/**
-						 * Если адрес совпадает с базовым
+						 * Мы слегка его корректируем
 						 */
-						if($sVal == $this->sBaseUrl) {
-							/**
-							 * Мы слегка его корректируем
-							 */
-							$sVal = $modx->makeUrl($modx->documentIdentifier);
+						$sVal = $modx->makeUrl($modx->documentIdentifier);
+					} else {
+						/**
+						 * Добавляем стартовый адрес и суффикс
+						 */
+						if(mb_substr($this->sBaseUrl, 0, 1) == '/') {
+							$sVal = '[(site_url)]' . mb_substr($this->sBaseUrl, 1) . $sVal . $this->config['url_suffix'];
 						} else {
-							/**
-							 * Добавляем стартовый адрес и суффикс
-							 */
-							if(mb_substr($this->sBaseUrl, 0, 1) == '/') {
-								$sVal = '[(site_url)]' . mb_substr($this->sBaseUrl, 1) . $sVal . $this->config['url_suffix'];
-							} else {
-								$sVal = MODX_BASE_URL . $this->sBaseUrl . $sVal . $this->config['url_suffix'];
-							}
+							$sVal = MODX_BASE_URL . $this->sBaseUrl . $sVal . $this->config['url_suffix'];
 						}
-					break;
-					case 'price':
-						if($sVal !== '') {
-							$sVal = intval($sVal);
-						}
-					break;
+					}
+				} elseif ($sKey === 'price') {
+					if($sVal !== '') {
+						$sVal = intval($sVal);
+					}
 				}
 			}
 			/**
@@ -747,6 +744,64 @@ class SBShop {
 		 * Возвращаем результат
 		 */
 		return $aTemplates;
+	}
+
+	/**
+	 * Рассчет стоимости с учетом надбавки
+	 * @param $iPrice
+	 * @param $sIncrementRule
+	 * @return float
+	 */
+	public function setPriseIncrement($iPrice, $sIncrementRule) {
+		/**
+		 * Если правила надбавки отсутствуют
+		 */
+		if($sIncrementRule != '') {
+			/**
+			 * Разбираем правило надбавки
+			 */
+			preg_match_all('/([\+\-=]?)([\d,\.]*)([%]?)/', $sIncrementRule, $aPriceAdd);
+			/**
+			 * Выделяем нужные данные: вид операции, число, тип операции
+			 */
+			$sAddOperation = $aPriceAdd[1][0];
+			$sAddCost = $aPriceAdd[2][0];
+			$sAddType = $aPriceAdd[3][0];
+			/**
+			 * Если тип операции - процент
+			 */
+			if($sAddType == '%') {
+				/**
+				 * Считаем стоимость с учетом процента и указанной операции
+				 */
+				if($sAddOperation == '' or $sAddOperation == '+') {
+					$iPrice = $iPrice * (1 + $sAddCost / 100);
+				} elseif($sAddOperation == '-') {
+					$iPrice = $iPrice * (1 - $sAddCost / 100);
+				} elseif($sAddOperation == '=') {
+					$iPrice = $iPrice * ($sAddCost / 100);
+				}
+			} else {
+				/**
+				 *Считаем стоимость с учетом указанного значения и операции
+				 */
+				if($sAddOperation == '' or $sAddOperation == '+') {
+					$iPrice = $iPrice + $sAddCost;
+				} elseif($sAddOperation == '-') {
+					$iPrice = $iPrice - $sAddCost;
+				} elseif($sAddOperation == '=') {
+					$iPrice = $sAddCost;
+				}
+			}
+			/**
+			 * Округляем
+			 */
+			$iPrice = round($iPrice, $this->config['round_precision']);
+		}
+		/**
+		 * Возвращаем результат
+		 */
+		return $iPrice;
 	}
 
 	/**

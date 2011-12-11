@@ -1,6 +1,5 @@
 <!--# product: Общий шаблон редактирования товара #-->
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
-<!-- script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.4/jquery-ui.min.js"></script -->
 <script type="text/javascript">
 	if(typeof(jQuery) == "undefined") {
 		alert('Похоже, что возникла проблема с Интернетом.');
@@ -67,6 +66,9 @@
 					<tr style="height: 24px;"><td width="100" align="left"><span class="warning">[+lang.product_price+]</span></td>
 						<td><input name="price" type="text" maxlength="255" value="[+product.price+]" class="inputBox" onchange="documentDirty=true;" />
 						&nbsp;&nbsp;<img src="[+style.icons_tooltip_over+]" onmouseover="this.src='[+style.icons_tooltip+]';" onmouseout="this.src='[+style.icons_tooltip_over+]';" alt="[+lang.product_price_description+]" onclick="alert(this.alt);" style="cursor:help;" /></td></tr>
+					<tr style="height: 24px;"><td width="100" align="left"><span class="warning">[+lang.product_price_add+]</span></td>
+						<td><input name="price_add" type="text" maxlength="255" value="[+product.price_add+]" class="inputBox" onchange="documentDirty=true;" />
+						&nbsp;&nbsp;<img src="[+style.icons_tooltip_over+]" onmouseover="this.src='[+style.icons_tooltip+]';" onmouseout="this.src='[+style.icons_tooltip_over+]';" alt="[+lang.product_price_add_description+]" onclick="alert(this.alt);" style="cursor:help;" /></td></tr>
 					<tr style="height: 24px;"><td width="100" align="left"><span class="warning">[+lang.product_vendor+]</span></td>
 						<td><input name="vendor" type="text" maxlength="255" value="[+product.vendor+]" class="inputBox" onchange="documentDirty=true;" spellcheck="true" [+product.group+] />
 						&nbsp;&nbsp;<img src="[+style.icons_tooltip_over+]" onmouseover="this.src='[+style.icons_tooltip+]';" onmouseout="this.src='[+style.icons_tooltip_over+]';" alt="[+lang.product_vendor_description+]" onclick="alert(this.alt);" style="cursor:help;" /></td></tr>
@@ -214,6 +216,8 @@
 							<input type="image" style="width: auto;" class="option_value_extend" src="/manager/media/style/MODxCarbon/images/icons/table.gif" title="[+lang.product_option_extend_hint+]">
 						</div>
 						<div class="extend">
+							<p class="title">[+lang.product_option_extend_add+]</p>
+							<input type="text" class="option_values_add" value="">
 							<p class="title">[+lang.product_option_extend_class+]</p>
 							<input type="text" class="option_values_class" value="">
 							<p class="title">[+lang.product_option_extend_image+]</p>
@@ -259,6 +263,12 @@
 														<label>
 															[+lang.product_bundle_price+]<br>
 															<input type="text" style="width: 50px;" name="bundle_price[]" value="">
+														</label>
+													</p>
+													<p>
+														<label>
+															[+lang.product_bundle_price_add+]<br>
+															<input type="text" style="width: 50px;" name="bundle_price_add[]" value="">
 														</label>
 													</p>
 													<p>
@@ -359,6 +369,12 @@
 							<label>
 								[+lang.product_bundle_price+]<br>
 								<input type="text" style="width: 50px;" name="bundle_price[]" value="[+bundle_price+]">
+							</label>
+						</p>
+						<p>
+							<label>
+								[+lang.product_bundle_price_add+]<br>
+								<input type="text" style="width: 50px;" name="bundle_price_add[]" value="[+bundle_price_add+]">
 							</label>
 						</p>
 						<p>
@@ -479,6 +495,8 @@
 		<input type="image" style="width: auto;" class="option_value_extend" src="/manager/media/style/MODxCarbon/images/icons/table.gif" title="[+lang.product_option_extend_hint+]">
 	</div>
 	<div class="extend">
+		<p class="title">[+lang.product_option_extend_add+]</p>
+		<input type="text" name="option_values_add[[+option.id+]][]" value="[+value.price_add+]">
 		<p class="title">[+lang.product_option_extend_class+]</p>
 		<input type="text" name="option_values_class[[+option.id+]][]" value="[+value.class+]">
 		<p class="title">[+lang.product_option_extend_image+]</p>

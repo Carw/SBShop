@@ -18,7 +18,7 @@
 	<form id="product_[+sb.id+]" method="post" action="[+sb.link_action+]">
 		<input type="hidden" name="sb_order_add" value="[+sb.id+]">
 		<input type="hidden" name="sbprod[quantity]" value="1">
-		<input type="hidden" name="baseprice" value="[+sb.price+]" />
+		<input type="hidden" name="baseprice" value="[+sb.price_full+]" />
 		<div class="bundles" id="bundles">
 			[+sb.base_bundle+]
 			[+sb.bundles+]
@@ -26,7 +26,7 @@
 		[+sb.options+]
 		<div class="summary">
 			<div>
-				Стоимость заказа: <span class="summ"><strong id="summ">[+sb.price+]</strong> руб</span>
+				Стоимость заказа: <span class="summ"><strong id="summ">[+sb.price_full+]</strong> руб</span>
 			</div>
 			<input class="button_active" type="submit" name="sb_order_submit" value="Добавить к заказу" />
 		</div>
@@ -55,7 +55,7 @@
 	<form id="product_[+sb.id+]" method="post" action="[+sb.link_action+]">
 		<input type="hidden" name="sb_order_add" value="[+sb.id+]">
 		<input type="hidden" name="sbprod[quantity]" value="1">
-		<input type="hidden" name="baseprice" value="[+sb.price+]" />
+		<input type="hidden" name="baseprice" value="[+sb.price_full+]" />
 		<div class="bundles" id="bundles">
 			[+sb.base_bundle+]
 			[+sb.bundles+]
@@ -63,7 +63,7 @@
 		[+sb.options+]
 		<div class="summary">
 			<div>
-				Стоимость заказа: <span class="summ"><strong id="summ">[+sb.price+]</strong> руб</span>
+				Стоимость заказа: <span class="summ"><strong id="summ">[+sb.price_full+]</strong> руб</span>
 			</div>
 			<input class="button_active" type="submit" name="sb_order_submit" value="Добавить к заказу" />
 		</div>
@@ -95,7 +95,7 @@
 	</script>
 </div>
 <!--# single_option_row: Шаблон для вывода опции где представлено всего одно значение #-->
-	<input type="hidden" id="sboption_[+sb.option.id+]_[+sb.id+]_val" name="[+sb.id+]_sbprod[sboptions][[+sb.option.id+]]" value="[+sb.value+]" />
+	<input type="hidden" id="sboption_[+sb.option.id+]_[+sb.id+]_val" name="[+sb.id+]_sbprod[sboptions][[+sb.option.id+]]" value="[+sb.price+]" />
 	<label>
 		<div class="action">
 			<input type="checkbox" id="sboption_[+sb.option.id+]_[+sb.id+]" class="optval" name="sbprod[sboptions][[+sb.option.id+]]" value="[+sb.id+]">
@@ -122,7 +122,7 @@
 </div>
 <!--# multi_option_row: Шаблон для вывода опции где представлено несколько значений #-->
 <li>
-	<input type="hidden" id="sboption_[+sb.option.id+]_[+sb.id+]_val" name="[+sb.id+]_sbprod[sboptions][[+sb.option.id+]]" value="[+sb.value+]" />
+	<input type="hidden" id="sboption_[+sb.option.id+]_[+sb.id+]_val" name="[+sb.id+]_sbprod[sboptions][[+sb.option.id+]]" value="[+sb.price+]" />
 	<label>
 		<div class="action">
 			<input type="radio" id="sboption_[+sb.option.id+]_[+sb.id+]" class="optval" name="sbprod[sboptions][[+sb.option.id+]]" value="[+sb.id+]">
@@ -133,7 +133,7 @@
 </li>
 <!--# single_bundle_base: Вывод базовой комплектации если других комплектаций нет #-->
 <div class="base_bundle">
-	<div class="price">[+sb.price+] руб</div>
+	<div class="price">[+sb.price_full+] руб</div>
 	<h2>Базовая комплектация</h2>
 	[+sb.bundle.options+]
 </div>
@@ -141,7 +141,7 @@
 <div class="base_bundle">
 	<input type="hidden" id="bundle_price_base" name="bundl_price_base" value="[+sb.price+]">
 	<div class="action"><input type="radio" id="bundle_base" name="sbprod[bundle]" value="base" checked="checked"></div>
-	<div class="price">[+sb.price+] руб</div>
+	<div class="price">[+sb.price_full+] руб</div>
 	<h2>Базовая комплектация</h2>
 	[+sb.bundle.options+]
 	<script type="text/javascript">
@@ -156,9 +156,9 @@
 <div class="row">
 	<label>
 		<div class="action"><input type="radio" id="bundle_[+sb.bundle.id+]" name="sbprod[bundle]" value="[+sb.bundle.id+]" [+sb.bundle.checked+] /></div>
-		<input type="hidden" id="bundle_price_[+sb.bundle.id+]" name="bundl_price_[+sb.bundle.id+]" value="[+sb.bundle.price+]">
+		<input type="hidden" id="bundle_price_[+sb.bundle.id+]" name="bundl_price_[+sb.bundle.id+]" value="[+sb.bundle.price_full+]">
 		<div class="price">
-			[+sb.bundle.price+] руб
+			[+sb.bundle.price_full+] руб
 		</div>
 	</label>
 	<div class="descr">

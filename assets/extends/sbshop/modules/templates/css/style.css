@@ -516,3 +516,25 @@ input[type="button"]:hover, input[type="submit"]:hover {
     border: 0;
     background: transparent;
 }
+
+.error {
+    color: #990000;
+    font-weight: bold;
+    padding: 5px 10px;
+    margin: 0 10px 10px 10px;
+    border: 1px solid #990000;
+    background-color: #FFEEEE;
+}
+
+.ok {
+    color: #009900;
+    font-weight: bold;
+    padding: 5px 10px;
+    margin: 0 10px 10px 10px;
+    border: 1px solid #009900;
+    background-color: #eeffee;
+}
+
+.hidden {
+	display: none;
+}

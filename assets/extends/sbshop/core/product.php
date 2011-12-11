@@ -16,7 +16,7 @@ class SBProduct {
 	protected $aProductData; // Основные параметры товара
 	protected $aProductDataKeys; // Ключи для основного списка параметров
 	protected $oProductExtendData; // Дополнительные параметры товара
-	protected $oOptions; // Опции товара
+	public $oOptions; // Опции товара
 	protected $aImages; // массив изображений
 	protected $aBaseBundle; // Базовая комплектация
 	protected $oBundles; // Дополнительные комплектации
@@ -46,6 +46,7 @@ class SBProduct {
 			'url' => null, // URL товара
 			'sku' => null, // артикул
 			'price' => null, // цена
+			'price_add' => null, // прибавка к цене
 			'options' => null, // список опций
 			'vendor' => null, // производитель
 			'model' => null, // модель товара
@@ -92,6 +93,10 @@ class SBProduct {
 				 */
 				if(in_array($sKey,$this->aProductDataKeys)) {
 					/**
+					 * Заносим основной параметр
+					 */
+					$this->aProductData[$sKey] = $sVal;
+					/**
 					 * Дополнительная обработка ключей
 					 */
 					switch ($sKey) {
@@ -110,11 +115,11 @@ class SBProduct {
 						case 'base_bundle':
 							$this->unserializeBaseBundle($sVal);
 						break;
+						case 'price':
+						case 'price_add':
+							$this->aProductData['price_full'] = $this->getFullPrice();
+						break;
 					}
-					/**
-					 * Заносим основной параметр
-					 */
-					$this->aProductData[$sKey] = $sVal;
 				}
 			}
 		}
@@ -284,6 +289,76 @@ class SBProduct {
 	}
 
 	/**
+	 * Расчет конечной стоимости с учетом надбавки
+	 */
+	public function getFullPrice() {
+		global $modx;
+		/**
+		 * Если цена не установлена
+		 */
+		if($this->aProductData['price'] == 'null') {
+			return 'null';
+		}
+		/**
+		 * Начальная стоимость равна основной стоимости
+		 */
+		$iFullPrice = $this->aProductData['price'];
+		/**
+		 * Если надбавки нет
+		 */
+		if($this->aProductData['price_add'] == '' or $this->aProductData['price_add'] == 'null') {
+			/**
+			 * Возвращаем основную стоимость без изменений
+			 */
+			return $iFullPrice;
+		} else {
+			$sPriceAdd = $this->aProductData['price_add'];
+			/**
+			 * Разбираем правило надбавки
+			 */
+			preg_match_all('/([\+\-=]?)([\d,\.]*)([%]?)/', $sPriceAdd, $aPriceAdd);
+			/**
+			 * Выделяем нужные данные: вид операции, число, тип операции
+			 */
+			$sAddOperation = $aPriceAdd[1][0];
+			$sAddCost = $aPriceAdd[2][0];
+			$sAddType = $aPriceAdd[3][0];
+
+			/**
+			 * Если тип операции - процент
+			 */
+			if($sAddType == '%') {
+				/**
+				 * Считаем стоимость с учетом процента и указанной опреации
+				 */
+				if($sAddOperation == '' or $sAddOperation == '+') {
+					$iFullPrice = $iFullPrice * (1 + $sAddCost / 100);
+				} elseif($sAddOperation == '-') {
+					$iFullPrice = $iFullPrice * (1 - $sAddCost / 100);
+				} elseif($sAddOperation == '=') {
+					$iFullPrice = $iFullPrice * ($sAddCost / 100);
+				}
+			} else {
+				/**
+				 *Считаем стоимость с учетом указанного значения и операции
+				 */
+				if($sAddOperation == '' or $sAddOperation == '+') {
+					$iFullPrice = $iFullPrice + $sAddCost;
+				} elseif($sAddOperation == '-') {
+					$iFullPrice = $iFullPrice - $sAddCost;
+				} elseif($sAddOperation == '=') {
+					$iFullPrice = $sAddCost;
+				}
+			}
+			/**
+			 * Округляем
+			 */
+			$iFullPrice = round($iFullPrice, $modx->sbshop->config['round_precision']);
+		}
+		return $iFullPrice;
+	}
+
+	/**
 	 * Опция является скрытой
 	 * @param <type> $iNameId
 	 * @return <type>
@@ -301,12 +376,22 @@ class SBProduct {
 	}
 
 	/**
+	 * Получить информацию по значению опции
+	 * @param $iNameId
+	 * @param $iValueId
+	 * @return
+	 */
+	public function getOptionValue($iNameId, $iValueId) {
+		return $this->oOptions->getOptionValue($iNameId,$iValueId);
+	}
+
+	/**
 	 * Получение значения опции по идентификаторам
 	 * @param <type> $iNameId
 	 * @param <type> $iValueId
 	 * @return <type>
 	 */
-	public function getValueByNameIdAndValId($iNameId,$iValueId) {
+	public function getValueByNameIdAndValId($iNameId, $iValueId) {
 		return $this->oOptions->getValueByNameIdAndValId($iNameId,$iValueId);
 	}
 
@@ -316,7 +401,7 @@ class SBProduct {
 	 * @param <type> $iValueId
 	 * @return <type>
 	 */
-	public function getNamesByNameIdAndValId($iNameId,$iValueId) {
+	public function getNamesByNameIdAndValId($iNameId, $iValueId) {
 		return $this->oOptions->getNamesByNameIdAndValId($iNameId,$iValueId);
 	}
 
@@ -325,6 +410,10 @@ class SBProduct {
 	 * @param <type> $aOptions
 	 */
 	public function getPriceByOptions($aOptions = array()) {
+		global $modx;
+		/**
+		 * Устанавливаем начальное значение переменной
+		 */
 		$iPrice = 0;
 		/**
 		 * Если не передано опций
@@ -340,9 +429,17 @@ class SBProduct {
 		 */
 		foreach ($aOptions as $iKey => $iVal) {
 			/**
+			 * Получаем информацию о значении
+			 */
+			$aVal = $this->getOptionValue($iKey, $iVal);
+			/**
+			 * Считаем полную стоимость
+			 */
+			$iPriceFull = $modx->sbshop->setPriseIncrement($aVal['value'], $aVal['price_add']);
+			/**
 			 * Получаем значение стоимости
 			 */
-			$iPrice += $this->getValueByNameIdAndValId($iKey, $iVal);
+			$iPrice += $iPriceFull;
 		}
 		return $iPrice;
 	}
@@ -355,8 +452,8 @@ class SBProduct {
 	 * @param <type> $sDescription
 	 * @param <type> $sId
 	 */
-	public function addBundle($sName, $sOptions, $fPrice = false, $sDescription = '', $sId = false) {
-		$this->oBundles->add($sName, $sOptions, $fPrice, $sDescription, $sId);
+	public function addBundle($sName, $sOptions, $fPrice = false, $sDescription = '', $sId = false, $sPriceAdd = '') {
+		$this->oBundles->add($sName, $sOptions, $fPrice, $sDescription, $sId, $sPriceAdd);
 	}
 
 	/**
@@ -465,31 +562,12 @@ class SBProduct {
 		$rs = $modx->db->select('*',$modx->getFullTableName('sbshop_products'),$sDeleted . 'product_id=' . intval($iProductId));
 		$aData = $modx->db->makeArray($rs);
 		/**
-		 * Заносим дополнительные параметры в массив
-		 */
-		$this->oProductExtendData->unserializeAttributes($aData[0]['product_attributes']);
-		/**
-		 * Десериализуем дополнительные опции
-		 */
-		$this->oOptions->unserializeOptions($aData[0]['product_options']);
-		/**
-		 * Десериализация комплектаций
-		 */
-		$this->oBundles->unserialize($aData[0]['product_bundles']);
-		/**
-		 * Подготавливаем основные параметры и заносим в массив
+		 * Если параметры есть, то устанавливаем их
 		 */
 		if(count($aData[0]) > 0) {
-			foreach ($aData[0] as $sKey => $sVal) {
-				$sKey = str_replace('product_','',$sKey);
-				$this->aProductData[$sKey] = $sVal;
-			}
+			$this->setAttributes($aData[0]);
 		}
 		unset($aData);
-		/**
-		 * Десериализуем изображения
-		 */
-		$this->unserializeImages($this->aProductData['images']);
 	}
 	
 	/**
@@ -515,9 +593,13 @@ class SBProduct {
 		 */
 		$aData['product_attributes'] = $this->oProductExtendData->serializeAttributes();
 		/**
-		 * Подготавливаем комплектации для для хранения
+		 * Подготавливаем комплектации для хранения
 		 */
 		$aData['product_bundles'] = $this->oBundles->serialize();
+		/**
+		 * Подготавливаем опции для хранения
+		 */
+		$aData['product_options'] = $this->oOptions->serializeOptions();
 		/**
 		 * Если ID есть, то делаем обновление информации
 		 */

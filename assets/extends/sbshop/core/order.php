@@ -414,6 +414,7 @@ class SBOrder {
 	}
 
 	public function getProductPriceBySetId($iSetId) {
+		global $modx;
 		/**
 		 * Получаем товар
 		 */
@@ -429,36 +430,81 @@ class SBOrder {
 			/**
 			 * Рассчитываем стоимость - сумма основной стоимости и стоимости опций
 			 */
-			$fPrice = $oProduct->getAttribute('price') + $aOrderInfo['options_price'];
+			$fPrice = $oProduct->getAttribute('price_full') + $aOrderInfo['options_price'];
+		} elseif ($aOrderInfo['bundle'] === 'personal') {
+			/**
+			 * Индивидуальная комплектация. Суммируем цену товара и опций
+			 */
+			$fPrice = $oProduct->getAttribute('price_full') + $aOrderInfo['options_price'];
 		} else {
 			/**
-			 * Обрабатываем разные варианты комплектаций
+			 * Любая другая комплектация. Берем стоимость комплектации
 			 */
-			if ($aOrderInfo['bundle'] === 'personal') {
+			$aBundle = $oProduct->getBundleById($aOrderInfo['bundle']);
+			/**
+			 * Если стоимость пустая
+			 */
+			if($aBundle['price'] === '') {
 				/**
-				 * Индивидуальная комплектация. Суммируем цену товара и опций
+				 * Определяем стоимость по факту - товар + опции
 				 */
-				$fPrice = $oProduct->getAttribute('price') + $aOrderInfo['options_price'];
+				$fPrice = $oProduct->getAttribute('price_full') + $oProduct->getPriceByOptions($aBundle['options']);
+			} elseif(substr($aBundle['price'],0,1) === '+') {
+				/**
+				 * Если первый символ - "+"
+				 */
+				$fPrice = $oProduct->getAttribute('price_full') + substr($aBundle['price'], 1);
 			} else {
+				$fPrice = $aBundle['price'];
+			}
+			/**
+			 * Обработка надбавки
+			 */
+			if($aBundle['price_add'] != '') {
+				$sPriceAdd = $aBundle['price_add'];
 				/**
-				 * Любая другая комплектация. Берем стоимость комплектации
+				 * Разбираем правило надбавки
 				 */
-				$aBunpdling = $oProduct->getBundleById($aOrderInfo['bundle']);
+				preg_match_all('/([\+\-=]?)([\d,\.]*)([%]?)/', $sPriceAdd, $aPriceAdd);
 				/**
-				 * Если цена установлена и не равна 0
+				 * Выделяем нужные данные: вид операции, число, тип операции
 				 */
-				if($aBunpdling['price'] != 0) {
+				$sAddOperation = $aPriceAdd[1][0];
+				$sAddCost = $aPriceAdd[2][0];
+				$sAddType = $aPriceAdd[3][0];
+
+				/**
+				 * Если тип операции - процент
+				 */
+				if($sAddType == '%') {
 					/**
-					 * Устанавливаем цену комплектации и прибавляем стоимость опций
+					 * Считаем стоимость с учетом процента и указанной опреации
 					 */
-					$fPrice = $aBunpdling['price'] + $aOrderInfo['options_price'];
+					if($sAddOperation == '' or $sAddOperation == '+') {
+						$fPrice = $fPrice * (1 + $sAddCost / 100);
+					} elseif($sAddOperation == '-') {
+						$fPrice = $fPrice * (1 - $sAddCost / 100);
+					} elseif($sAddOperation == '=') {
+						$fPrice = $fPrice * ($sAddCost / 100);
+					}
 				} else {
 					/**
-					 * Используем обычный расчет
+					 *Считаем стоимость с учетом указанного значения и операции
 					 */
-					$fPrice = $oProduct->getAttribute('price') + $aOrderInfo['options_price'];
+					if($sAddOperation == '' or $sAddOperation == '+') {
+						$fPrice = $fPrice + $sAddCost;
+					} elseif($sAddOperation == '-') {
+						$fPrice = $fPrice - $sAddCost;
+					} elseif($sAddOperation == '=') {
+						$fPrice = $sAddCost;
+					}
 				}
+				/**
+				 * Округляем
+				 */
+				$fPrice = round($fPrice, $modx->sbshop->config['round_precision']);
 			}
+
 		}
 		/**
 		 * Возвращаем результат
@@ -507,10 +553,6 @@ class SBOrder {
 			 * Загружаем список заказанных товаров
 			 */
 			$this->oProductList = new SBProductList('',$aProductIds);
-			/**
-			 * Считаем общую цену
-			 */
-			$aPrices = $this->oProductList->getAttributes('price');
 			/**
 			 * Инициализируем массив для суммарной стоимости товаров
 			 */

@@ -174,6 +174,7 @@ class product_mode {
 					 */
 					if($aValue['value'] != 'null') {
 						$aValue['price'] = $aValue['value'];
+						$aValue['price'] = $modx->sbshop->setPriseIncrement($aValue['price'], $aValue['price_add']);
 					} else {
 						$aValue['price'] = '';
 					}
@@ -192,6 +193,7 @@ class product_mode {
 					foreach ($aValues as $aValue) {
 						if($aValue['value'] != 'null') {
 							$aValue['price'] = $aValue['value'];
+							$aValue['price'] = $modx->sbshop->setPriseIncrement($aValue['price'], $aValue['price_add']);
 						} else {
 							$aValue['price'] = '';
 						}
@@ -276,7 +278,7 @@ class product_mode {
 					$iBundleId = 'personal';
 					$aBundle = array (
 						'title' => $modx->sbshop->lang['bundle_personal_title'],
-						'price' => $modx->sbshop->oGeneralProduct->getAttribute('price'),
+						'price' => $modx->sbshop->oGeneralProduct->getAttribute('price_full'),
 						'options' => array(),
 						'description' => $modx->sbshop->lang['bundle_personal_description'],
 					);
@@ -314,16 +316,20 @@ class product_mode {
 					/**
 					 * Определяем стоимость по факту - товар + опции
 					 */
-					$aBundle['price'] = $modx->sbshop->oGeneralProduct->getAttribute('price') + $modx->sbshop->oGeneralProduct->getPriceByOptions($aBundle['options']);
-				} else {
+					$aBundle['price_full'] = $modx->sbshop->oGeneralProduct->getAttribute('price_full') + $modx->sbshop->oGeneralProduct->getPriceByOptions($aBundle['options']);
+				} elseif(substr($aBundle['price'],0,1) === '+') {
 					/**
 					 * Стоимость задана и нам нужно определить правило ее формирования.
 					 * Если первый символ - "+"
 					 */
-					if(substr($aBundle['price'],0,1) === '+') {
-						$aBundle['price'] = $modx->sbshop->oGeneralProduct->getAttribute('price') + substr($aBundle['price'], 1);
-					}
+					$aBundle['price_full'] = $modx->sbshop->oGeneralProduct->getAttribute('price_full') + substr($aBundle['price'], 1);
+				} else {
+					$aBundle['price_full'] = $aBundle['price'];
 				}
+				/**
+				 * Обработка надбавки
+				 */
+				$aBundle['price_full'] = $modx->sbshop->setPriseIncrement($aBundle['price_full'], $aBundle['price_add']);
 				/**
 				 * Делаем набор плейсхолдеров
 				 */

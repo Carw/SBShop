@@ -25,6 +25,25 @@ class SBOptionList {
 		$this->aOptionList = array();
 	}
 
+	/**
+	 * Установка значений для опции по идентификатору
+	 * @param $iNameId
+	 * @param $aValues
+	 */
+	public function setValuesByNameId($iNameId, $aValues) {
+		$this->aOptionList[$iNameId]['values'] = $aValues;
+	}
+
+	/**
+	 * Установка конкретного значения по идентификатору опции и значения
+	 * @param $iNameId
+	 * @param $iValueId
+	 * @param $aValue
+	 */
+	public function setValueByNameIdAndValId($iNameId, $iValueId, $aValue) {
+		$this->aOptionList[$iNameId]['values'][$iValueId] = $aValue;
+	}
+
 	public function getOptionNames() {
 		$aNames = array();
 		if(count($this->aOptionList) > 0) {
@@ -34,6 +53,19 @@ class SBOptionList {
 			}
 		}
 		return $aNames;
+	}
+
+	/**
+	 * Получение значения опции
+	 * @param $iNameId
+	 * @param $iValueId
+	 * @return
+	 */
+	public function getOptionValue($iNameId,$iValueId) {
+		/**
+		 * Возвращаем значение
+		 */
+		return $this->aOptionList[$iNameId]['values'][$iValueId];
 	}
 
 	public function getValuesByOptionName($sName) {

@@ -13,13 +13,6 @@
 
 class SBBundleList {
 
-	/**
-	 * @todo
-	 * - название комплектации
-	 * - цена комплектации
-	 * - набор включенных опций
-	 */
-
 	protected $aBundleList;
 
 	/**
@@ -72,9 +65,10 @@ class SBBundleList {
 	 * @param <type> $fPrice
 	 * @param <type> $sDescription
 	 * @param <type> $sId
+	 * @param String $sAdd Надбавка к стоимости
 	 * @return <type>
 	 */
-	public function add($sName, $sOptions, $fPrice = false, $sDescription = '', $sId = false) {
+	public function add($sName, $sOptions, $fPrice = false, $sDescription = '', $sId = false, $sPriceAdd = '') {
 		/**
 		 * Если не указан заголовок, или пуст список опций
 		 */
@@ -93,28 +87,29 @@ class SBBundleList {
 		 */
 		if(count($aOptions) > 0) {
 			/**
+			 * Собираем все данные по комплектации
+			 */
+			$aAdd = array(
+				'title' => $sName,
+				'price' => $fPrice,
+				'price_add' => $sPriceAdd,
+				'options' => $aOptions,
+				'description' => $sDescription
+			);
+
+			/**
 			 * Если установлен идентификатор
 			 */
 			if($sId) {
 				/**
 				 * делаем запись с заданным идентификатором
 				 */
-				$this->aBundleList[$sId] = array(
-					'title' => $sName,
-					'price' => $fPrice,
-					'options' => $aOptions,
-					'description' => $sDescription
-				);
+				$this->aBundleList[$sId] = $aAdd;
 			} else {
 				/**
 				 * делаем запись автоматическим идентификатором
 				 */
-				$this->aBundleList[] = array(
-					'title' => $sName,
-					'price' => $fPrice,
-					'options' => $aOptions,
-					'description' => $sDescription
-				);
+				$this->aBundleList[] = $aAdd;
 			}
 		}
 	}
