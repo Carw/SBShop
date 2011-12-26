@@ -599,9 +599,9 @@ class SBShop {
 							$sVal = MODX_BASE_URL . $this->sBaseUrl . $sVal . $this->config['url_suffix'];
 						}
 					}
-				} elseif ($sKey === 'price') {
+				} elseif ($sKey === 'price' or $sKey === 'price_full') {
 					if($sVal !== '') {
-						$sVal = intval($sVal);
+						$sVal = number_format(round($sVal, $this->config['price_round']['precision']), $this->config['price_round']['decimals'], $this->config['price_round']['dec_point'], $this->config['price_round']['thousands_sep']);
 					}
 				}
 			}

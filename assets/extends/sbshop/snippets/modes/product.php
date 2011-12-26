@@ -173,8 +173,7 @@ class product_mode {
 					 * Если значение равно null, то устанавливаем цену опции
 					 */
 					if($aValue['value'] != 'null') {
-						$aValue['price'] = $aValue['value'];
-						$aValue['price'] = $modx->sbshop->setPriseIncrement($aValue['price'], $aValue['price_add']);
+						$aValue['price'] = $modx->sbshop->setPriseIncrement($aValue['value'], $aValue['price_add']);
 					} else {
 						$aValue['price'] = '';
 					}
@@ -192,8 +191,7 @@ class product_mode {
 					 */
 					foreach ($aValues as $aValue) {
 						if($aValue['value'] != 'null') {
-							$aValue['price'] = $aValue['value'];
-							$aValue['price'] = $modx->sbshop->setPriseIncrement($aValue['price'], $aValue['price_add']);
+							$aValue['price'] = $modx->sbshop->setPriseIncrement($aValue['value'], $aValue['price_add']);
 						} else {
 							$aValue['price'] = '';
 						}
@@ -319,7 +317,6 @@ class product_mode {
 					$aBundle['price_full'] = $modx->sbshop->oGeneralProduct->getAttribute('price_full') + $modx->sbshop->oGeneralProduct->getPriceByOptions($aBundle['options']);
 				} elseif(substr($aBundle['price'],0,1) === '+') {
 					/**
-					 * Стоимость задана и нам нужно определить правило ее формирования.
 					 * Если первый символ - "+"
 					 */
 					$aBundle['price_full'] = $modx->sbshop->oGeneralProduct->getAttribute('price_full') + substr($aBundle['price'], 1);
