@@ -304,17 +304,17 @@ class order_mode {
 				 */
 				$aOrderInfo = $oOrder->getOrderSetInfo($iSetId);
 				/**
-				 * Добавляем плейсхолдеры информации заказа
-				 */
-				$aProductRepl = array_merge($aProductRepl,$modx->sbshop->arrayToPlaceholders($aOrderInfo));
-				/**
 				 * Делаем рассчет цены товара
 				 */
-				$aProductRepl['[+sb.price+]'] = $oOrder->getProductPriceBySetId($iSetId);
+				$aOrderInfo['price'] = $oOrder->getProductPriceBySetId($iSetId);
 				/**
 				 * Общая сумма за товар
 				 */
-				$aProductRepl['[+sb.summ+]'] = $oOrder->getProductSummBySetId($iSetId);
+				$aOrderInfo['summ'] = $oOrder->getProductSummBySetId($iSetId);
+				/**
+				 * Добавляем плейсхолдеры информации заказа
+				 */
+				$aProductRepl = array_merge($aProductRepl, $modx->sbshop->arrayToPlaceholders($aOrderInfo));
 				/**
 				 * Если установлена комплектация
 				 */
@@ -395,7 +395,7 @@ class order_mode {
 			/**
 			 * Полная информация о заказанных товарах
 			 */
-			$aOrderRepl['[+sb.products+]'] = str_replace('[+sb.wrapper+]', implode($aProductRows), $aTemplates['product_outer']);
+			$aOrderRepl['[+sb.products+]'] = str_replace('[+sb.wrapper+]', implode('', $aProductRows), $aTemplates['product_outer']);
 			/**
 			 * Доступные для управления статусы
 			 */
@@ -428,7 +428,7 @@ class order_mode {
 				/**
 				 * Заносим в контейнер и делаем плейсхолдер
 				 */
-				$aOrderRepl['[+sb.action+]'] = str_replace('[+sb.wrapper+]', implode($aStatRows), $aTemplates['action_outer']);
+				$aOrderRepl['[+sb.action+]'] = str_replace('[+sb.wrapper+]', implode('', $aStatRows), $aTemplates['action_outer']);
 			} else {
 				/**
 				 * Делаем плейсхолдер управления пустым

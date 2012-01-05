@@ -574,9 +574,9 @@ class SBShop {
 		 */
 		foreach ($aData as $sKey => $sVal) {
 			/**
-			 * Если обработка происходит не в админке
+			 * Если значение не является объектом
 			 */
-			if(!$modx->insideManager()) {
+			if(!is_object($sVal)) {
 				/**
 				 * Преобразование некоторых типов параметров для правильного вывода в шаблон
 				 */
@@ -599,16 +599,16 @@ class SBShop {
 							$sVal = MODX_BASE_URL . $this->sBaseUrl . $sVal . $this->config['url_suffix'];
 						}
 					}
-				} elseif ($sKey === 'price' or $sKey === 'price_full') {
+				} elseif ($sKey === 'price' or $sKey === 'price_full' or $sKey === 'summ') {
 					if($sVal !== '') {
 						$sVal = number_format(round($sVal, $this->config['price_round']['precision']), $this->config['price_round']['decimals'], $this->config['price_round']['dec_point'], $this->config['price_round']['thousands_sep']);
 					}
 				}
+				/**
+				 * Добавляем значение к массиву
+				 */
+				$phData['[+' . $sPrefix . $sKey . $sSuffix . '+]'] = $sVal;
 			}
-			/**
-			 * Добавляем значение к массиву
-			 */
-			$phData['[+' . $sPrefix . $sKey . $sSuffix . '+]'] = $sVal;
 		}
 		return $phData;
 	}

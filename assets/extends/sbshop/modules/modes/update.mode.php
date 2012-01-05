@@ -51,6 +51,10 @@ class update_mode {
 		 * Изменение формата хранения параметров для добавления группировки
 		 */
 		//$this->groupAttributes();
+		/**
+		 * Обновление списка товаров хранимых в заказах. Версия 02.01.12
+		 */
+		$this->updateOrderProductList();
 		
 		echo '<p>Если вы ожидали, что здесь скрывается автоматическое обновление, то зря. Для работы необхожимо раскомментировать необходимую строку у режима модуля "update".</p>';
 
@@ -245,6 +249,64 @@ class update_mode {
 		echo '</pre>';
 	}
 
+
+	/**
+	 * Обновление хранения списка товаров в заказах
+	 */
+	protected function updateOrderProductList() {
+		global $modx;
+		/**
+		 * Загружаем список всех заказов
+		 */
+		$rs = $modx->db->select('*', $modx->getFullTableName('sbshop_orders'));
+		$aRaws = $modx->db->makeArray($rs);
+		/**
+		 * Обрабатываем каждую запись
+		 */
+		foreach ($aRaws as $aRaw) {
+			/**
+			 * Десериализуем
+			 */
+			$aProducts = json_decode($aRaw['order_products'], true);
+			/**
+			 * Переработанный массив
+			 */
+			$aProductsNew = array();
+			/**
+			 * Обрабатываем список товаров
+			 */
+			foreach ($aProducts as $sKey => $aProduct) {
+				$iProductId = intval($sKey);
+				/**
+				 * Загружаем товар
+				 */
+				$oProduct = new SBProduct();
+				$oProduct->load($iProductId, true);
+				/**
+				 * Передаем все старые значения в том же виде
+				 */
+				$aProductsNew[$sKey] = $aProduct;
+				/**
+				 * Добавляем информацию о товаре
+				 */
+				$aProductsNew[$sKey]['product'] = $oProduct;
+			}
+			/**
+			 * Сериализуем результат
+			 */
+			$aRaw['order_products'] = base64_encode(serialize($aProductsNew));
+			/**
+			 * Обновляем запись
+			 */
+			$aUpd = array(
+				'order_products' => $aRaw['order_products']
+			);
+			if($modx->db->update($aUpd, $modx->getFullTableName('sbshop_orders'),'order_id = ' . $aRaw['order_id'])) {
+				echo('<pre>Обновлен заказ номер: ' . $aRaw['order_id'] . '</pre>');
+			}
+		}
+	}
+
 	protected function parseOldAttributes($sParams = '') {
 		global $modx;
 		/**
@@ -356,9 +418,10 @@ class update_mode {
 			 * Обрабатываем информацию по каждому товару
 			 */
 			foreach($aProductRaws as $aProductRaw) {
-
+				/**
+				 * Десериализуем параметры
+				 */
 				$aProductAttrs = unserialize(base64_decode($aProductRaw['product_attributes']));
-				//var_dump('<pre>',$aProductAttrs,'</pre>');
 				/**
 				 * Получаем идентификаторы
 				 */

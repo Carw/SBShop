@@ -57,6 +57,10 @@ class SBOrder {
 		 */
 		$this->oComments = new SBTimeList();
 		/**
+		 * Список товаров в заказе
+		 */
+		$this->oProductList = new SBProductList();
+		/**
 		 * Если переданы параметры
 		 */
 		if(is_array($aParam)) {
@@ -64,10 +68,6 @@ class SBOrder {
 			 * Устанавливаем параметры заказа по переданному массиву
 			 */
 			$this->setAttributes($aParam);
-			/**
-			 * Загружаем список заказанных товаров
-			 */
-			$this->oProductList = new SBProductList('',$this->getProductIds());
 		}
 	}
 	
@@ -225,6 +225,15 @@ class SBOrder {
 		 */
 		if(is_array($aParams)) {
 			/**
+			 * Загружаем заказанный товар
+			 */
+			$oProduct = new SBProduct();
+			$oProduct->load($iProductId);
+			/**
+			 * Добавляем товар
+			 */
+			$aParams['product'] = $oProduct;
+			/**
 			 * Если передана индивидуальная комплектация, но нет значений
 			 */
 			if(isset($aParams['bundle']) and ($aParams['bundle'] === 'base' or $aParams['bundle'] === 'personal') and !isset($aParams['sboptions'])) {
@@ -237,14 +246,6 @@ class SBOrder {
 			 * Если передана комплектация или опции
 			 */
 			if(isset($aParams['bundle']) or (isset($aParams['sboptions']) and count($aParams['sboptions']) > 0)) {
-				/**
-				 * Загружаем заказанный товар
-				 */
-				$oProduct = new SBProduct();
-				$oProduct->load($iProductId);
-				/**
-				 *
-				 */
 				/**
 				 * Переменная для сбора идентификатора
 				 */
@@ -771,7 +772,7 @@ class SBOrder {
 	 * Сериализация данных о заказанных товарах
 	 */
 	public function serializeProducts() {
-		$this->aOrderData['products'] = json_encode($this->aProducts);
+		$this->aOrderData['products'] = base64_encode(serialize($this->aProducts));
 		return $this->aOrderData['products'];
 	}
 	
@@ -789,7 +790,21 @@ class SBOrder {
 		/**
 		 * десериализуем данные из JSON
 		 */
-		$this->aProducts = json_decode($sParams, true);
+		$this->aProducts = unserialize(base64_decode($sParams));
+		/**
+		 * Если товары есть в списке
+		 */
+		if($this->aProducts) {
+			/**
+			 * Обрабатываем каждый товар в заказе
+			 */
+			foreach ($this->aProducts as $aProduct) {
+				/**
+				 * Добавляем товар в список товаров
+				 */
+				$this->oProductList->addProduct($aProduct['product']);
+			}
+		}
 		/**
 		 * Возвращаем результат
 		 */

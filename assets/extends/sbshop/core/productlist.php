@@ -321,7 +321,7 @@ class SBProductList {
 		$sProductIds = implode(',',$aProductIds);
 		/**
 		 * Количество товаров на страницу
-		 * XXX разобраться с постраничной разбивкой
+		 * @todo разобраться с постраничной разбивкой
 		 */
 		$ProductPerPage = $modx->sbshop->config['product_per_page'];
 		/**
@@ -355,7 +355,15 @@ class SBProductList {
 			}
 		}
 	}
-	
+
+	/**
+	 * Добавление переданного товара в список
+	 * @param SBProduct $oProduct Товар
+	 */
+	public function addProduct($oProduct) {
+		$this->aProductList[$oProduct->getAttribute('id')] = $oProduct;
+	}
+
 	/**
 	 * Получение списка товаров
 	 */

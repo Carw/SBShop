@@ -224,13 +224,13 @@ class cart_mode {
 				 */
 				$aOrderInfo = $modx->sbshop->oOrder->getOrderSetInfo($iSetId);
 				/**
+				 * Делаем рассчет цены товара
+				 */
+				$aOrderInfo['price'] = $modx->sbshop->oOrder->getProductPriceBySetId($iSetId);
+				/**
 				 * Добавляем плейсхолдеры информации заказа
 				 */
 				$aRepl = array_merge($aRepl,$modx->sbshop->arrayToPlaceholders($aOrderInfo));
-				/**
-				 * Делаем рассчет цены товара
-				 */
-				$aRepl['[+sb.price+]'] = $modx->sbshop->oOrder->getProductPriceBySetId($iSetId);
 				/**
 				 * Идентификатор набора товара
 				 */

@@ -221,17 +221,17 @@ class checkout_mode {
 				 */
 				$aOrderInfo = $modx->sbshop->oOrder->getOrderSetInfo($iSetId);
 				/**
-				 * Добавляем плейсхолдеры информации заказа
-				 */
-				$aRepl = array_merge($aRepl,$modx->sbshop->arrayToPlaceholders($aOrderInfo));
-				/**
 				 * Делаем рассчет цены товара
 				 */
-				$aRepl['[+sb.price+]'] = $modx->sbshop->oOrder->getProductPriceBySetId($iSetId);
+				$aOrderInfo['price'] = $modx->sbshop->oOrder->getProductPriceBySetId($iSetId);
 				/**
 				 * Идентификатор набора товара
 				 */
-				$aRepl['[+sb.set_id+]'] = $iSetId;
+				$aOrderInfo['set_id'] = $iSetId;
+				/**
+				 * Добавляем плейсхолдеры информации заказа
+				 */
+				$aRepl = array_merge($aRepl,$modx->sbshop->arrayToPlaceholders($aOrderInfo));
 				/**
 				 * Если установлены опции в товаре
 				 */
