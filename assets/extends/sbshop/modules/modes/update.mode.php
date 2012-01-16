@@ -54,7 +54,11 @@ class update_mode {
 		/**
 		 * Обновление списка товаров хранимых в заказах. Версия 02.01.12
 		 */
-		$this->updateOrderProductList();
+		//$this->updateOrderProductList();
+		/**
+		 * Обновление формата хранения изображений и привьюшек для товаров
+		 */
+		//$this->updateImages();
 		
 		echo '<p>Если вы ожидали, что здесь скрывается автоматическое обновление, то зря. Для работы необхожимо раскомментировать необходимую строку у режима модуля "update".</p>';
 
@@ -249,64 +253,6 @@ class update_mode {
 		echo '</pre>';
 	}
 
-
-	/**
-	 * Обновление хранения списка товаров в заказах
-	 */
-	protected function updateOrderProductList() {
-		global $modx;
-		/**
-		 * Загружаем список всех заказов
-		 */
-		$rs = $modx->db->select('*', $modx->getFullTableName('sbshop_orders'));
-		$aRaws = $modx->db->makeArray($rs);
-		/**
-		 * Обрабатываем каждую запись
-		 */
-		foreach ($aRaws as $aRaw) {
-			/**
-			 * Десериализуем
-			 */
-			$aProducts = json_decode($aRaw['order_products'], true);
-			/**
-			 * Переработанный массив
-			 */
-			$aProductsNew = array();
-			/**
-			 * Обрабатываем список товаров
-			 */
-			foreach ($aProducts as $sKey => $aProduct) {
-				$iProductId = intval($sKey);
-				/**
-				 * Загружаем товар
-				 */
-				$oProduct = new SBProduct();
-				$oProduct->load($iProductId, true);
-				/**
-				 * Передаем все старые значения в том же виде
-				 */
-				$aProductsNew[$sKey] = $aProduct;
-				/**
-				 * Добавляем информацию о товаре
-				 */
-				$aProductsNew[$sKey]['product'] = $oProduct;
-			}
-			/**
-			 * Сериализуем результат
-			 */
-			$aRaw['order_products'] = base64_encode(serialize($aProductsNew));
-			/**
-			 * Обновляем запись
-			 */
-			$aUpd = array(
-				'order_products' => $aRaw['order_products']
-			);
-			if($modx->db->update($aUpd, $modx->getFullTableName('sbshop_orders'),'order_id = ' . $aRaw['order_id'])) {
-				echo('<pre>Обновлен заказ номер: ' . $aRaw['order_id'] . '</pre>');
-			}
-		}
-	}
-
 	protected function parseOldAttributes($sParams = '') {
 		global $modx;
 		/**
@@ -493,6 +439,154 @@ class update_mode {
 				if($modx->db->query($sql)) {
 					echo('<pre>Раздел "' . $aCategoryRaw['category_title'] . '" успешно обновлен.</pre>');
 				}
+			}
+		}
+	}
+
+	/**
+	 * Обновление хранения списка товаров в заказах
+	 */
+	protected function updateOrderProductList() {
+		global $modx;
+		/**
+		 * Загружаем список всех заказов
+		 */
+		$rs = $modx->db->select('*', $modx->getFullTableName('sbshop_orders'));
+		$aRaws = $modx->db->makeArray($rs);
+		/**
+		 * Обрабатываем каждую запись
+		 */
+		foreach ($aRaws as $aRaw) {
+			/**
+			 * Десериализуем
+			 */
+			$aProducts = json_decode($aRaw['order_products'], true);
+			/**
+			 * Переработанный массив
+			 */
+			$aProductsNew = array();
+			/**
+			 * Обрабатываем список товаров
+			 */
+			foreach ($aProducts as $sKey => $aProduct) {
+				$iProductId = intval($sKey);
+				/**
+				 * Загружаем товар
+				 */
+				$oProduct = new SBProduct();
+				$oProduct->load($iProductId, true);
+				/**
+				 * Передаем все старые значения в том же виде
+				 */
+				$aProductsNew[$sKey] = $aProduct;
+				/**
+				 * Добавляем информацию о товаре
+				 */
+				$aProductsNew[$sKey]['product'] = $oProduct;
+			}
+			/**
+			 * Сериализуем результат
+			 */
+			$aRaw['order_products'] = base64_encode(serialize($aProductsNew));
+			/**
+			 * Обновляем запись
+			 */
+			$aUpd = array(
+				'order_products' => $aRaw['order_products']
+			);
+			if($modx->db->update($aUpd, $modx->getFullTableName('sbshop_orders'),'order_id = ' . $aRaw['order_id'])) {
+				echo('<pre>Обновлен заказ номер: ' . $aRaw['order_id'] . '</pre>');
+			}
+		}
+	}
+
+	/**
+	 * Обновление формата хранения изображений и создание привьюшек
+	 */
+	protected function updateImages() {
+		global $modx;
+		/**
+		 * Получаем данные о всех имеющихся товарах
+		 */
+		$rs = $modx->db->select('product_id, product_images', $modx->getFullTableName('sbshop_products'));
+		$aProductsRaws = $modx->db->makeArray($rs);
+		/**
+		 * Конфигурация для ресайза
+		 */
+		$aResizeConfigs = $modx->sbshop->config['image_resizes'];
+		/**
+		 * Конфигурация для миниатюры
+		 */
+		$aResizePreviewConfig = array(array(
+			'mode' => 'xy',
+			'w' => 96,
+			'h' => 96,
+			'quality' => 85,
+			'key' => '-prv'
+		));
+		/**
+		 * Максимальные параметры в конфиге
+		 */
+		$iWidthMax = 0;
+		$sKeyMax = '';
+		/**
+		 * Пробегаем все конфигурации, чтобы определить конфиг с самой большой картинкой
+		 */
+		foreach ($aResizeConfigs as $aConfig) {
+			/**
+			 * Если текущий конфиг имеет картинку большего размера, чем заданный
+			 */
+			if($aConfig['w'] > $iWidthMax) {
+				/**
+				 * Записываем новые значения в переменные
+				 */
+				$iWidthMax = $aConfig['w'];
+				$sKeyMax = $aConfig['key'];
+			}
+		}
+		/**
+		 * Обрабатываем каждый товар
+		 */
+		foreach ($aProductsRaws as $aProductRaw) {
+			/**
+			 * Разбиваем список ключей
+			 */
+			$aImgIds = explode('||', $aProductRaw['product_images']);
+			/**
+			 * Измененный массив изображений
+			 */
+			$aImgIdsNew = array();
+			/**
+			 * Обрабатываем каждый идентификатор изображения
+			 */
+			foreach ($aImgIds as $sImageId) {
+				/**
+				 * Формируем путь до самого большого изображения в наборе
+				 */
+				$sImagePath = $modx->sbshop->config['image_base_dir'] . $aProductRaw['product_id'] . '/' . $sImageId . $sKeyMax . '.jpg';
+				$sBasePath = $modx->sbshop->config['image_base_dir'] . $aProductRaw['product_id'] . '/';
+				/**
+				 * Если файл существует
+				 */
+				if (is_file($sImagePath)) {
+					/**
+					 * Делаем привьюшку
+					 */
+					SBImage::imageResize($sImagePath, $sBasePath, $aResizePreviewConfig, $sImageId);
+					/**
+					 * Добавляем изображение в массив
+					 */
+					$aImgIdsNew[$sImageId] = array('id' => $sImageId);
+				}
+			}
+			/**
+			 * Массив обновляемых значений
+			 */
+			$aUpd = array(
+				'product_images' => serialize($aImgIdsNew)
+			);
+			if ($modx->db->update($aUpd, $modx->getFullTableName('sbshop_products'), 'product_id = ' . $aProductRaw['product_id'])) {
+				echo('<p>Обновлены изображения для товара: ' . $aProductRaw['product_id'] . '</p>');
 			}
 		}
 	}

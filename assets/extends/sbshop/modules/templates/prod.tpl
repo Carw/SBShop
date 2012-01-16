@@ -6,8 +6,11 @@
 		document.write("<scr" + "ipt type=\"text/javascript\" src=\"' . MODX_SITE_URL . 'assets/libs/javascript/jquery-1.3.2.min.js\"></scr" + "ipt>");
 	}
 </script>
-<script type="text/javascript" src="[+site.url+]assets/libs/javascript/jquery.tablednd_0_5.js"></script>
+<!--script type="text/javascript" src="[+site.url+]assets/libs/javascript/jquery.tablednd_0_5.js"></script-->
+<script type="text/javascript" src="[+site.url+]assets/libs/javascript/jquery.dragsort-0.4.3.min.js"></script>
 <script type="text/javascript" src="[+site.url+]assets/extends/sbshop/modules/templates/js/product.js"></script>
+<link href="[+site.url+]assets/libs/javascript/css/fileuploader.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="[+site.url+]assets/libs/javascript/fileuploader.js"></script>
 
 <div class="sectionHeader">
 	<div class="breadcrumbs">
@@ -21,7 +24,7 @@
 	<h1>[+lang.product_edit+]</h1>
 
 	<form name="mutate" id="mutate" class="content" method="post" enctype="multipart/form-data" action="[+module.link+]&mode=prod&act=[+module.act+]">
-	<input type="hidden" name="prodid" value="[+product.id+]" />
+	<input type="hidden" id="prodid" name="prodid" value="[+product.id+]" />
 	<input type="hidden" name="catid" value="[+product.category+]" />
 	<input type="hidden" name="ok" value="true" />
 
@@ -97,27 +100,18 @@
 			<div class="tab-page" id="tabImages">
 				<h2 class="tab">[+lang.product_tab_images+]</h2>
 				<script type="text/javascript">tpResources.addTabPage(document.getElementById("tabImages"));</script>
-				<div style="width:100%">
-					<p><input type="file" name="img[]" onchange="documentDirty=true;" />[+product.images.1+]</p>
-					<p><input type="file" name="img[]" onchange="documentDirty=true;" />[+product.images.2+]</p>
-					<p><input type="file" name="img[]" onchange="documentDirty=true;" />[+product.images.3+]</p>
-					<p><input type="file" name="img[]" onchange="documentDirty=true;" />[+product.images.4+]</p>
-					<p><input type="file" name="img[]" onchange="documentDirty=true;" />[+product.images.5+]</p>
-					<p><input type="file" name="img[]" onchange="documentDirty=true;" />[+product.images.6+]</p>
-					<p><input type="file" name="img[]" onchange="documentDirty=true;" />[+product.images.7+]</p>
-					<p><input type="file" name="img[]" onchange="documentDirty=true;" />[+product.images.8+]</p>
-					<p><input type="file" name="img[]" onchange="documentDirty=true;" />[+product.images.9+]</p>
-					<p><input type="file" name="img[]" onchange="documentDirty=true;" />[+product.images.10+]</p>
-					<p><input type="file" name="img[]" onchange="documentDirty=true;" />[+product.images.11+]</p>
-					<p><input type="file" name="img[]" onchange="documentDirty=true;" />[+product.images.12+]</p>
-					<p><input type="file" name="img[]" onchange="documentDirty=true;" />[+product.images.13+]</p>
-					<p><input type="file" name="img[]" onchange="documentDirty=true;" />[+product.images.14+]</p>
-					<p><input type="file" name="img[]" onchange="documentDirty=true;" />[+product.images.15+]</p>
-					<p><input type="file" name="img[]" onchange="documentDirty=true;" />[+product.images.16+]</p>
-					<p><input type="file" name="img[]" onchange="documentDirty=true;" />[+product.images.17+]</p>
-					<p><input type="file" name="img[]" onchange="documentDirty=true;" />[+product.images.18+]</p>
-					<p><input type="file" name="img[]" onchange="documentDirty=true;" />[+product.images.19+]</p>
-					<p><input type="file" name="img[]" onchange="documentDirty=true;" />[+product.images.20+]</p>
+				<div id="images" style="width:100%">
+					<div id="file-uploader">
+					    <noscript>
+					        <p>Please enable JavaScript to use file uploader.</p>
+					        <!-- or put a simple form for upload here -->
+					    </noscript>
+					</div>
+
+					<div id="imagebox" class="imagebox">
+						[+images+]
+					</div>
+
 				</div>
 			</div>
 			<div class="tab-page" id="tabAttributes">
@@ -517,4 +511,11 @@
 		<option value="p" style="color: green" [+attribute.type.primary+]>[+lang.product_attribute_type_primary+]</option>
 		<option value="h" style="color: silver;" [+attribute.type.hidden+]>[+lang.product_attribute_type_hidden+]</option>
 	</select>
+</div>
+<!--# image_row: Шаблон изображения #-->
+<div class="img" id="img-[+sb.id+]" style="background-image: url('[+sb.image+]')">
+	<div class="imagedel">
+		<input type="image" class="image_del" style="width: auto;" src="/manager/media/style/MODxCarbon/images/icons/delete.png">
+	</div>
+	<input type="hidden" class="image_id" name="img[]" value="[+sb.id+] " />
 </div>

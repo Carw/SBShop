@@ -22,11 +22,11 @@ class SBImage {
 	 * @param <type> $sMode
 	 * @return <type>
 	 */
-	public function imageResize($sSrc,$sBaseDir,$aParams) {
+	public function imageResize($sSrc, $sBaseDir, $aParams, $sFileName = false) {
 		/**
 		 * Если картинку не передали
 		 */
-		if(!$sSrc or !getimagesize($sSrc) or count($aParams) <= 0) {
+		if (!$sSrc or !getimagesize($sSrc) or count($aParams) <= 0) {
 			/**
 			 * Убиваем файл
 			 */
@@ -55,7 +55,7 @@ class SBImage {
 		/**
 		 * Если это JPG
 		 */
-		if($sTypeImg == 'image/jpeg') {
+		if ($sTypeImg == 'image/jpeg') {
 			/**
 			 * Загружаем изображение
 			 */
@@ -70,17 +70,22 @@ class SBImage {
 				mkdir($sBaseDir, 0777, true);
 			}
 			/**
-			 * Генерим название картинки
+			 * Если не указано название файла
 			 */
-			$sFileName = substr(md5(uniqid(rand(),true)),0,5);
-			/**
-			 * Если файл существует
-			 */
-			while (file_exists($sBaseDir . $sFileName . $aParams[0]['key'] . '.jpg')) {
+			if(!$sFileName) {
 				/**
-				 * Генерим новое название
+				 * Генерим название картинки
 				 */
 				$sFileName = substr(md5(uniqid(rand(),true)),0,5);
+				/**
+				 * Если файл существует
+				 */
+				while (file_exists($sBaseDir . $sFileName . $aParams[0]['key'] . '.jpg')) {
+					/**
+					 * Генерим новое название
+					 */
+					$sFileName = substr(md5(uniqid(rand(),true)),0,5);
+				}
 			}
 			/**
 			 * Обрабатываем все размеры

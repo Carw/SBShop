@@ -135,7 +135,7 @@ class SBShop {
 			/**
 			 * Записываем базовый идентификатор документа
 			 */
-			$this->iBaseDocId = $iDocStart;
+			$this->iBaseDocId = $this->config['doc_start'];
 			/**
 			 * Устанавливаем режим менеджера
 			 */

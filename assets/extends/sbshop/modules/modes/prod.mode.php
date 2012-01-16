@@ -62,8 +62,6 @@ class prod_mode {
 			case 'new':
 				/**
 				 * Создание нового продукта
-				 */
-				/**
 				 * Устанавливаем флаг нового продукта
 				 */
 				$this->bIsNewProduct = true;
@@ -93,8 +91,6 @@ class prod_mode {
 			case 'edit':
 				/**
 				 * Редактирование товара
-				 */
-				/**
 				 * Устанавливаем флаг нового товара
 				 */
 				$this->bIsNewProduct = false;
@@ -253,6 +249,40 @@ class prod_mode {
 			 */
 			$phModule['[+attributes+]'] .= str_replace(array_keys($aRepl), array_values($aRepl), $this->aTemplate['attribute_outer']);
 		}
+		/**
+		 * Массив изображений
+		 */
+		$aImageList = $this->oProduct->getAllImages();
+		/**
+		 * Массив для рядов изображений
+		 */
+		$aImages = array();
+		/**
+		 * Если изображения есть
+		 */
+		if(count($aImageList) > 0) {
+			/**
+			 * Обрабатываем каждое изображение
+			 */
+			foreach ($aImageList as $sKey => $aImage) {
+				/**
+				 * Массив значений
+				 */
+				$aRepl = array(
+					'id' => $sKey,
+					'image' => $modx->sbshop->config['image_base_url'] . $this->oProduct->getAttribute('id') . '/' . $sKey . '-prv.jpg'
+				);
+				/**
+				 * Готовим плейсхолдеры
+				 */
+				$aRepl = $modx->sbshop->arrayToPlaceholders($aRepl);
+				/**
+				 * Делаем вставку в шаблон изображения
+				 */
+				$aImages[] = str_replace(array_keys($aRepl), array_values($aRepl), $this->aTemplate['image_row']);
+			}
+		}
+		$phModule['[+images+]'] = implode('', $aImages);
 		/**
 		 * Массив для рядов опций
 		 */
@@ -624,42 +654,6 @@ class prod_mode {
 				$this->oProduct->setAttribute('date_edit',date('Y-m-d G:i:s'));
 			}
 			/**
-			 * Обрабатываем изображения здесь, так как нам важно знать идентификатор товара
-			 */
-			if(isset($_FILES['img'])) {
-				/**
-				 * Массив изображений
-				 */
-				$aImgs = array();
-				/**
-				 * Обрабатываем каждый полученный файл
-				 */
-				foreach ($_FILES['img']['tmp_name'] as $sSrc) {
-					/**
-					 * Если файл нормально загружен
-					 */
-					if(is_uploaded_file($sSrc)) {
-						/**
-						 * Определяем базовую директорию для изображений
-						 */
-						$sBasePath = $modx->sbshop->config['image_base_dir'] . $this->oProduct->getAttribute('id') . '/';
-						/**
-						 * Делаем ресайз
-						 */
-						$aImgs[] = SBImage::imageResize($sSrc, $sBasePath, $modx->sbshop->config['image_resizes']);
-					}
-				}
-				/**
-				 * Если массив переданных изображений не пуст
-				 */
-				if(count($aImgs) > 0) {
-					/**
-					 * Устанавливаем информацию об изображениях
-					 */
-					$this->oProduct->setAttribute('images',implode('||', $aImgs));
-				}
-			}
-			/**
 			 * Снова сохраняем.
 			 */
 			$this->oProduct->save();
@@ -873,6 +867,20 @@ class prod_mode {
 		 * Актуализируем коллекцию параметров. Передаем только названия
 		 */
 		SBAttributeCollection::setAttributeCollection(array_keys($this->oProduct->getExtendAttributes()));
+		/**
+		 * Если есть изображения
+		 */
+		if ($_POST['img']) {
+			/**
+			 * Обрабатываем каждый полученный файл
+			 */
+			foreach ($_POST['img'] as $sImageId) {
+				/**
+				 * Добавляем изображение в файл
+				 */
+				$this->oProduct->addImage(trim($sImageId));
+			}
+		}
 		/**
 		 * Если установлены опции
 		 */

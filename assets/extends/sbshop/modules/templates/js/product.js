@@ -23,6 +23,31 @@ bundle_reinit = function() {
 	bundle_init();
 };
 
+image_delete = function(){
+	var img = $(this).parents('div.img');
+	var id = img.find('input.image_id').val();
+	$.ajax({
+		type: "POST",
+		dataType: 'json',
+		url: "/assets/extends/sbshop/ajax/ajax.module.php",
+		data: 'm=imgDel&prodid=' + $('#prodid').val() + '&imgid=' + id,
+		success: function(data){
+			/**
+			 * Удаление успешно состоялось
+			 */
+			if(data['success'] == true) {
+				/**
+				 * Удаляем картинку из списка
+				 */
+				img.remove();
+			} else {
+				alert(data['error']);
+			}
+		}
+	});
+	return false;
+}
+
 $(document).ready(function(){
 	// обработка клика на кнопку добавления новой опции
 	$("#new_option_add").click(function(){
@@ -55,8 +80,13 @@ $(document).ready(function(){
 				elem.addClass('visible');
 			}
 		});
-		$('#options .sorttable').tableDnD({
+		/*$('#options .sorttable').tableDnD({
 			dragHandle: "dragHandle"
+		});*/
+		$('#options .sorttable tbody').dragsort({
+			itemSelector: 'tr',
+			dragSelector: "td.dragHandle",
+			placeHolderTemplate: '<tr class="option"><td class="dragHandle"><div>&nbsp;</div></td><td></td></tr>'
 		});
 		option_reinit();
 		return false;
@@ -155,9 +185,14 @@ $(document).ready(function(){
 				elem.addClass('visible');
 			}
 		});
-		$('#bundles .sorttable').tableDnD({
-			dragHandle: "dragHandle"
+		$('#bundles .sorttable tbody').dragsort({
+			itemSelector: 'tr',
+			dragSelector: "td.dragHandle",
+			placeHolderTemplate: '<tr class="bundle"><td class="dragHandle"><div>&nbsp;</div></td><td></td></tr>'
 		});
+		/*$('#bundles .sorttable').tableDnD({
+			dragHandle: "dragHandle"
+		});*/
 		bundle_reinit();
 		return false;
 	});
@@ -248,9 +283,46 @@ $(document).ready(function(){
 		}
 	});
 
-	$('.sorttable').tableDnD({
-		dragHandle: "dragHandle"
+	$('.sorttable tbody').dragsort({
+		itemSelector: 'tr',
+		dragSelector: "td.dragHandle",
+		placeHolderTemplate: '<tr class="option"><td class="dragHandle"><div>&nbsp;</div></td><td></td></tr>'
 	});
+
+	/*$('.sorttable').tableDnD({
+		dragHandle: "dragHandle"
+	});*/
+
+    $('#imagebox').dragsort({
+	    itemSelector: "div",
+        dragSelector: "div",
+	    placeHolderTemplate: '<div class="img"></div>'
+    });
+
+    var uploader = new qq.FileUploader({
+        element: document.getElementById('file-uploader'),
+        action: '/assets/extends/sbshop/ajax/ajax.module.php',
+        params: {
+            m: 'imgUpl',
+            prodid: $('#prodid').val()
+        },
+        allowedExtensions: ['jpg', 'jpeg', 'png', 'gif'],
+        debug: true,
+//        showMessage: function(message){},
+//        onSubmit: function(id, fileName){},
+//        onProgress: function(id, fileName, loaded, total){},
+        onComplete: function(id, fileName, responseJSON){
+	        var elem = $(html_entity_decode(responseJSON['html']));
+	        elem.find('.image_del').click(image_delete);
+	        $('#imagebox').append(elem);
+        }
+//        onCancel: function(id, fileName){}
+    });
+
+	/**
+	 * Обработка события "удаление изображения"
+	 */
+	$("#imagebox .image_del").click(image_delete);
 
 });
 
@@ -298,4 +370,8 @@ function SetUrl(url, width, height, alt){
 	} else {
 		return;
 	}
+}
+
+function html_entity_decode(str) {
+	return $('<textarea>').html(str).text();
 }

@@ -18,8 +18,6 @@ if(!defined('MODX_BASE_PATH')) {
  * Подключаем необходимый файл
  */
 include_once MODX_BASE_PATH . 'assets/extends/sbshop/ajax/ajax.inc.php';
-//var_dump('Hello world!');
-
 
 $aParams = array();
 
@@ -54,6 +52,6 @@ $oAjax = new SBAjax($sMethod, $aParams);
 /**
  * Выводим результат
  */
-echo json_encode($oAjax->result());
+echo htmlspecialchars(json_encode($oAjax->result()), ENT_NOQUOTES);
 
 ?>

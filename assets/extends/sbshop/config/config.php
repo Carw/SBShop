@@ -28,6 +28,10 @@ $config = array(
 	 */
 	'notice_email' => 'info@example.com',
 	/**
+	 * Базовый документ магазина
+	 */
+	'doc_start' => 11,
+	/**
 	 * Настройка списка системных режимов работы магазина
 	 */
 	'route_pages' => array(
@@ -128,7 +132,7 @@ $config = array(
 	/**
 	 * Базовый URL
 	 */
-	'image_base_url' => '[(site_url)]assets/images/sbshop/',
+	'image_base_url' => '/assets/images/sbshop/',
 	/**
 	 * Настройки генерации псевдонима
 	 */

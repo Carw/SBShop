@@ -480,11 +480,56 @@ class SBProduct {
 	}
 
 	/**
+	 * Добавление изображения к товару
+	 * @param $sImageId
+	 * @param bool $aParams
+	 */
+	public function addImage($sImageId, $aParams = false) {
+		global $modx;
+		/**
+		 * Получаем правила ресайза
+		 */
+		$aImageParams = $modx->sbshop->config['image_resizes'];
+		/**
+		 * Массив результирующих изображений
+		 */
+		$aImageLinks = array();
+		/**
+		 * Обрабатываем правила ресайза
+		 */
+		foreach ($aImageParams as $aImageParam) {
+			$aImageLinks[$aImageParam['key']] = $modx->sbshop->config['image_base_url'] . $this->aProductData['id'] . '/' . $sImageId . $aImageParam['key'] . '.jpg';
+		}
+		/**
+		 * Закидываем информацию
+		 */
+		$this->aImages[$sImageId] = $aImageLinks;
+	}
+
+
+	/**
 	 * Десериализация параметров товара
 	 * @param unknown_type $sParams
 	 */
 	public function unserializeAttributes($sParams) {
 		return $this->oProductExtendData->unserializeAttributes($sParams);
+	}
+
+	/**
+	 * Сериализация изображений
+	 */
+	public function serializeImages() {
+		/**
+		 * Преобразованный для сохранения массив
+		 */
+		$aResult = array();
+		/**
+		 * Обрабатываем каждое изображение
+		 */
+		foreach ($this->aImages as $sImageId => $aImage) {
+			$aResult[$sImageId] = array('id' => $sImageId);
+		}
+		return serialize($aResult);
 	}
 
 	/**
@@ -498,7 +543,7 @@ class SBProduct {
 		/**
 		 * Разбиваем список изображений на массив
 		 */
-		$aImageNames = explode('||', $sParams);
+		$aImageNames = unserialize($sParams);
 		/**
 		 * Получаем правила ресайза
 		 */
@@ -506,7 +551,7 @@ class SBProduct {
 		/**
 		 * Обрабатываем каждое изображение
 		 */
-		foreach ($aImageNames as $sImageName) {
+		foreach ($aImageNames as $sImageName => $sImage) {
 			/**
 			 * Массив результирующих изображений
 			 */
@@ -593,13 +638,17 @@ class SBProduct {
 		 */
 		$aData['product_attributes'] = $this->oProductExtendData->serializeAttributes();
 		/**
-		 * Подготавливаем комплектации для хранения
+		 * Подготавливаем комплектации для сохранения
 		 */
 		$aData['product_bundles'] = $this->oBundles->serialize();
 		/**
-		 * Подготавливаем опции для хранения
+		 * Подготавливаем опции для сохранения
 		 */
 		$aData['product_options'] = $this->oOptions->serializeOptions();
+		/**
+		 * Подготавливаем изображения для сохранения
+		 */
+		$aData['product_images'] = $this->serializeImages();
 		/**
 		 * Если ID есть, то делаем обновление информации
 		 */

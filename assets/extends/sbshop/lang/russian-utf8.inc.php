@@ -92,6 +92,7 @@ return array(
 	'product_error_category' => 'Товар должен быть привязан к какой-либо категории.',
 	'product_tab_images' => 'Изображения',
 	'product_images' => 'Изображения',
+	'product_image_delete_error' => 'При удалении изображения возникла какая-то ошибка',
 	'product_tab_options' => 'Опции',
 	'product_options' => 'Опции',
 	'product_option_add' => 'Добавить опцию',

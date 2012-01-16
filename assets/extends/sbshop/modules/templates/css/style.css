@@ -18,7 +18,7 @@ div.sectionHeader {
 }
 
 
-.optiondel, .attributedel, .bundledel {
+.optiondel, .attributedel, .bundledel, .imagedel {
 	float: right;
 }
 
@@ -97,6 +97,22 @@ div.sectionHeader {
 
 #attributes input.attribute_value {
     width: 150px;
+}
+
+#imagebox {
+	overflow: hidden;
+}
+
+#imagebox .img {
+	width: 100px;
+	height: 100px;
+	background-position: center;
+	background-repeat: no-repeat;
+	background-color: #fff;
+	float: left;
+	display: block;
+	margin: 15px 15px 15px 0;
+	border: 1px solid #ccc;
 }
 
 .button_add {
@@ -199,11 +215,11 @@ select {
 	display: block;
 }
 
-#options .option_del, #attributes .attribute_del, #bundles .bundle_del {
+#options .option_del, #attributes .attribute_del, #bundles .bundle_del, .image_del {
 	opacity: 0.3;
 }
 
-#options .option_del:hover, #attributes .attribute_del:hover, #bundles .bundle_del:hover {
+#options .option_del:hover, #attributes .attribute_del:hover, #bundles .bundle_del:hover, #imagebox .image_del:hover {
 	opacity: 1;
 }
 
