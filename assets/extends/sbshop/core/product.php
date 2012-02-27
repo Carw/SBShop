@@ -63,6 +63,10 @@ class SBProduct {
 		 */
 		$this->aProductDataKeys = array_keys($this->aProductData);
 		/**
+		 * Изображения
+		 */
+		$this->aImages = array();
+		/**
 		 * Опции
 		 */
 		$this->oOptions = new SBOptionList();
@@ -506,6 +510,12 @@ class SBProduct {
 		$this->aImages[$sImageId] = $aImageLinks;
 	}
 
+	/**
+	 * Удаление всех изображений из товара
+	 */
+	public function delImages() {
+		$this->aImages = array();
+	}
 
 	/**
 	 * Десериализация параметров товара

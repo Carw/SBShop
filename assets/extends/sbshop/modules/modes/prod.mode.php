@@ -462,6 +462,14 @@ class prod_mode {
 		 */
 		$this->oProduct->setAttribute('id', null);
 		/**
+		 * Убираем флаг наличия товара
+		 */
+		$this->oProduct->setAttribute('published', 0);
+		/**
+		 * Удаляем информацию об изображениях из товара
+		 */
+		$this->oProduct->delImages();
+		/**
 		 * Изменяем alias
 		 */
 		$sAlias = $modx->sbshop->lang['product_copy_alias_prefix'] . $this->oProduct->getAttribute('alias');

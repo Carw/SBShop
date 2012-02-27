@@ -6,7 +6,7 @@
 <div class="cart activ">
 	[+sb.wrapper+]
 	<div class="resume">
-		Общая стоимость: <span class="price"><strong>[+sb.price+]</strong> руб</span>
+		Общая стоимость: <span class="price"><strong>[+sb.price.format+]</strong> руб</span>
 	</div>
 	<div class="actions">
 		<form id="sbcart" method="post" action="[+sb.link_action+]">
@@ -23,7 +23,7 @@
 		<form method="post" action="[+sb.link_action+]">
 		<span class="title"><a href="[+sb.url+]">[+sb.title+]</a></span>
 		<span class="price">
-			[+sb.price+] руб (x[+sb.quantity+]) /
+			[+sb.price.format+] руб (x[+sb.quantity+]) /
 			<input type="hidden" name="sb_order_remove[]" value="[+sb.set_id+]" />
 			<input type="image"  class="imgdel" src="[(site_url)]assets/templates/sbshop/images/del.gif" size="16,16" />
 		</span>

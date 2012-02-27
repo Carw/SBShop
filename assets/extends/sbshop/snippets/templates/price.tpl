@@ -24,7 +24,7 @@
 		<table>
 			<tr class="base">
 				<td class="title"><a href="[+sb.url+]">[+sb.longtitle+]</a></td>
-				<td class="cost">[+sb.price+]</td>
+				<td class="cost">[+sb.price.format+]</td>
 				<td class="checkbox">
 					<input type="checkbox" class="price_check" value="[+sb.price+]">
 				</td>
@@ -37,7 +37,7 @@
 <!--# bundle_row: Пункт товара #-->
 <tr class="bundle">
 	<td class="title">[+sb.title+]</td>
-	<td class="cost">[+sb.price+]</td>
+	<td class="cost">[+sb.price.format+]</td>
 	<td class="checkbox">
 		<input type="checkbox" class="price_check" value="[+sb.price+]">
 	</td>

@@ -47,7 +47,7 @@ echo '<html>
 <head>
 <link rel="stylesheet" type="text/css" href="media/style/MODxCarbon/style.css" />
 <link rel="stylesheet" type="text/css" href="' . MODX_SITE_URL . 'assets/libs/javascript/css/ui-lightness/jquery-ui-1.8.4.custom.css" />
-<link rel="stylesheet" type="text/css" href="' . MODX_SITE_URL . 'assets/extends/sbshop/modules/templates/css/style.css" />
+<link rel="stylesheet" type="text/css" href="' . MODX_SITE_URL . 'assets/extends/sbshop/modules/templates/css/style.css?ver=0.3.1" />
 <script type="text/javascript" src="media/script/tabpane.js"></script>
 
 <style>

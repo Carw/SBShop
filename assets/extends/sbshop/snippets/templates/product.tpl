@@ -26,7 +26,7 @@
 		[+sb.options+]
 		<div class="summary">
 			<div>
-				Стоимость заказа: <span class="summ"><strong id="summ">[+sb.price_full+]</strong> руб</span>
+				Стоимость заказа: <span class="summ"><strong id="summ">[+sb.price_full.format+]</strong> руб</span>
 			</div>
 			<input class="button_active" type="submit" name="sb_order_submit" value="Добавить к заказу" />
 		</div>
@@ -101,7 +101,7 @@
 			<input type="checkbox" id="sboption_[+sb.option.id+]_[+sb.id+]" class="optval" name="sbprod[sboptions][[+sb.option.id+]]" value="[+sb.id+]">
 		</div>
 		<div class="price">
-			[+sb.price+]
+			[+sb.price.format+]
 		</div>
 		<div class="option_title">
 			[+sb.option.title+] [+sb.title+]
@@ -127,21 +127,21 @@
 		<div class="action">
 			<input type="radio" id="sboption_[+sb.option.id+]_[+sb.id+]" class="optval" name="sbprod[sboptions][[+sb.option.id+]]" value="[+sb.id+]">
 		</div>
-		<span class="option_price">[+sb.price+]</span>
+		<span class="option_price">[+sb.price.format+]</span>
 		[+sb.title+]
 	</label>
 </li>
 <!--# single_bundle_base: Вывод базовой комплектации если других комплектаций нет #-->
 <div class="base_bundle">
-	<div class="price">[+sb.price_full+] руб</div>
+	<div class="price">[+sb.price_full.format+] руб</div>
 	<h2>Базовая комплектация</h2>
 	[+sb.bundle.options+]
 </div>
 <!--# multi_bundle_base: Вывод базовой комплектации с другими комплектациями #-->
 <div class="base_bundle">
-	<input type="hidden" id="bundle_price_base" name="bundl_price_base" value="[+sb.price+]">
+	<input type="hidden" id="bundle_price_base" name="bundl_price_base" value="[+sb.price_full+]">
 	<div class="action"><input type="radio" id="bundle_base" name="sbprod[bundle]" value="base" checked="checked"></div>
-	<div class="price">[+sb.price_full+] руб</div>
+	<div class="price">[+sb.price_full.format+] руб</div>
 	<h2>Базовая комплектация</h2>
 	[+sb.bundle.options+]
 	<script type="text/javascript">
@@ -158,7 +158,7 @@
 		<div class="action"><input type="radio" id="bundle_[+sb.bundle.id+]" name="sbprod[bundle]" value="[+sb.bundle.id+]" [+sb.bundle.checked+] /></div>
 		<input type="hidden" id="bundle_price_[+sb.bundle.id+]" name="bundl_price_[+sb.bundle.id+]" value="[+sb.bundle.price_full+]">
 		<div class="price">
-			[+sb.bundle.price_full+] руб
+			[+sb.bundle.price_full.format+] руб
 		</div>
 	</label>
 	<div class="descr">

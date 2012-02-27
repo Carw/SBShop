@@ -174,13 +174,17 @@ class categories_mode {
 				 */
 				foreach ($aLevel as $iCatId) {
 					/**
-					 * Получаем массив параметров категории
+					 * Получаем раздел
 					 */
-					$aAttributes = $this->oCatTree->getAttributesById($iCatId);
+					$oCategory = $this->oCatTree->getCategoryById($iCatId);
+					/**
+					 * Получаем массив параметров раздела
+					 */
+					$aAttributes = $oCategory->getAttributes();
 					/**
 					 * Получаем информацию о вложенных товарах и добавляем в массив
 					 */
-					$aAttributes['products'] = $this->outputInnerProducts($iCatId);
+					$aAttributes['products'] = $this->outputInnerProducts($oCategory);
 					/**
 					 * Получаем список плейсхолдеров
 					 */
@@ -296,7 +300,7 @@ class categories_mode {
 	 * Вывод вложенных в категорию товаров
 	 * @param <type> $iProductId
 	 */
-	public function outputInnerProducts($iCatId) {
+	public function outputInnerProducts($oCategory) {
 		global $modx;
 		/**
 		 * Получаем лимит количества товаров на категорию
@@ -318,7 +322,7 @@ class categories_mode {
 		/**
 		 * Получаем список товаров
 		 */
-		$oProducts = new SBProductList($iCatId, false, $iLimit);
+		$oProducts = new SBProductList($oCategory->getAttribute('id'), false, $iLimit);
 		/**
 		 * Получение списка товаров
 		 */
@@ -326,7 +330,7 @@ class categories_mode {
 		/**
 		 * Формируем список товаров
 		 */
-		$sOutput = $this->getProductList($aProducts);
+		$sOutput = $this->getProductList($aProducts, $oCategory);
 		/**
 		 * Отдаем результат
 		 */
@@ -336,7 +340,7 @@ class categories_mode {
 	/**
 	 * Формирование списка товаров
 	 */
-	public function getProductList($aProducts) {
+	public function getProductList($aProducts, $oCategory = false) {
 		global $modx;
 		/**
 		 * Если есть записи
@@ -359,7 +363,11 @@ class categories_mode {
 			/**
 			 * Получаем набор ключей параметров раздела
 			 */
-			$aGeneralAttributes = array_keys($modx->sbshop->oGeneralCategory->getExtendAttributes());
+			if($oCategory) {
+				$aGeneralAttributes = array_keys($oCategory->getExtendAttributes());
+			} else {
+				$aGeneralAttributes = array_keys($modx->sbshop->oGeneralCategory->getExtendAttributes());
+			}
 			/**
 			 * Массив групп
 			 */
@@ -470,7 +478,7 @@ class categories_mode {
 			 * Готовим плейсхолдеры
 			 */
 			$aRepl = $modx->sbshop->arrayToPlaceholders($aCategory);
-			$aRepl['[+sb.wrapper+]'] = implode($aGroupRows);
+			$aRepl['[+sb.wrapper+]'] = implode('', $aGroupRows);
 			/**
 			 * Делаем замену плейсхолдеров в контейнере
 			 */

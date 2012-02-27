@@ -2,13 +2,11 @@
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
 <script type="text/javascript">
 	if(typeof(jQuery) == "undefined") {
-		alert('Похоже, что возникла проблема с Интернетом.');
 		document.write("<scr" + "ipt type=\"text/javascript\" src=\"' . MODX_SITE_URL . 'assets/libs/javascript/jquery-1.3.2.min.js\"></scr" + "ipt>");
 	}
 </script>
-<!--script type="text/javascript" src="[+site.url+]assets/libs/javascript/jquery.tablednd_0_5.js"></script-->
 <script type="text/javascript" src="[+site.url+]assets/libs/javascript/jquery.dragsort-0.4.3.min.js"></script>
-<script type="text/javascript" src="[+site.url+]assets/extends/sbshop/modules/templates/js/product.js"></script>
+<script type="text/javascript" src="[+site.url+]assets/extends/sbshop/modules/templates/js/product.js?ver=0.3.1"></script>
 <link href="[+site.url+]assets/libs/javascript/css/fileuploader.css" rel="stylesheet" type="text/css">
 <script type="text/javascript" src="[+site.url+]assets/libs/javascript/fileuploader.js"></script>
 

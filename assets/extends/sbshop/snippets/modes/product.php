@@ -190,11 +190,12 @@ class product_mode {
 					 * Обрабатываем значения
 					 */
 					foreach ($aValues as $aValue) {
-						if($aValue['value'] != 'null') {
+						if($aValue['value'] !== 'null') {
 							$aValue['price'] = $modx->sbshop->setPriseIncrement($aValue['value'], $aValue['price_add']);
 						} else {
 							$aValue['price'] = '';
 						}
+
 						$aReplVal = $modx->sbshop->arrayToPlaceholders($aValue);
 						/**
 						 * Вставляем данные в шаблон

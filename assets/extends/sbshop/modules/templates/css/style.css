@@ -133,7 +133,7 @@ div.sectionHeader {
 }
 
 #bundles, #options {
-	visibility: hidden;
+	/*visibility: hidden;*/
 }
 
 select {

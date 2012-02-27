@@ -594,14 +594,26 @@ class SBShop {
 						 * Добавляем стартовый адрес и суффикс
 						 */
 						if(mb_substr($this->sBaseUrl, 0, 1) == '/') {
-							$sVal = '[(site_url)]' . mb_substr($this->sBaseUrl, 1) . $sVal . $this->config['url_suffix'];
+							$sVal = $modx->getConfig('site_url') . mb_substr($this->sBaseUrl, 1) . $sVal . $this->config['url_suffix'];
 						} else {
 							$sVal = MODX_BASE_URL . $this->sBaseUrl . $sVal . $this->config['url_suffix'];
 						}
 					}
 				} elseif ($sKey === 'price' or $sKey === 'price_full' or $sKey === 'summ') {
-					if($sVal !== '') {
-						$sVal = number_format(round($sVal, $this->config['price_round']['precision']), $this->config['price_round']['decimals'], $this->config['price_round']['dec_point'], $this->config['price_round']['thousands_sep']);
+					/**
+					 * Если значение есть
+					 */
+					if(is_numeric($sVal)) {
+						/**
+						 * Добавляем отформатированное значение с дополнительным суффиксом
+						 */
+						$phData['[+' . $sPrefix . $sKey . '.format' . $sSuffix . '+]'] = number_format(round($sVal, $this->config['price_round']['precision']), $this->config['price_round']['decimals'], $this->config['price_round']['dec_point'], $this->config['price_round']['thousands_sep']);
+                        /**
+                         * А основное значение просто округляем
+                         */
+                        $sVal = round($sVal, $this->config['price_round']['precision']);
+					} else {
+						$phData['[+' . $sPrefix . $sKey . '.format' . $sSuffix . '+]'] = '';
 					}
 				}
 				/**

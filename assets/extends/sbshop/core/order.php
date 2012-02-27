@@ -83,10 +83,6 @@ class SBOrder {
 			 * Записываем ее
 			 */
 			$this->setAttributes($_SESSION['sb.order']);
-			/**
-			 * Загружаем список заказанных товаров
-			 */
-			$this->oProductList = new SBProductList('',$this->getProductIds());
 		}
 	}
 
@@ -427,7 +423,8 @@ class SBOrder {
 		/**
 		 * Если не указана комплектация
 		 */
-		if(!isset($aOrderInfo['bundle'])) {
+		$oProduct->getBundleById($aOrderInfo['bundle']);
+		if(!isset($aOrderInfo['bundle']) or $aOrderInfo['bundle'] == 'base') {
 			/**
 			 * Рассчитываем стоимость - сумма основной стоимости и стоимости опций
 			 */
@@ -505,7 +502,6 @@ class SBOrder {
 				 */
 				$fPrice = round($fPrice, $modx->sbshop->config['round_precision']);
 			}
-
 		}
 		/**
 		 * Возвращаем результат

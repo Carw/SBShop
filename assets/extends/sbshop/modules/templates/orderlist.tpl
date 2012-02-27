@@ -59,7 +59,7 @@
 			<div class="content">
 				[+sb.products+]
 				<p align="right">
-					Общая сумма: <span class="total">[+sb.price+]</span> руб
+					Общая сумма: <span class="total">[+sb.price.format+]</span> руб
 				</p>
 			</div>
 			<h2>Параметры заказа</h2>
@@ -95,7 +95,7 @@
 <div class="prod">
 	<span class="title">[+sb.title+] [+sb.bundle.title+]</span>
 	<span class="price">
-		<small>[+sb.quantity+] x</small> [+sb.price+] = <span class="summ">[+sb.summ+] руб</span>
+		<small>[+sb.quantity+] x</small> [+sb.price.format+] = <span class="summ">[+sb.summ.format+] руб</span>
 	</span>
 	[+sb.sku+]
 	<br>
