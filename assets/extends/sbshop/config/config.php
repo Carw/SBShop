@@ -134,6 +134,10 @@ $config = array(
 	 */
 	'image_base_url' => '/assets/images/sbshop/',
 	/**
+	 * Разрешенные типы загружаемых файлов для вложений к товару
+	 */
+	'file_allowed_extensions' => array('jpg', 'jpeg', 'png', 'gif', 'pdf', 'zip'),
+	/**
 	 * Настройки генерации псевдонима
 	 */
 	'transalias_table_name' => 'russian',
@@ -146,6 +150,7 @@ $config = array(
 	'status_manage' => array(
 		10,
 		20,
+		25,
 		30,
 		-30
 	),

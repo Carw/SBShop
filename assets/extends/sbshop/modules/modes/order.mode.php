@@ -75,7 +75,7 @@ class order_mode {
 		/**
 		 * Загружаем список полученных заказов
 		 */
-		$oOrderList = new SBOrderList(array(10,20));
+		$oOrderList = new SBOrderList(array(10,20,25));
 		/**
 		 * Получаем массив заказов
 		 */

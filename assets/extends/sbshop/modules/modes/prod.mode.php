@@ -284,6 +284,42 @@ class prod_mode {
 		}
 		$phModule['[+images+]'] = implode('', $aImages);
 		/**
+		 * Массив изображений
+		 */
+		$aFilesList = $this->oProduct->getAllFiles();
+		/**
+		 * Массив для рядов изображений
+		 */
+		$aFiles = array();
+		/**
+		 * Если изображения есть
+		 */
+		if(count($aFilesList) > 0) {
+			/**
+			 * Обрабатываем каждое изображение
+			 */
+			foreach ($aFilesList as $sKey => $aFile) {
+				/**
+				 * Массив значений
+				 */
+				$aRepl = array(
+					'id' => $sKey,
+					'name' => $sKey,
+					'file' => $modx->sbshop->config['image_base_url'] . $this->oProduct->getAttribute('id') . '/' . $sKey,
+					'type' => substr($sKey, strrpos($sKey, '.') + 1),
+				);
+				/**
+				 * Готовим плейсхолдеры
+				 */
+				$aRepl = $modx->sbshop->arrayToPlaceholders($aRepl);
+				/**
+				 * Делаем вставку в шаблон изображения
+				 */
+				$aFiles[] = str_replace(array_keys($aRepl), array_values($aRepl), $this->aTemplate['file_row']);
+			}
+		}
+		$phModule['[+files+]'] = implode('', $aFiles);
+		/**
 		 * Массив для рядов опций
 		 */
 		$aOptions = array();
@@ -466,9 +502,13 @@ class prod_mode {
 		 */
 		$this->oProduct->setAttribute('published', 0);
 		/**
-		 * Удаляем информацию об изображениях из товара
+		 * Удаляем информацию об изображениях
 		 */
 		$this->oProduct->delImages();
+		/**
+		 * Удаляем информацию о файлах
+		 */
+		$this->oProduct->delFiles();
 		/**
 		 * Изменяем alias
 		 */
@@ -887,6 +927,20 @@ class prod_mode {
 				 * Добавляем изображение в файл
 				 */
 				$this->oProduct->addImage(trim($sImageId));
+			}
+		}
+		/**
+		 * Если есть файлы
+		 */
+		if ($_POST['file']) {
+			/**
+			 * Обрабатываем каждый полученный файл
+			 */
+			foreach ($_POST['file'] as $sFileId) {
+				/**
+				 * Добавляем изображение в файл
+				 */
+				$this->oProduct->addFile(trim($sFileId));
 			}
 		}
 		/**

@@ -155,6 +155,7 @@ return array(
 	'order_list_title' => 'Очередь новых заказов',
 	'order_status_10' => 'Заказ ждет подтверждения',
 	'order_status_20' => 'Заказ обработан',
+	'order_status_25' => 'Доставка',
 	'order_status_30' => 'Заказ выполнен',
 	'order_status_0' => 'Заказ создается клиентом',
 	'order_status_-10' => 'Корзина была очищена',

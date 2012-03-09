@@ -42,6 +42,33 @@ image_delete = function(){
 				img.remove();
 			} else {
 				alert(data['error']);
+				img.remove();
+			}
+		}
+	});
+	return false;
+}
+
+file_delete = function(){
+	var file = $(this).parents('div.file');
+	var id = file.find('input.file_id').val();
+	$.ajax({
+		type: "POST",
+		dataType: 'json',
+		url: "/assets/extends/sbshop/ajax/ajax.module.php",
+		data: 'm=fileDel&prodid=' + $('#prodid').val() + '&fileid=' + id,
+		success: function(data){
+			/**
+			 * Удаление успешно состоялось
+			 */
+			if(data['success'] == true) {
+				/**
+				 * Удаляем картинку из списка
+				 */
+				file.remove();
+			} else {
+				alert(data['error']);
+				file.remove();
 			}
 		}
 	});
@@ -289,40 +316,68 @@ $(document).ready(function(){
 		placeHolderTemplate: '<tr class="option"><td class="dragHandle"><div>&nbsp;</div></td><td></td></tr>'
 	});
 
-	/*$('.sorttable').tableDnD({
-		dragHandle: "dragHandle"
-	});*/
-
     $('#imagebox').dragsort({
 	    itemSelector: "div",
         dragSelector: "div",
 	    placeHolderTemplate: '<div class="img"></div>'
     });
 
-    var uploader = new qq.FileUploader({
+	var imageuploader = new qq.FileUploader({
         element: document.getElementById('file-uploader'),
         action: '/assets/extends/sbshop/ajax/ajax.module.php',
         params: {
             m: 'imgUpl',
             prodid: $('#prodid').val()
         },
+		template: '<div class="qq-uploader">' +
+				'<div class="qq-upload-drop-area"><span>Бросьте файлы сюда для загрузки</span></div>' +
+				'<div class="qq-upload-button">Загрузить изображения</div>' +
+				'<ul class="qq-upload-list"></ul>' +
+				'</div>',
         allowedExtensions: ['jpg', 'jpeg', 'png', 'gif'],
         debug: true,
-//        showMessage: function(message){},
-//        onSubmit: function(id, fileName){},
-//        onProgress: function(id, fileName, loaded, total){},
         onComplete: function(id, fileName, responseJSON){
 	        var elem = $(html_entity_decode(responseJSON['html']));
 	        elem.find('.image_del').click(image_delete);
 	        $('#imagebox').append(elem);
         }
-//        onCancel: function(id, fileName){}
     });
+
+	$('#filebox').dragsort({
+		itemSelector: "div",
+		dragSelector: "div",
+		placeHolderTemplate: '<div class="file"></div>'
+	});
+
+	var fileuploader = new qq.FileUploader({
+		element: document.getElementById('file-uploader-ext'),
+		action: '/assets/extends/sbshop/ajax/ajax.module.php',
+		params: {
+			m: 'fileUpl',
+			prodid: $('#prodid').val()
+		},
+		template: '<div class="qq-uploader">' +
+				'<div class="qq-upload-drop-area"><span>Бросьте файлы сюда для загрузки</span></div>' +
+				'<div class="qq-upload-button">Загрузить файлы</div>' +
+				'<ul class="qq-upload-list"></ul>' +
+				'</div>',
+		allowedExtensions: ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'zip'],
+		debug: true,
+		onComplete: function(id, fileName, responseJSON){
+			var elem = $(html_entity_decode(responseJSON['html']));
+			elem.find('.file_del').click(file_delete);
+			$('#filebox').append(elem);
+		}
+	});
 
 	/**
 	 * Обработка события "удаление изображения"
 	 */
 	$("#imagebox .image_del").click(image_delete);
+    /**
+     * Обработка события "удаление файла"
+     */
+    $("#filebox .file_del").click(file_delete);
 
 });
 

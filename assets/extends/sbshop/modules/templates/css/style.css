@@ -18,7 +18,7 @@ div.sectionHeader {
 }
 
 
-.optiondel, .attributedel, .bundledel, .imagedel {
+.optiondel, .attributedel, .bundledel, .imagedel, .filedel {
 	float: right;
 }
 
@@ -113,6 +113,23 @@ div.sectionHeader {
 	display: block;
 	margin: 15px 15px 15px 0;
 	border: 1px solid #ccc;
+}
+
+#filebox {
+	overflow: hidden;
+}
+
+#filebox .file {
+	width: 50px;
+	height: 50px;
+	background-position: center;
+	background-repeat: no-repeat;
+	background-color: #fff;
+	float: left;
+	display: block;
+	margin: 15px 15px 15px 0;
+	border: 1px solid #ccc;
+	overflow-x: hidden;
 }
 
 .button_add {
@@ -215,11 +232,11 @@ select {
 	display: block;
 }
 
-#options .option_del, #attributes .attribute_del, #bundles .bundle_del, .image_del {
+#options .option_del, #attributes .attribute_del, #bundles .bundle_del, .image_del, .file_del {
 	opacity: 0.3;
 }
 
-#options .option_del:hover, #attributes .attribute_del:hover, #bundles .bundle_del:hover, #imagebox .image_del:hover {
+#options .option_del:hover, #attributes .attribute_del:hover, #bundles .bundle_del:hover, #imagebox .image_del:hover,  #filebox .file_del:hover {
 	opacity: 1;
 }
 
@@ -450,6 +467,11 @@ select {
 .order.status20 .header {
 	border-top: 2px solid #ff9c00;
 	border-right: 6px solid #ff9c00;
+}
+
+.order.status25 .header {
+        border-top: 2px solid #fb00ec;
+        border-right: 6px solid #fb00ec;
 }
 
 .order.status-30 .header {

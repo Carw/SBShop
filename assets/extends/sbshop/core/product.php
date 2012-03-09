@@ -18,6 +18,7 @@ class SBProduct {
 	protected $oProductExtendData; // Дополнительные параметры товара
 	public $oOptions; // Опции товара
 	protected $aImages; // массив изображений
+	protected $aFiles; // массив файлов
 	protected $aBaseBundle; // Базовая комплектация
 	protected $oBundles; // Дополнительные комплектации
 
@@ -37,6 +38,7 @@ class SBProduct {
 			'introtext' => null, // аннотация
 			'description' => null, // расширенное описание
 			'images' => null, // изображения
+			'files' => null, // файлы
 			'attributes' => null, // параметры товаров (динамические)
 			'viewed' => null, // количество просмотров
 			'published' => null, // товар опубликован
@@ -66,6 +68,10 @@ class SBProduct {
 		 * Изображения
 		 */
 		$this->aImages = array();
+		/**
+		 * Файлы
+		 */
+		$this->aFiles = array();
 		/**
 		 * Опции
 		 */
@@ -106,6 +112,9 @@ class SBProduct {
 					switch ($sKey) {
 						case 'images':
 							$this->unserializeImages($sVal);
+						break;
+						case 'files':
+							$this->unserializeFiles($sVal);
 						break;
 						case 'options':
 							$this->oOptions->unserializeOptions($sVal);
@@ -276,6 +285,16 @@ class SBProduct {
 		 * Возвращаем результат
 		 */
 		return $aImages;
+	}
+
+	/**
+	 * Получение всех изображений товара
+	 */
+	public function getAllFiles() {
+		/**
+		 * Отдаем весь массив
+		 */
+		return $this->aFiles;
 	}
 
 	/**
@@ -518,6 +537,26 @@ class SBProduct {
 	}
 
 	/**
+	 * Добавление файла к товару
+	 * @param $sFileId
+	 * @param bool $aParams
+	 */
+	public function addFile($sFileId, $aParams = false) {
+		global $modx;
+		/**
+		 * Закидываем информацию
+		 */
+		$this->aFiles[$sFileId] = $modx->sbshop->config['image_base_url'] . $this->aProductData['id'] . '/' . $sFileId;
+	}
+
+	/**
+	 * Удаление всех файлов из товара
+	 */
+	public function delFiles() {
+		$this->aFiles = array();
+	}
+
+	/**
 	 * Десериализация параметров товара
 	 * @param unknown_type $sParams
 	 */
@@ -577,6 +616,23 @@ class SBProduct {
 			 */
 			$this->aImages[$sImageName] = $aImageLinks;
 		}
+	}
+
+	/**
+	 * Сериализация файлов
+	 */
+	public function serializeFiles() {
+		return serialize($this->aFiles);
+	}
+
+	/**
+	 * Десериализация файлов
+	 */
+	public function unserializeFiles($sParams) {
+		if($sParams == '') {
+			return false;
+		}
+		$this->aFiles = unserialize($sParams);
 	}
 
 	/**
@@ -659,6 +715,10 @@ class SBProduct {
 		 * Подготавливаем изображения для сохранения
 		 */
 		$aData['product_images'] = $this->serializeImages();
+		/**
+		 * Подготавливаем изображения для сохранения
+		 */
+		$aData['product_files'] = $this->serializeFiles();
 		/**
 		 * Если ID есть, то делаем обновление информации
 		 */

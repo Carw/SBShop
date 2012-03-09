@@ -196,6 +196,9 @@ class SBAjax {
 		}
 	}
 
+	/**
+	 * Удаление изображения
+	 */
 	protected function imgDelAjax() {
 		global $modx;
 		/**
@@ -238,6 +241,202 @@ class SBAjax {
 			} else {
 				$bError = true;
 			}
+		}
+		/**
+		 * Если нет ошибки
+		 */
+		if(!$bError) {
+			/**
+			 * Все отлично!
+			 */
+			$this->aResult['success'] = true;
+		} else {
+			/**
+			 * Отправляем ошибку
+			 */
+			$this->aResult['error'] = $modx->sbshop->lang['product_image_delete_error'];
+		}
+	}
+
+	/**
+	 * Загрузка изображений на сервер через Ajax
+	 * @return bool
+	 */
+	protected function fileUplAjax() {
+		global $modx;
+		/**
+		 * Идентификатор товара
+		 */
+		$iProductId = intval($this->aParams['prodid']);
+		/**
+		 * Если идентификатор товара не ноль
+		 */
+		if ($iProductId > 0) {
+			/**
+			 * Формируем путь для изображения
+			 */
+			$sBasePath = $modx->sbshop->config['image_base_dir'] . $iProductId . '/';
+			$sBaseUrl = $modx->sbshop->config['image_base_url'] . $iProductId . '/';
+			/**
+			 * Определяем метод загрузки
+			 */
+			if (isset($_GET['qqfile'])) {
+				/**
+				 * Выделяем разрешение
+				 */
+				$sFileExtension = mb_strtolower(substr($_SERVER['HTTP_X_FILE_NAME'], strrpos($_SERVER['HTTP_X_FILE_NAME'], '.') + 1));
+				/**
+				 * Если это разрешение доступно
+				 */
+				if(in_array($sFileExtension, $modx->sbshop->config['file_allowed_extensions'])) {
+					/**
+					 * Имя файла
+					 */
+					$sFile = mb_strtolower($_SERVER['HTTP_X_FILE_NAME']);
+					/**
+					 * Считываем данные с потока
+					 */
+					$sInput = fopen("php://input", "r");
+					/**
+					 * Путь к файлу
+					 */
+					$fTmpName = $sBasePath . $sFile;
+					$fTmpFile = fopen($fTmpName, "w");
+					/**
+					 * Копируем
+					 */
+					$iRealSize = stream_copy_to_stream($sInput, $fTmpFile);
+					/**
+					 * Закрываем файл
+					 */
+					fclose($sInput);
+					/**
+					 * На всякий случай сверяем размер
+					 */
+					if ($iRealSize != $_SERVER["CONTENT_LENGTH"]){
+						/**
+						 * Ошибка. Размер не совпадает!
+						 */
+						$this->aResult['error'] = 'Ошибка при загрузке файла.';
+						return false;
+					}
+					/**
+					 * Закрываем и удаляем временный файл
+					 */
+					fclose($fTmpFile);
+				} else {
+					/**
+					 * Расширение файла не находится в списке разрешенных
+					 */
+					$this->aResult['error'] = 'Файлы такого типа не разрешены для загрузки.';
+					return false;
+				}
+			} elseif (isset($_FILES['qqfile'])) {
+				/**
+				 * Имя файла
+				 */
+				$sFile = mb_strtolower($_FILES['qqfile']['name']);
+				/**
+				 * Выделяем разрешение
+				 */
+				$sFileExtension = substr($sFile, strrpos($sFile, '.') + 1);
+				/**
+				 * Если это разрешение доступно
+				 */
+				if(in_array($sFileExtension, $modx->sbshop->config['file_allowed_extensions'])) {
+					/**
+					 * Путь к файлу
+					 */
+					$fTmpName = $sBasePath . $sFile;
+					/**
+					 * Переносим загруженный файл
+					 */
+					move_uploaded_file($_FILES['qqfile']['tmp_name'], $fTmpName);
+				} else {
+					/**
+					 * Расширение файла не находится в списке разрешенных
+					 */
+					$this->aResult['error'] = 'Файлы такого типа не разрешены для загрузки.';
+					return false;
+				}
+
+			} else {
+				/**
+				 * Ошибка. Файла нет!
+				 */
+				$this->aResult['error'] = 'Файла нет.';
+				return false;
+			}
+			/**
+			 * Загружаем шаблоны
+			 */
+			$aTemplates = $modx->sbshop->getModuleTemplate('prod');
+			/**
+			 * Устанавливаем результат
+			 */
+			$this->aResult['success'] = true;
+			/**
+			 * Название файла
+			 */
+			$this->aResult['id'] = $sFile;
+			$this->aResult['filename'] = $sBaseUrl . $sFile;
+			/**
+			 * Готовим плейсхолдеры
+			 */
+			$aRepl = array(
+				'id' => $sFile,
+				'name' => $sFile,
+				'file' => $this->aResult['filename'],
+				'type' => $sFileExtension
+			);
+			$aRepl = $modx->sbshop->arrayToPlaceholders($aRepl);
+			/**
+			 * Конечный результат
+			 */
+			$this->aResult['html'] = str_replace(array_keys($aRepl), array_values($aRepl), $aTemplates['file_row']);
+		} else {
+			/**
+			 * Вероятно товар новый.
+			 * @todo Сделать возможность загружать картинки для нового товара
+			 */
+		}
+	}
+
+	/**
+	 * Удаление файла
+	 */
+	protected function fileDelAjax() {
+		global $modx;
+		/**
+		 * Идентификатор товара
+		 */
+		$iProductId = intval($this->aParams['prodid']);
+		/**
+		 * Идентификатор файла
+		 */
+		$sFileId = trim($this->aParams['fileid']);
+		/**
+		 * Путь до папки с изображениями товара
+		 */
+		$sBasePath = $modx->sbshop->config['image_base_dir'] . $iProductId . '/';
+		/**
+		 * Ошибка в процессе работы
+		 */
+		$bError = false;
+		/**
+		 * Путь к файлу
+		 */
+		$sFilePath = $sBasePath . $sFileId;
+		/**
+		 * Если файл существует
+		 */
+		if (is_file($sFilePath)) {
+			/**
+			 * Удаляем файл
+			 */
+			unlink($sFilePath);
+		} else {
+			$bError = true;
 		}
 		/**
 		 * Если нет ошибки

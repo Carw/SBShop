@@ -110,6 +110,16 @@
 						[+images+]
 					</div>
 
+					<div id="file-uploader-ext">
+					    <noscript>
+					        <p>Please enable JavaScript to use file uploader.</p>
+					        <!-- or put a simple form for upload here -->
+					    </noscript>
+					</div>
+
+					<div id="filebox" class="filebox">
+						[+files+]
+					</div>
 				</div>
 			</div>
 			<div class="tab-page" id="tabAttributes">
@@ -515,5 +525,13 @@
 	<div class="imagedel">
 		<input type="image" class="image_del" style="width: auto;" src="/manager/media/style/MODxCarbon/images/icons/delete.png">
 	</div>
-	<input type="hidden" class="image_id" name="img[]" value="[+sb.id+] " />
+	<input type="hidden" class="image_id" name="img[]" value="[+sb.id+]" />
+</div>
+<!--# file_row: Шаблон файла #-->
+<div class="file file_[+sb.type+]" id="file-[+sb.id+]">
+	<div class="filedel">
+		<input type="image" class="file_del" style="width: auto;" src="/manager/media/style/MODxCarbon/images/icons/delete.png">
+	</div>
+	<a href="[+sb.file+]">[+sb.name+]</a>
+	<input type="hidden" class="file_id" name="file[]" value="[+sb.id+]" />
 </div>

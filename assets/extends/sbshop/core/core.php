@@ -817,6 +817,32 @@ class SBShop {
 	}
 
 	/**
+	 * Транслитерация псевдонима
+	 * @param $sAlias
+	 */
+	public function transAlias($sAlias) {
+		global $modx;
+		/**
+		 * Подключаем класс плагина TransAlias
+		 */
+		require_once MODX_BASE_PATH . 'assets/plugins/transalias/transalias.class.php';
+		$oTrans = new TransAlias();
+		$oTrans->loadTable($modx->sbshop->config['transalias_table_name'], $modx->sbshop->config['transalias_remove_periods']);
+		/**
+		 * Получаем алиас на основе заголовка
+		 */
+		$sAlias = $oTrans->stripAlias($sAlias, $modx->sbshop->config['transalias_char_restrict'], $modx->sbshop->config['transalias_word_separator']);
+		/**
+		 * Все приводим к маленькому регистру
+		 */
+		$sAlias = mb_strtolower($sAlias);
+		/**
+		 * Возвращаем результат
+		 */
+		return $sAlias;
+	}
+
+	/**
 	 * Функция вывода сообщения об успешном выполнении какого-то действия с последующим редиректом
 	 */
 	public function alertWait($sModuleLink) {
