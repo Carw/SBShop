@@ -226,6 +226,10 @@ class SBOrder {
 			$oProduct = new SBProduct();
 			$oProduct->load($iProductId);
 			/**
+			 * Начальное значение сета - идентификатор товара
+			 */
+			$sSet = $iProductId;
+			/**
 			 * Добавляем товар
 			 */
 			$aParams['product'] = $oProduct;
@@ -276,7 +280,6 @@ class SBOrder {
 						 */
 						$iPrice = $oProduct->getPriceByOptions($aBundleOptions);
 					} else {
-						$aBundleOptions = array();
 						$aParams['sboptions'] = $aBundleParams;
 						/**
 						 * Стоимость опций равна 0
@@ -311,11 +314,11 @@ class SBOrder {
 				/**
 				 * Формируем новый идентификатор
 				 */
-				$iProductId .= '.' . implode('.', $aOptionRows);
+				$sSet .= '.' . implode('.', $aOptionRows);
 				/**
 				 * Добавляем дополнительную стоимость в настройки заказа
 				 */
-				$this->aProducts[$iProductId]['options_price'] = $iPrice;
+				$this->aProducts[$sSet]['options_price'] = $iPrice;
 			}
 			/**
 			 * Обрабатываем каждое значение
@@ -324,18 +327,22 @@ class SBOrder {
 				/**
 				 * Если параметр - quantity (количество) и он установлен
 				 */
-				if($sKey == 'quantity' and isset($this->aProducts[$iProductId]['quantity'])) {
+				if($sKey == 'quantity' and isset($this->aProducts[$sSet]['quantity'])) {
 					/**
 					 * Суммируем имеющееся значение
 					 */
-					$this->aProducts[$iProductId]['quantity'] += $sVal;
+					$this->aProducts[$sSet]['quantity'] += $sVal;
 				} else {
 					/**
 					 * Добавляем параметры
 					 */
-					$this->aProducts[$iProductId][$sKey] = $sVal;
+					$this->aProducts[$sSet][$sKey] = $sVal;
 				}
 			}
+			/**
+			 * Возвращаем сет товара
+			 */
+			return $sSet;
 		}
 	}
 

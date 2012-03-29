@@ -186,6 +186,19 @@ class categories_mode {
 					 */
 					$aAttributes['products'] = $this->outputInnerProducts($oCategory);
 					/**
+					 * Вызов плагинов до вставки данных по разделу
+					 */
+					$PlOut = $modx->invokeEvent('OnSBShopCategorySubcategoryPrerender', array(
+						'oCategory' => $oCategory,
+						'aRowData' => $aAttributes
+					));
+					/**
+					 * Берем результат работы первого плагина, если это массив.
+					 */
+					if (is_array($PlOut[0])) {
+						$aAttributes = $PlOut[0];
+					}
+					/**
 					 * Получаем список плейсхолдеров
 					 */
 					$aPlaceholders = $modx->sbshop->arrayToPlaceholders($aAttributes);
@@ -387,7 +400,7 @@ class categories_mode {
 					/**
 					 * Подготавливаем информацию для вставки в шаблон
 					 */
-					$aRepl = $modx->sbshop->arrayToPlaceholders($oProduct->getAttributes());
+					$aProductData = $oProduct->getAttributes();
 					/**
 					 * Если установлен параметр "Есть в наличии"
 					 */
@@ -395,12 +408,12 @@ class categories_mode {
 						/**
 						 * Устанавливаем заголовок "есть в наличии" из языкового файла
 						 */
-						$aRepl['[+sb.existence+]'] = $modx->sbshop->lang['product_existence_title'];
+						$aProductData['existence'] = $modx->sbshop->lang['product_existence_title'];
 					} else {
 						/**
 						 * Устанавливаем заголовок "нет в наличии" из языкового файла
 						 */
-						$aRepl['[+sb.existence+]'] = $modx->sbshop->lang['product_notexistence_title'];
+						$aProductData['existence'] = $modx->sbshop->lang['product_notexistence_title'];
 					}
 					/**
 					 * Получаем набор параметров товара
@@ -433,6 +446,9 @@ class categories_mode {
 					 * Обрабатываем каждый параметр
 					 */
 					foreach ($aAttributes as $aAttrVal) {
+						/**
+						 * Плейсхолдеры для параметра
+						 */
 						$aAttrRepl = $modx->sbshop->arrayToPlaceholders($aAttrVal);
 						/**
 						 * Формируем ряд
@@ -442,7 +458,24 @@ class categories_mode {
 					/**
 					 * Вставляем параметры в контейнер
 					 */
-					$aRepl['[+sb.attributes+]'] = str_replace('[+sb.wrapper+]', $sAttrRows, $this->aTemplates['attribute_outer']);
+					$aProductData['attributes'] = str_replace('[+sb.wrapper+]', $sAttrRows, $this->aTemplates['attribute_outer']);
+					/**
+					 * Вызов плагинов до вставки данных по товару
+					 */
+					$PlOut = $modx->invokeEvent('OnSBShopCategoryProductPrerender', array(
+						'oProduct' => $oProduct,
+						'aProductData' => $aProductData
+					));
+					/**
+					 * Берем результат работы первого плагина, если это массив.
+					 */
+					if (is_array($PlOut[0])) {
+					    $aProductData = $PlOut[0];
+					}
+					/**
+					 * Готовим плейсхолдеры для вставки данных
+					 */
+					$aRepl = $modx->sbshop->arrayToPlaceholders($aProductData);
 					/**
 					 * Добавляем изображения
 					 */
@@ -459,7 +492,7 @@ class categories_mode {
 				/**
 				 * Вставляем ряды в шаблон группы
 				 */
-				$aGroupRows[] = str_replace('[+sb.wrapper+]', implode($aRows), $this->aTemplates['category_group']);
+				$aGroupRows[] = str_replace('[+sb.wrapper+]', implode('', $aRows), $this->aTemplates['category_group']);
 			}
 			/**
 			 * Информация о текущей категории

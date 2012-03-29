@@ -46,6 +46,9 @@ if(count($aModes) > 0) {
 	 * обрабатываем каждый режим
 	 */
 	foreach ($aModes as $sMode) {
+		$modx->invokeEvent('OnSBShopModeInit', array(
+			'sMode' => $sMode,
+		));
 		/**
 		 * Переключатель управляющих действий сниппета
 		 * Проверяем существование экшена и если он есть, то передаем ему выполнение

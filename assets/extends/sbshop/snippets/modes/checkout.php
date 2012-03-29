@@ -125,6 +125,12 @@ class checkout_mode {
 		 */
 		if(isset($_POST['sb_order_remove'])) {
 			/**
+			 * Вызов плагинов до удаления товара
+			 */
+			$modx->invokeEvent('OnSBShopCheckoutBeforeProducsDelete', array(
+				'aProductIds' => $_POST['sb_order_remove'],
+			));
+			/**
 			 * Удаляем выбранные товары
 			 */
 			$modx->sbshop->oOrder->deleteProducts($_POST['sb_order_remove']);
@@ -137,6 +143,12 @@ class checkout_mode {
 		 * Обрабатываем изменения количества товара
 		 */
 		if(isset($_POST['sb_product_quantity'])) {
+			/**
+			 * Вызов плагинов до изменения количества товара
+			 */
+			$modx->invokeEvent('OnSBShopCheckoutBeforeQuantityChange', array(
+				'aProductIds' => $_POST['sb_product_quantity'],
+			));
 			/**
 			 * Обрабатываем каждое значение
 			 */
@@ -168,9 +180,21 @@ class checkout_mode {
 	public function clearCart() {
 		global $modx;
 		/**
+		 * Вызов плагинов до очистки корзины
+		 */
+		$modx->invokeEvent('OnSBShopCheckoutBeforeClear', array(
+			'oOrder' => $modx->sbshop->oOrder,
+		));
+		/**
 		 * Делаем очистку корзины
 		 */
 		$modx->sbshop->oOrder->clear();
+		/**
+		 * Вызов плагинов после очистки корзины
+		 */
+		$modx->invokeEvent('OnSBShopCheckoutAfterClear', array(
+			'oOrder' => $modx->sbshop->oOrder,
+		));
 	}
 
 	/**
@@ -213,9 +237,9 @@ class checkout_mode {
 				 */
 				$aProduct = $oProduct->getAttributes();
 				/**
-				 * Плесхолдеры параметров товара
+				 * Плейсхолдеры параметров товара
 				 */
-				$aRepl = $modx->sbshop->arrayToPlaceholders($aProduct);
+				$aRowData = $aProduct;
 				/**
 				 * Получаем информацию о количестве и прочих условиях заказа товара
 				 */
@@ -225,13 +249,13 @@ class checkout_mode {
 				 */
 				$aOrderInfo['price'] = $modx->sbshop->oOrder->getProductPriceBySetId($iSetId);
 				/**
-				 * Идентификатор набора товара
-				 */
-				$aOrderInfo['set_id'] = $iSetId;
-				/**
 				 * Добавляем плейсхолдеры информации заказа
 				 */
-				$aRepl = array_merge($aRepl,$modx->sbshop->arrayToPlaceholders($aOrderInfo));
+				$aRowData = array_merge($aRowData, $aOrderInfo);
+				/**
+				 * Идентификатор набора товара
+				 */
+				$aRowData['set_id'] = $iSetId;
 				/**
 				 * Если установлены опции в товаре
 				 */
@@ -239,9 +263,17 @@ class checkout_mode {
 				if(isset($aOrderInfo['sboptions']) and count($aOrderInfo['sboptions']) > 0) {
 					foreach ($aOrderInfo['sboptions'] as $sOptKeyId => $sOptValId) {
 						/**
-						 * Создаем плейсхолдеры для значений
+						 * Получаем название опции и значения по идентификаторам
 						 */
-						$aOptRepl = $modx->sbshop->arrayToPlaceholders($oProduct->getNamesByNameIdAndValId($sOptKeyId,$sOptValId));
+						$aOptionData = $oProduct->getNamesByNameIdAndValId($sOptKeyId,$sOptValId);
+						/**
+						 * Убираем переносы строки у названия
+						 */
+						$aOptionData['title'] = str_replace('<br>', '', $aOptionData['title']);
+						/**
+						 * Готовим плейсхолдеры
+						 */
+						$aOptRepl = $modx->sbshop->arrayToPlaceholders($aOptionData);
 						/**
 						 * Разделитель между опцией и значением
 						 */
@@ -256,41 +288,78 @@ class checkout_mode {
 							$aOptRepl['[+sb.value+]'] = '';
 							$aOptRepl['[+sb.separator+]'] = '';
 						}
+						/**
+						 * Вставляем в шаблон и добавляем ряд
+						 */
 						$aOptions[] = str_replace(array_keys($aOptRepl), array_values($aOptRepl), $this->aTemplates['option_row']);
 					}
 					/**
 					 * Объединяем ряды и вставляем в контейнер
 					 */
 					$sOptions = str_replace('[+sb.wrapper+]', implode($this->aTemplates['option_separator'],$aOptions), $this->aTemplates['option_outer']);
-					$aRepl['[+sb.options+]'] = $sOptions;
+					$aRowData['options'] = $sOptions;
 				} else {
-					$aRepl['[+sb.options+]'] = '';
+					$aRowData['options'] = '';
 				}
+				/**
+				 * Запускаем плагины перед вставкой данных по товару в корзину
+				 */
+				$PlOut = $modx->invokeEvent('OnSBShopCheckoutProductPrerender', array(
+					'iSetId' => $iSetId,
+					'aRowData' => $aRowData
+				));
+				/**
+				 * Берем результат работы первого плагина, если это массив.
+				 */
+				if (is_array($PlOut[0])) {
+					$aRowData = $PlOut[0];
+				}
+				/**
+				 * Готовим плейсхолдеры для товара
+				 */
+				$aRepl = $modx->sbshop->arrayToPlaceholders($aRowData);
 				/**
 				 * Вставляем данные в шаблон
 				 */
 				$aRows[] = str_replace(array_keys($aRepl), array_values($aRepl), $this->aTemplates['cart_row']);
 			}
 			/**
-			 * Подготавливаем плейсхолдеры для общего контейнера корзины
+			 * Данные заказа
 			 */
-			$aRepl = $modx->sbshop->arrayToPlaceholders($modx->sbshop->oOrder->getAttributes());
+			$aOrderData = $modx->sbshop->oOrder->getAttributes();
 			/**
 			 * Добавляем ссылку для текущего режима
 			 */
-			$aRepl['[+sb.link_mode+]'] = $modx->sbshop->sBaseUrl;
+			$aOrderData['link_mode'] = $modx->sbshop->sBaseUrl;
 			/**
 			 * Информация о суффиксе в ссылке
 			 */
-			$aRepl['[+sb.link_suffix+]'] = $modx->sbshop->config['url_suffix'];
+			$aOrderData['link_suffix'] = $modx->sbshop->config['url_suffix'];
 			/**
 			 * Следующий шаг - оформление
 			 */
-			$aRepl['[+sb.link_userform+]'] = $modx->sbshop->sBaseUrl . 'checkout/userinfo' . $modx->sbshop->config['url_suffix'];
+			$aOrderData['link_userform'] = $modx->sbshop->sBaseUrl . 'checkout/userinfo' . $modx->sbshop->config['url_suffix'];
 			/**
 			 * Добавляем сформированные данные
 			 */
-			$aRepl['[+sb.wrapper+]'] = implode($aRows);
+			$aOrderData['wrapper'] = implode('', $aRows);
+			/**
+			 * Запускаем плагины перед вставкой данных по заказу в корзину
+			 */
+			$PlOut = $modx->invokeEvent('OnSBShopCheckoutOrderPrerender', array(
+				'oOrder' => $modx->sbshop->oOrder,
+				'aOrderData' => $aOrderData
+			));
+			/**
+			 * Берем результат работы первого плагина, если это массив.
+			 */
+			if (is_array($PlOut[0])) {
+				$aOrderData = $PlOut[0];
+			}
+			/**
+			 * Подготавливаем плейсхолдеры для общего контейнера корзины
+			 */
+			$aRepl = $modx->sbshop->arrayToPlaceholders($aOrderData);
 			/**
 			 * Вставляем список товаров в контейнер корзины
 			 */
@@ -444,6 +513,12 @@ class checkout_mode {
 		 */
 		if(!$bError) {
 			/**
+			 * Вызов плагинов до сохранения информации о клиенте
+			 */
+			$modx->invokeEvent('OnSBShopCheckoutBeforeClientAdd', array(
+				'oCustomer' => $modx->sbshop->oCustomer
+			));
+			/**
 			 * Сохраняем информацию клиента
 			 */
 			$modx->sbshop->oCustomer->save();
@@ -521,6 +596,20 @@ class checkout_mode {
 			$mail->Body = $sMessage;
 			$mail->AddAddress($modx->sbshop->config['notice_email']);
 			/**
+			 * Вызов плагинов после очистки корзины
+			 */
+			$PlOut = $modx->invokeEvent('OnSBShopCheckoutBeforeMailSend', array(
+				'oOrder' => $modx->sbshop->oOrder,
+				'oCustomer' => $modx->sbshop->oCustomer,
+				'oMail' => $mail
+			));
+			/**
+			 * Берем результат работы первого плагина, если это массив.
+			 */
+			if (is_object($PlOut[0])) {
+				$mail = $PlOut[0];
+			}
+			/**
 			 * Отправляем письмо
 			 */
 			$mail->send();
@@ -528,6 +617,13 @@ class checkout_mode {
 			 * Устанавливаем статистику
 			 */
 			$this->setStat();
+			/**
+			 * Вызов плагинов до очистки корзины после завершения оформления
+			 */
+			$modx->invokeEvent('OnSBShopCheckoutBeforeOrderComplete', array(
+				'oOrder' => $modx->sbshop->oOrder,
+				'oCustomer' => $modx->sbshop->oCustomer
+			));
 			/**
 			 * Очищаем заказ
 			 */

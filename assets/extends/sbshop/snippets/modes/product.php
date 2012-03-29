@@ -45,22 +45,18 @@ class product_mode {
 		/**
 		 * Получение данных товара
 		 */
-		$aProduct = $modx->sbshop->oGeneralProduct->getAttributes();
+		$aProductData = $modx->sbshop->oGeneralProduct->getAttributes();
 		/**
 		 * Если не установлен расширенный заголовок
 		 */
-		if($aProduct['longtitle'] == '') {
-			$aProduct['longtitle'] = $aProduct['title'];
+		if($aProductData['longtitle'] == '') {
+			$aProductData['longtitle'] = $aProductData['title'];
 		}
 		/**
-		 * Установка заголовков
+		 * Установка заголовков в виде глобальных плейсхолдеров
 		 */
-		$modx->setPlaceholder('sb.product.title',$aProduct['title']);
-		$modx->setPlaceholder('sb.product.longtitle',$aProduct['longtitle']);
-		/**
-		 * Подготавливаем плейсхолдеры
-		 */
-		$aRepl = $modx->sbshop->arrayToPlaceholders($aProduct);
+		$modx->setPlaceholder('sb.product.title', $aProductData['title']);
+		$modx->setPlaceholder('sb.product.longtitle', $aProductData['longtitle']);
 		/**
 		 * Если установлен параметр "Есть в наличии"
 		 */
@@ -68,12 +64,12 @@ class product_mode {
 			/**
 			 * Устанавливаем заголовок "есть в наличии" из языкового файла
 			 */
-			$aRepl['[+sb.existence+]'] = $modx->sbshop->lang['product_existence_title'];
+			$aProductData['existence'] = $modx->sbshop->lang['product_existence_title'];
 		} else {
 			/**
 			 * Устанавливаем заголовок "нет в наличии" из языкового файла
 			 */
-			$aRepl['[+sb.existence+]'] = $modx->sbshop->lang['product_notexistence_title'];
+			$aProductData['existence'] = $modx->sbshop->lang['product_notexistence_title'];
 		}
 		/**
 		 * Обрабатываем описание и делим на блоки
@@ -84,7 +80,7 @@ class product_mode {
 		 */
 		$aReplBlocks = array_merge($aReplBlocks,$modx->sbshop->multiarrayToPlaceholders($modx->sbshop->oGeneralProduct->getAllImages(),'num','sb.image.'));
 		/**
-		 * Подготавливает массив миниатюры
+		 * Подготавливает массив миниатюр
 		 */
 		$aImages = $modx->sbshop->oGeneralProduct->getImagesByKey('x104');
 		/**
@@ -507,6 +503,23 @@ class product_mode {
 			 */
 			$sOutput = str_replace(array_keys($aReplBlocks),array_values($aReplBlocks),$this->aTemplates['absent_product']);
 		}
+		/**
+		 * Вызов плагинов до вставки общих данных по товару
+		 */
+		$PlOut = $modx->invokeEvent('OnSBShopProductPrerender', array(
+			'oProduct' => $modx->sbshop->oGeneralProduct,
+			'aProductData' => $aProductData
+		));
+		/**
+		 * Берем результат работы первого плагина, если это массив.
+		 */
+		if (is_array($PlOut[0])) {
+			$aProductData = $PlOut[0];
+		}
+		/**
+		 * Подготавливаем плейсхолдеры для общей информации о товаре
+		 */
+		$aRepl = $modx->sbshop->arrayToPlaceholders($aProductData);
 		/**
 		 * Делаем вставку параметров
 		 */

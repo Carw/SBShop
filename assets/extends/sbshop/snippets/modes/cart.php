@@ -122,7 +122,7 @@ class cart_mode {
 				/**
 				 * Массив значений для добавления
 				 */
-				$aSets = array();
+				$aParams = array();
 				/**
 				 * Обрабатываем каждый элемент
 				 */
@@ -135,7 +135,7 @@ class cart_mode {
 							/**
 							 * Прибавляем количество
 							 */
-							$aSets['quantity'] = intval($sVal);
+							$aParams['quantity'] = intval($sVal);
 						break;
 						case 'sboptions':
 							/**
@@ -145,21 +145,44 @@ class cart_mode {
 								/**
 								 * Заносим в общий массив значений переводя все значения в числа
 								 */
-								$aSets['sboptions'][intval($sOptKey)] = intval($sOptVal);
+								$aParams['sboptions'][intval($sOptKey)] = intval($sOptVal);
 							}
 						break;
 						case 'bundle':
 							if($sVal !== 'base' and $sVal !== 'personal') {
 								$sVal = intval($sVal);
 							}
-							$aSets['bundle'] = $sVal;
+							$aParams['bundle'] = $sVal;
 						break;
 					}
 				}
 				/**
+				 * Вызов плагинов перед обработкой добавляемого товара
+				 */
+				$PlOut = $modx->invokeEvent('OnSBShopCartBeforeProductAdd', array(
+					'oOrder' => $modx->sbshop->oOrder,
+					'iProductId' => $iProductId,
+					'aProductParams' => $aParams
+				));
+				/**
+				 * Берем результат работы первого плагина, если это массив.
+				 */
+				if (is_array($PlOut[0])) {
+					$aParams = $PlOut[0];
+				}
+				/**
 				 * Заносим значения в заказ
 				 */
-				$modx->sbshop->oOrder->addProduct($iProductId,$aSets);
+				$sSet = $modx->sbshop->oOrder->addProduct($iProductId, $aParams);
+				/**
+				 * Вызов плагинов после обработки добавляемого товара
+				 */
+				$modx->invokeEvent('OnSBShopCartAfterProductAdd', array(
+					'oOrder' => $modx->sbshop->oOrder,
+					'sProductId' => $iProductId,
+					'aProductParams' => $aParams,
+					'sSet' => $sSet
+				));
 			} else {
 				$bError = true;
 			}
@@ -190,9 +213,12 @@ class cart_mode {
 		 */
 		$sOutput = '';
 		/**
-		 * Если нет товаров в корзине
+		 * Получаем набор сетов
 		 */
 		$aIds = $modx->sbshop->oOrder->getProductSetIds();
+		/**
+		 * Если нет товаров в корзине
+		 */
 		if(count($aIds) == 0) {
 			/**
 			 * Выводим шаблон пустой корзины
@@ -216,9 +242,9 @@ class cart_mode {
 				 */
 				$aProduct = $oProduct->getAttributes();
 				/**
-				 * Плесхолдеры параметров товара
+				 * Плейсхолдеры параметров товара
 				 */
-				$aRepl = $modx->sbshop->arrayToPlaceholders($aProduct);
+				$aRowData = $aProduct;
 				/**
 				 * Получаем информацию о количестве и прочих условиях заказа товара
 				 */
@@ -230,11 +256,11 @@ class cart_mode {
 				/**
 				 * Добавляем плейсхолдеры информации заказа
 				 */
-				$aRepl = array_merge($aRepl,$modx->sbshop->arrayToPlaceholders($aOrderInfo));
+				$aRowData = array_merge($aRowData, $aOrderInfo);
 				/**
 				 * Идентификатор набора товара
 				 */
-				$aRepl['[+sb.set_id+]'] = $iSetId;
+				$aRowData['set_id'] = $iSetId;
 				/**
 				 * Если установлены опции в товаре
 				 */
@@ -276,10 +302,27 @@ class cart_mode {
 					 * Объединяем ряды и вставляем в контейнер
 					 */
 					$sOptions = str_replace('[+sb.wrapper+]', implode($this->aTemplates['option_separator'],$aOptions), $this->aTemplates['option_outer']);
-					$aRepl['[+sb.options+]'] = $sOptions;
+					$aRowData['options'] = $sOptions;
 				} else {
-					$aRepl['[+sb.options+]'] = '';
+					$aRowData['options'] = '';
 				}
+				/**
+				 * Запускаем плагины перед вставкой данных по товару в корзину
+				 */
+				$PlOut = $modx->invokeEvent('OnSBShopCartProductPrerender', array(
+					'iSetId' => $iSetId,
+					'aRowData' => $aRowData
+				));
+				/**
+				 * Берем результат работы первого плагина, если это массив.
+				 */
+				if (is_array($PlOut[0])) {
+					$aRowData = $PlOut[0];
+				}
+				/**
+				 * Готовим плейсхолдеры для товара
+				 */
+				$aRepl = $modx->sbshop->arrayToPlaceholders($aRowData);
 				/**
 				 * Вставляем данные в шаблон
 				 */
@@ -288,19 +331,36 @@ class cart_mode {
 			/**
 			 * Вставляем ряды в контейнер списка товаров
 			 */
-			$sOutput = str_replace('[+sb.wrapper+]', implode($aRows), $this->aTemplates['cart_outer']);
+			$sOutput = str_replace('[+sb.wrapper+]', implode('', $aRows), $this->aTemplates['cart_outer']);
 			/**
-			 * Подготавливаем плейсхолдеры для общего контейнера корзины
+			 * Данные заказа
 			 */
-			$aRepl = $modx->sbshop->arrayToPlaceholders($modx->sbshop->oOrder->getAttributes());
+			$aOrderData = $modx->sbshop->oOrder->getAttributes();
 			/**
 			 * Добавляем ссылку на оформление заказа
 			 */
-			$aRepl['[+sb.link_checkout+]'] = $modx->sbshop->sBaseUrl . 'checkout' . $modx->sbshop->config['url_suffix'];
+			$aOrderData['link_checkout'] = $modx->sbshop->sBaseUrl . 'checkout' . $modx->sbshop->config['url_suffix'];
 			/**
 			 * Добавляем сформированные данные
 			 */
-			$aRepl['[+sb.wrapper+]'] = $sOutput;
+			$aOrderData['wrapper'] = $sOutput;
+			/**
+			 * Запускаем плагины перед вставкой данных по заказу в корзину
+			 */
+			$PlOut = $modx->invokeEvent('OnSBShopCartOrderPrerender', array(
+				'oOrder' => $modx->sbshop->oOrder,
+				'aOrderData' => $aOrderData
+			));
+			/**
+			 * Берем результат работы первого плагина, если это массив.
+			 */
+			if (is_array($PlOut[0])) {
+				$aOrderData = $PlOut[0];
+			}
+			/**
+			 * Подготавливаем плейсхолдеры для общего контейнера корзины
+			 */
+			$aRepl = $modx->sbshop->arrayToPlaceholders($aOrderData);
 			/**
 			 * Вставляем список товаров в контейнер корзины
 			 */
@@ -331,9 +391,21 @@ class cart_mode {
 	public function deleteCart() {
 		global $modx;
 		/**
+		 * Вызов плагинов до очистки корзины
+		 */
+		$modx->invokeEvent('OnSBShopCartBeforeClear', array(
+			'oOrder' => $modx->sbshop->oOrder,
+		));
+		/**
 		 * Удаляем выбранные товары
 		 */
 		$modx->sbshop->oOrder->deleteProducts($_POST['sb_order_remove']);
+		/**
+		 * Вызов плагинов после очистки корзины
+		 */
+		$modx->invokeEvent('OnSBShopCartAfterClear', array(
+			'oOrder' => $modx->sbshop->oOrder,
+		));
 		/**
 		 * Сохраняем результат
 		 */

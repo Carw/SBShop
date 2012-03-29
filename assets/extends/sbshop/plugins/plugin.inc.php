@@ -32,11 +32,13 @@ if(!isset($modx->sbshop)) {
 	/**
 	 * Делаем доступ к объекту магазина через системный $modx
 	 */
-	$modx->sbshop = new SBShop($doc_start);
+	$modx->sbshop = new SBShop();
 	/**
 	 * Запускаем инициализацию
 	 */
 	$modx->sbshop->initialise();
+	// Запуск плагинов после инициализации
+	$modx->invokeEvent('OnSBShopInit');
 }
 
 if(!function_exists('SBShop_OnPageNotFound')) {

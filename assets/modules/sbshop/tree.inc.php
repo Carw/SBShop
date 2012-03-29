@@ -93,6 +93,11 @@ $_3b_treebuilder = array(
 			'image'				=> 'manager/media/style/MODxCarbon/images/icons/save.png'
 		),
 		'separator1'		=> array('text' => '-'),
+		'copyFile'			=> array(
+			'text'				=> 'Сделать копию',
+			'onclick'			=> "top.main.location.href = 'index.php?a=112&id=' + modid + '&mode=prod&act=copy&prodid=' + itemToChange",
+			'image'				=> 'manager/media/style/MODxCarbon/images/icons/page_white_copy.png'
+		),
 		'publishFile'		=> array(
 			'text'				=> 'Опубликовать',
 			'onclick'			=> "top.main.location.href = 'index.php?a=112&id=' + modid + '&mode=prod&act=pub&prodid=' + itemToChange",
