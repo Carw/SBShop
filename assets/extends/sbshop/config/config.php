@@ -1,16 +1,16 @@
 <?php
-
 /**
+ * @name SBShop
  * @author Mukharev Maxim
  * 
  * @desription
- * 
- * Электронный магазин для MODx
+ *
+ * SBShop - Интернет-магазин на MODx
  * 
  * Конфигурация
  */
 
-$config = array(
+return array(
 	/**
 	 * Режим дебагинга
 	 */

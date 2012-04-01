@@ -1,15 +1,13 @@
 <?php
-
 /**
+ * @name SBShop
  * @author Mukharev Maxim
- * @version 0.1a
- * 
- * @desription
- * 
- * Электронный магазин для MODx
- * 
- * Сниппет электронного магазина
  *
+ * @desription
+ *
+ * SBShop - Интернет-магазин на MODx
+ * 
+ * Сниппет интернет-магазина
  */
 
 if(!defined('MODX_BASE_PATH')) {

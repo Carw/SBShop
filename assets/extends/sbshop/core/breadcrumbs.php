@@ -1,14 +1,13 @@
 <?php
-
 /**
+ * @name SBShop
  * @author Mukharev Maxim
- * @version 0.1a
  *
  * @desription
  *
- * Электронный магазин для MODx
+ * SBShop - Интернет-магазин на MODx
  *
- * Класс для "хлебных крошек" электронного магазина
+ * Класс для реализации "хлебных крошек"
  */
 
 class SBBreadcrumbs {
@@ -28,7 +27,6 @@ class SBBreadcrumbs {
 		/**
 		 * Если если мы не внутри каталога, то выходим
 		 */
-		//$modx->sbshop->oGeneralCategory,$modx->sbshop->oGeneralProduct
 		if(!$modx->sbshop->insideCategory()) {
 			return;
 		}
@@ -38,6 +36,7 @@ class SBBreadcrumbs {
 		$sStartUrl = $modx->sbshop->sBaseUrl;
 		/**
 		 * Устанавливаем суфикс
+		 * @todo Разобраться в его использовании
 		 */
 		$sSuffix = $modx->sbshop->config['url_suffix'];
 		/**

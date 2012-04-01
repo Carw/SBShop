@@ -3,13 +3,12 @@
 /**
  * @name SBShop
  * @author Mukharev Maxim
- * @version 0.1a
- * 
+ *
  * @desription
+ *
+ * SBShop - Интернет-магазин на MODx
  * 
- * Электронный магазин для MODx
- * 
- * Экшен сниппета электронного магазина: Вывод товара
+ * Экшен сниппета: Вывод товара
  * 
  */
 
@@ -111,11 +110,11 @@ class product_mode {
 		/**
 		 * Получаем опции товара
 		 */
-		$aOptions = $modx->sbshop->oGeneralProduct->getOptionNames();
+		$aOptions = $modx->sbshop->oGeneralProduct->oOptions->getOptionNames();
 		/**
 		 * Опции раздела
 		 */
-		$aGeneralOptions = $modx->sbshop->oGeneralCategory->getOptionNames();
+		$aGeneralOptions = $modx->sbshop->oGeneralCategory->oOptions->getOptionNames();
 		/**
 		 * Обрабатываем каждую опцию
 		 */
@@ -150,7 +149,7 @@ class product_mode {
 				/**
 				 * Массив значений
 				 */
-				$aValues = $modx->sbshop->oGeneralProduct->getValuesByOptionName($aOption['title']);
+				$aValues = $modx->sbshop->oGeneralProduct->oOptions->getValuesByOptionName($aOption['title']);
 				/**
 				 * Если есть только одно значение
 				 */
@@ -296,7 +295,7 @@ class product_mode {
 					/**
 					 * Если опция не является скрытой
 					 */
-					if(!$modx->sbshop->oGeneralProduct->isOptionHidden($sOptionKey)) {
+					if(!$modx->sbshop->oGeneralProduct->oOptions->isOptionHidden($sOptionKey)) {
 						$aBundleOptions[$sOptionKey] = $sOptionVal;
 					}
 				}
@@ -340,7 +339,7 @@ class product_mode {
 						/**
 						 * Плейсхолдеры для опций в коплектации
 						 */
-						$aOptionRepl = $modx->sbshop->arrayToPlaceholders($modx->sbshop->oGeneralProduct->getNamesByNameIdAndValId($iOptKey,$iOptVal));
+						$aOptionRepl = $modx->sbshop->arrayToPlaceholders($modx->sbshop->oGeneralProduct->oOptions->getNamesByNameIdAndValId($iOptKey,$iOptVal));
 						/**
 						 * Разделитель между опцией и значением
 						 */
@@ -406,7 +405,7 @@ class product_mode {
 				/**
 				 * Плейсхолдеры для опций в коплектации
 				 */
-				$aOptionRepl = $modx->sbshop->arrayToPlaceholders($modx->sbshop->oGeneralProduct->getNamesByNameIdAndValId($iOptKey,$iOptVal));
+				$aOptionRepl = $modx->sbshop->arrayToPlaceholders($modx->sbshop->oGeneralProduct->oOptions->getNamesByNameIdAndValId($iOptKey,$iOptVal));
 				/**
 				 * Разделитель между опцией и значением
 				 */

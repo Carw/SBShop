@@ -3,13 +3,12 @@
 /**
  * @name SBShop
  * @author Mukharev Maxim
- * @version 0.1a
- * 
+ *
  * @desription
+ *
+ * SBShop - Интернет-магазин на MODx
  * 
- * Электронный магазин для MODx
- * 
- * Экшен сниппета электронного магазина: Вывод категорий
+ * Экшен сниппета: Вывод разделов
  * 
  */
 
@@ -60,7 +59,7 @@ class categories_mode {
 			 * Получаем список товаров
 			 */
 			$this->oProductList = new SBProductList();
-			$this->oProductList->loadFilteredListByCategoryId($this->oCategory->getAttribute('id'), false, $this->oCategory->getFilterSelected());
+			$this->oProductList->loadFilteredListByCategoryId($this->oCategory->getAttribute('id'), false, $this->oCategory->oFilterList->getFilterSelected());
 		}
 		/**
 		 * Устанавливаем шаблоны
@@ -516,7 +515,7 @@ class categories_mode {
 			 * Делаем замену плейсхолдеров в контейнере
 			 */
 			$sOutput = str_replace(array_keys($aRepl), array_values($aRepl), $this->aTemplates['product_list']);
-		} elseif($this->oCategory->getFilterSelected()) {
+		} elseif($this->oCategory->oFilterList->getFilterSelected()) {
 			$sOutput = $this->aTemplates['products_absent'];
 		}
 		return $sOutput;

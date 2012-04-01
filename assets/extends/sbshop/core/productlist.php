@@ -1,14 +1,13 @@
 <?php
-
 /**
+ * @name SBShop
  * @author Mukharev Maxim
- * @version 0.1a
- * 
+ *
  * @desription
+ *
+ * SBShop - Интернет-магазин на MODx
  * 
- * Электронный магазин для MODx
- * 
- * Объект список товаров
+ * Класс управления списком товаров
  */
 
 class SBProductList {
@@ -59,9 +58,9 @@ class SBProductList {
 		}
 		/**
 		 * Количество товаров на страницу
-		 * XXX разобраться с постраничной разбивкой
+		 * @todo разобраться с постраничной разбивкой
 		 */
-		$ProductPerPage = $modx->sbshop->config['product_per_page'];
+		//$ProductPerPage = $modx->sbshop->config['product_per_page'];
 		/**
 		 * Получаем информацию из базы
 		 */
@@ -87,9 +86,9 @@ class SBProductList {
 		}
 		/**
 		 * Количество товаров на страницу
-		 * XXX разобраться с постраничной разбивкой
+		 * @todo разобраться с постраничной разбивкой
 		 */
-		$ProductPerPage = $modx->sbshop->config['product_per_page'];
+		//$ProductPerPage = $modx->sbshop->config['product_per_page'];
 		/**
 		 * Получаем информацию из базы
 		 */
@@ -281,9 +280,9 @@ class SBProductList {
 		global $modx;
 		/**
 		 * Количество товаров на страницу
-		 * XXX разобраться с постраничной разбивкой
+		 * @todo разобраться с постраничной разбивкой
 		 */
-		$ProductPerPage = $modx->sbshop->config['product_per_page'];
+		//$ProductPerPage = $modx->sbshop->config['product_per_page'];
 		/**
 		 * Получаем информацию из базы
 		 */
@@ -323,7 +322,7 @@ class SBProductList {
 		 * Количество товаров на страницу
 		 * @todo разобраться с постраничной разбивкой
 		 */
-		$ProductPerPage = $modx->sbshop->config['product_per_page'];
+		//$ProductPerPage = $modx->sbshop->config['product_per_page'];
 		/**
 		 * Получаем информацию из базы
 		 */

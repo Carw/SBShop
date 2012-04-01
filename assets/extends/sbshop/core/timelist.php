@@ -1,14 +1,13 @@
 <?php
-
 /**
+ * @name SBShop
  * @author Mukharev Maxim
- * @version 0.1a
  *
  * @desription
  *
- * Электронный магазин для MODx
+ * SBShop - Интернет-магазин на MODx
  *
- * Объект списка информации с отметкой времени
+ * Класс списка информации с отметкой времени
  */
 
 class SBTimeList {

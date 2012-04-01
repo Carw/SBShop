@@ -3,13 +3,12 @@
 /**
  * @name SBShop
  * @author Mukharev Maxim
- * @version 0.1a
  *
  * @desription
  *
- * Электронный магазин для MODx
+ * SBShop - Интернет-магазин на MODx
  *
- * Экшен сниппета электронного магазина: Вывод данных магазина в виде YML для Яндекс.Маркет
+ * Экшен сниппета: Вывод данных в виде полного прайса
  *
  */
 
@@ -147,7 +146,7 @@ class price_mode {
 					/**
 					 * Обрабатываем все опции
 					 */
-					$aOptions = $oProduct->getOptionNames();
+					$aOptions = $oProduct->oOptions->getOptionNames();
 					$sOptionRows = '';
 					/**
 					 * Обрабатываем каждую опцию
@@ -160,7 +159,7 @@ class price_mode {
 							/**
 							 * Массив значений
 							 */
-							$aValues = $oProduct->getValuesByOptionName($aOption['title']);
+							$aValues = $oProduct->oOptions->getValuesByOptionName($aOption['title']);
 							/**
 							 * Обрабатываем каждое значение
 							 */

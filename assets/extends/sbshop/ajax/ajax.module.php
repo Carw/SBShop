@@ -1,10 +1,13 @@
 <?php
 /**
- * Created by JetBrains PhpStorm.
- * User: maxim
- * Date: 07.01.12
- * Time: 1:37
- * To change this template use File | Settings | File Templates.
+ * @name SBShop
+ * @author Mukharev Maxim
+ *
+ * @desription
+ *
+ * SBShop - Интернет-магазин на MODx
+ *
+ * Интерфейс для модуля SBShop через Ajax
  */
 
 

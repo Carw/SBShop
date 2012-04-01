@@ -1,20 +1,17 @@
 <?php
-
 /**
+ * @name SBShop
  * @author Mukharev Maxim
- * @version 0.1a
- * 
- * @desription
- * 
- * Электронный магазин для MODx
  *
+ * @desription
+ *
+ * SBShop - Интернет-магазин на MODx
+ *
+ * Ядро
  */
 
 class SBShop {
 	
-	/**
-	 * XXX лучше всего закрыть все переменные и сделать доступ через соответствующие методы
-	 */
 	public $config = array(); // массив с настройками
 	public $lang = array(); // массив языковых данных
 	public $iBaseDocId; // идентификатор документа в котором располагается каталог
@@ -41,57 +38,36 @@ class SBShop {
 		 * Подключаем необходимые файлы
 		 */
 		// конфиги
-		include MODX_BASE_PATH . 'assets/extends/sbshop/config/config.php';
+		$config = include MODX_BASE_PATH . 'assets/extends/sbshop/config/config.php';
 		/**
 		 * Записываем настройки
 		 */
 		$this->config = $config;
-		// Управление параметрами
-		include MODX_BASE_PATH . 'assets/extends/sbshop/core/attributelist.php';
-		// Управление товарами
-		include MODX_BASE_PATH . 'assets/extends/sbshop/core/product.php';
-		// Управление категориями
-		include MODX_BASE_PATH . 'assets/extends/sbshop/core/category.php';
-		// Управление фильтрами
-		include MODX_BASE_PATH . 'assets/extends/sbshop/core/filterlist.php';
-		// Управление коллекцией параметров
-		include MODX_BASE_PATH . 'assets/extends/sbshop/core/attributecollection.php';
-		// Управление набором опций
-		include MODX_BASE_PATH . 'assets/extends/sbshop/core/optionlist.php';
-		// Управление деревом категорий
-		include MODX_BASE_PATH . 'assets/extends/sbshop/core/cattree.php';
-		// Управление "хлебными крошками"
-		include MODX_BASE_PATH . 'assets/extends/sbshop/core/breadcrumbs.php';
-		// Управление списком товаров
-		include MODX_BASE_PATH . 'assets/extends/sbshop/core/productlist.php';
-		// Управление заказами
-		include MODX_BASE_PATH . 'assets/extends/sbshop/core/order.php';
-		// Управление списком заказов
-		include MODX_BASE_PATH . 'assets/extends/sbshop/core/orderlist.php';
-		// Управление данными клиента
-		include MODX_BASE_PATH . 'assets/extends/sbshop/core/customer.php';
-		// Управление данными клиента
-		include MODX_BASE_PATH . 'assets/extends/sbshop/core/image.php';
-		// Управление списками с отметкой времени
-		include MODX_BASE_PATH . 'assets/extends/sbshop/core/timelist.php';
-		// Управление списками комплектаций
-		include MODX_BASE_PATH . 'assets/extends/sbshop/core/bundlelist.php';
-		// Управление подсказками
-		include MODX_BASE_PATH . 'assets/extends/sbshop/core/tip.php';
+		/**
+		 * Загрузка расширений ядра SBShop
+		 */
+		$this->loadCoreExtensions();
 		/**
 		 * Подключаем языковой файл
 		 */
-		$langname = strtolower($modx->config['manager_language']);
-		$langpath = MODX_BASE_PATH . 'assets/extends/sbshop/lang/' . $langname . '.inc.php';
+		$sLangName = strtolower($modx->config['manager_language']);
+		$sLangPath = MODX_BASE_PATH . 'assets/extends/sbshop/lang/' . $sLangName . '.inc.php';
 		/**
 		 * Если указанный языковой файл существует
 		 */
-		if(is_file($langpath)) {
-			$lang = include $langpath;
+		if(is_file($sLangPath)) {
+			$aLang = include $sLangPath;
 		} else {
-			$lang = include MODX_BASE_PATH . 'assets/extends/sbshop/lang/russian-utf8.inc.php';
+			$aLang = include MODX_BASE_PATH . 'assets/extends/sbshop/lang/russian-utf8.inc.php';
 		}
-		$this->lang = $lang;
+		/**
+		 * Устанавливаем языковые данные
+		 */
+		$this->lang = $aLang;
+		/**
+		 * Записываем базовый идентификатор документа
+		 */
+		$this->iBaseDocId = $this->config['doc_start'];
 		/**
 		 * Если это не админка
 		 */
@@ -133,10 +109,6 @@ class SBShop {
 			 */
 			$this->aModes = array();
 			/**
-			 * Записываем базовый идентификатор документа
-			 */
-			$this->iBaseDocId = $this->config['doc_start'];
-			/**
 			 * Устанавливаем режим менеджера
 			 */
 			$this->bManager = false;
@@ -144,6 +116,11 @@ class SBShop {
 			 * Делаем анализ URL
 			 */
 			$this->analiseUrl();
+		} else {
+			/**
+			 * Устанавливаем режим менеджера
+			 */
+			$this->bManager = true;
 		}
 	}
 	
@@ -165,7 +142,6 @@ class SBShop {
 	 * Роутер. Определение режима работы и действий
 	 */
 	public function route() {
-		global $modx;
 		/**
 		 * Определяем $sURL
 		 */
@@ -214,9 +190,8 @@ class SBShop {
 	
 	/**
 	 * Загрузка расширений ядра
-	 * XXX Нужно довести до ума. пока не работает
 	 */
-	/*protected function loadCoreExtensions() {
+	protected function loadCoreExtensions() {
 		$sDir = MODX_BASE_PATH . 'assets/extends/sbshop/core';
 		$hDir = opendir($sDir);
 		while ($sFile = readdir($hDir)) {
@@ -226,7 +201,7 @@ class SBShop {
 			}
 		}
 		closedir($hDir);
-	}*/
+	}
 	
 	/**
 	 * Установка языковых данных
@@ -283,7 +258,7 @@ class SBShop {
 	}
 
 	/**
-	 * Набор общесистемных функций, необходимых для работы, которых нехватает в MODx
+	 * Набор общесистемных функций, необходимых для работы SBShop, которых не хватает в MODx
 	 */
 	
 	/**
@@ -294,7 +269,7 @@ class SBShop {
 		/**
 		 * Получаем базовый URL каталога
 		 */
-		$sBaseUrl = str_replace($this->config['url_suffix'],'',$modx->makeUrl($this->iBaseDocId));
+		$sBaseUrl = str_replace($this->config['url_suffix'], '', $modx->makeUrl($this->iBaseDocId));
 		/**
 		 * Записываем базовый URL со слешем на конце
 		 */
@@ -330,7 +305,7 @@ class SBShop {
 		 */
 		$aSetParams = $this->config['snippet_params'];
 		/**
-		 * Если текущий URL включаем базовый
+		 * Если текущий URL включает базовый
 		 */
 		if(strpos($sCurrentUrl,$sBaseUrl) === 0) {
 			/**

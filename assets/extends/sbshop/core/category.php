@@ -1,14 +1,13 @@
 <?php
-
 /**
+ * @name SBShop
  * @author Mukharev Maxim
- * @version 0.1a
- * 
+ *
  * @desription
+ *
+ * SBShop - Интернет-магазин на MODx
  * 
- * Электронный магазин для MODx
- * 
- * Класс для категории электронного магазина
+ * Класс для раздела
  */
 
 class SBCategory {
@@ -16,8 +15,8 @@ class SBCategory {
 	protected $aCategoryData;
 	protected $aCategoryDataKeys;
 	protected $oCategoryExtendData;
-	protected $oFilterList;
-	protected $oOptions; // Опции раздела
+	public $oFilterList;
+	public $oOptions; // Опции раздела
 	
 	/**
 	 * Конструктор
@@ -94,7 +93,7 @@ class SBCategory {
 						$this->unserializeAttributes($sVal);
 					break;
 					case 'filters':
-						$this->unserializeFilters($sVal);
+						$this->oFilterList->unserializeFilters($sVal);
 					break;
 					case 'options':
 						$this->oOptions->unserializeOptions($sVal);
@@ -120,24 +119,6 @@ class SBCategory {
 	 */
 	public function setExtendAttributes($aParam = false) {
 		return $this->oCategoryExtendData->setAttributes($aParam);
-	}
-
-	public function addFilter($aFilter, $aValues) {
-		return $this->oFilterList->add($aFilter, $aValues);
-	}
-
-	/**
-	 * Получение списка опций
-	 */
-	public function getOptionNames() {
-		return $this->oOptions->getOptionNames();
-	}
-
-	/**
-	 * Получение списка значений опций
-	 */
-	public function getValuesByOptionName($sName) {
-		return $this->oOptions->getValuesByOptionName($sName);
 	}
 
 	/**
@@ -230,47 +211,11 @@ class SBCategory {
 	}
 
 	/**
-	 * Получение фильтра по идентификатору
-	 * @param  $sFilterId
-	 * @return void
-	 */
-	public function getFilterById($sFilterId) {
-		return $this->oFilterList->getFilterById($sFilterId);
-	}
-
-	/**
-	 * Получение списка идентификаторов фильтров
-	 * @return array
-	 */
-	public function getFilterIds() {
-		return $this->oFilterList->getFilterIds();
-	}
-
-	/**
-	 * Получение списка названий фильтров
-	 * @return void
-	 */
-	public function getFilterNames() {
-		return $this->oFilterList->getFilterNames();
-	}
-
-	public function getFilterSelected($bCompact = false) {
-		return $this->oFilterList->getFilterSelected($bCompact);
-	}
-
-	/**
 	 * Десериализация параметров категории
 	 * @param unknown_type $sParams
 	 */
 	public function unserializeAttributes($sParams) {
 		return $this->oCategoryExtendData->unserializeAttributes($sParams);
-	}
-
-	/**
-	 * Десериализация фильтров
-	 */
-	public function unserializeFilters($sParams) {
-		return $this->oFilterList->unserializeFilters($sParams);
 	}
 
 	/**
@@ -321,7 +266,7 @@ class SBCategory {
 			/**
 			 * Фильтры
 			 */
-			$this->unserializeFilters($this->aCategoryData['filters']);
+			$this->oFilterList->unserializeFilters($this->aCategoryData['filters']);
 			return true;
 		} else {
 			return false;
@@ -359,7 +304,7 @@ class SBCategory {
 			/**
 			 * Фильтры
 			 */
-			$this->unserializeFilters($this->aCategoryData['filters']);
+			$this->oFilterList->unserializeFilters($this->aCategoryData['filters']);
 			return true;
 		} else {
 			return false;

@@ -2,13 +2,12 @@
 /**
  * @name SBShop
  * @author Mukharev Maxim
- * @version 0.1a
  *
  * @desription
  *
- * Электронный магазин для MODx
+ * SBShop - Интернет-магазин на MODx
  *
- * Экшен сниппета электронного магазина: Вывод фильтра
+ * Экшен сниппета: Вывод фильтра
  *
  */
 
@@ -56,7 +55,7 @@ class filter_mode {
 		/**
 		 * Данные фильтра
 		 */
-		$aFilterSelected = $this->oCategory->getFilterSelected(true);
+		$aFilterSelected = $this->oCategory->oFilterList->getFilterSelected(true);
 		/**
 		 * Записываем основной контейнер
 		 */
@@ -68,11 +67,11 @@ class filter_mode {
 		/**
 		 * Получаем список фильтров
 		 */
-		$aFilterIds = $this->oCategory->getFilterIds();
+		$aFilterIds = $this->oCategory->oFilterList->getFilterIds();
 		/**
 		 * Получаем список названий фильтров
 		 */
-		$aFilterNames = $this->oCategory->getFilterNames();
+		$aFilterNames = $this->oCategory->oFilterList->getFilterNames();
 		/**
 		 * Обрабатываем каждый фильтр
 		 */
@@ -80,7 +79,7 @@ class filter_mode {
 			/**
 			 * Получаем данные фильтра
 			 */
-			$aFilter = $this->oCategory->getFilterById($sFilterId);
+			$aFilter = $this->oCategory->oFilterList->getFilterById($sFilterId);
 			/**
 			 * Значения
 			 */

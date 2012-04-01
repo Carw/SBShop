@@ -1,16 +1,13 @@
 <?php
-
 /**
  * @name SBShop
  * @author Mukharev Maxim
- * @version 0.1a
  *
  * @desription
  *
- * Электронный магазин для MODx
+ * SBShop - Интернет-магазин на MODx
  *
- * Экшен модуля электронного магазина: Управление товарами
- *
+ * Экшен модуля: Ручное обновление данных SBShop
  */
 
 class update_mode {

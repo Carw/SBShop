@@ -1,25 +1,24 @@
 <?php
-
 /**
+ * @name SBShop
  * @author Mukharev Maxim
- * @version 0.1a
  *
  * @desription
  *
- * Электронный магазин для MODx
+ * SBShop - Интернет-магазин на MODx
  *
- * Класс для дерева категорий электронного магазина
+ * Класс для дерева разделов
  */
 
 class SBCatTree {
 	/**
 	 * @var SBCategory
 	 */
-	protected $oParentCategory; // Идентификатор родительской категории
+	protected $oParentCategory; // Родительский раздел
 	protected $iLevel; // Уровень вложенности дерева
 	protected $aCatTree; // Массив дерева категории
-	protected $aCatTreeChildren; // Массив дерева категории
-	protected $aCatTreeLevels; // Массив дерева категории
+	protected $aCatTreeChildren; // Массив дерева разделов
+	protected $aCatTreeLevels; // Массив дерева разделов
 
 	public function  __construct($oParentCategory = false,$iLevel = false, $bDeleted = false) {
 		global $modx;
@@ -73,7 +72,6 @@ class SBCatTree {
 		$iStartLevel = $this->oParentCategory->getAttribute('level');
 		/**
 		 * Вычисляем конечный уровень
-		 * XXX Здесь надо разобраться с конечным уровнем окончательно
 		 */
 		$iEndLevel = $iLevel + $iStartLevel;
 		/**

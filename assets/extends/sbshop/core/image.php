@@ -1,14 +1,13 @@
 <?php
-
 /**
+ * @name SBShop
  * @author Mukharev Maxim
- * @version 0.1a
  *
  * @desription
  *
- * Электронный магазин для MODx
+ * SBShop - Интернет-магазин на MODx
  *
- * Класс для работы с изображениями электронного магазина
+ * Класс для работы с изображениями
  */
 
 class SBImage {

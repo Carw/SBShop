@@ -1,3 +1,14 @@
+/**
+ * @name SBShop
+ * @author Mukharev Maxim
+ *
+ * @desription
+ *
+ * SBShop - Интернет-магазин на MODx
+ *
+ * Скрипт для управления разделом
+ */
+
 // Инициализация опций
 option_init = function(){
 	$("#options input.option_name").keyup(function(event){

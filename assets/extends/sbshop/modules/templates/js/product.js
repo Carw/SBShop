@@ -1,3 +1,13 @@
+/**
+ * @name SBShop
+ * @author Mukharev Maxim
+ *
+ * @desription
+ *
+ * SBShop - Интернет-магазин на MODx
+ *
+ * Скрипт для управления товаром
+ */
 
 // Инициализация опций
 option_init = function(){

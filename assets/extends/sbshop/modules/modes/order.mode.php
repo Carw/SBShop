@@ -1,16 +1,13 @@
 <?php
-
 /**
  * @name SBShop
  * @author Mukharev Maxim
- * @version 0.1a
  *
  * @desription
  *
- * Электронный магазин для MODx
+ * SBShop - Интернет-магазин на MODx
  *
- * Экшен модуля электронного магазина: Режим управления заказами
- *
+ * Экшен модуля: Режим управления заказами
  */
 
 class order_mode {
@@ -194,7 +191,7 @@ class order_mode {
 				/**
 				 * Добавляем комментарий
 				 */
-				$aOrderList[$sKey]->addComment($modx->db->escape($sComment));
+				$aOrderList[$sKey]->oComments->add($modx->db->escape($sComment));
 				/**
 				 * Сохраняем
 				 */
@@ -245,7 +242,7 @@ class order_mode {
 			/**
 			 * Комментарии
 			 */
-			$aComments = $oOrder->getComments();
+			$aComments = $oOrder->oComments->getAll();
 			/**
 			 * Комментарии
 			 */
@@ -362,7 +359,7 @@ class order_mode {
 						/**
 						 * Создаем плейсхолдеры
 						 */
-						$aOptRepl = $modx->sbshop->arrayToPlaceholders($oProduct->getNamesByNameIdAndValId($sOptKeyId,$sOptValId));
+						$aOptRepl = $modx->sbshop->arrayToPlaceholders($oProduct->oOptions->getNamesByNameIdAndValId($sOptKeyId,$sOptValId));
 						/**
 						 * Разделитель между опцией и значением
 						 */

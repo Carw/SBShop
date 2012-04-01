@@ -1,16 +1,13 @@
 <?php
-
 /**
  * @name SBShop
  * @author Mukharev Maxim
- * @version 0.1a
- * 
+ *
  * @desription
+ *
+ * SBShop - Интернет-магазин на MODx
  * 
- * Электронный магазин для MODx
- * 
- * Экшен модуля электронного магазина: Управление товарами
- * 
+ * Экшен модуля: Управление товарами
  */
 
 class prod_mode {
@@ -326,7 +323,7 @@ class prod_mode {
 		/**
 		 * Получаем список опций
 		 */
-		$aOptionList = $this->oProduct->getOptionNames();
+		$aOptionList = $this->oProduct->oOptions->getOptionNames();
 		/**
 		 * Если опции есть
 		 */
@@ -342,7 +339,7 @@ class prod_mode {
 				/**
 				 * Получаем значение опции
 				 */
-				$aValuesList = $this->oProduct->getValuesByOptionName($aOption['title']);
+				$aValuesList = $this->oProduct->oOptions->getValuesByOptionName($aOption['title']);
 				/**
 				 * Если есть значения
 				 */

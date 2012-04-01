@@ -1,14 +1,13 @@
 <?php
-
 /**
+ * @name SBShop
  * @author Mukharev Maxim
- * @version 0.1a
- * 
+ *
  * @desription
+ *
+ * SBShop - Интернет-магазин на MODx
  * 
- * Электронный магазин для MODx
- * 
- * Объект заказа
+ * Класс управления заказом
  */
 
 class SBOrder {
@@ -17,7 +16,7 @@ class SBOrder {
 	protected $aOrderDataKeys; // ключи для основных данных заказа
 	protected $aProducts; // информация о купленных товарах / количестве / конфигурации и т.д.
 	protected $aOptions; // настраиваемые параметры заказа, определяемые процедурой оформления
-	protected $oComments; // комментарии к заказу
+	public $oComments; // комментарии к заказу
 	/**
 	 * @var SBProductList
 	 */
@@ -299,7 +298,7 @@ class SBOrder {
 					/**
 					 * Если значение опции не равно 'null'
 					 */
-					if($oProduct->getValueByNameIdAndValId($iKey,$iVal) != 'null') {
+					if($oProduct->oOptions->getValueByNameIdAndValId($iKey,$iVal) != 'null') {
 						/**
 						 * Добавляем значение
 						 */
@@ -866,28 +865,6 @@ class SBOrder {
 		 * Выполняем десериализцию и возвращаем результат
 		 */
 		return $this->oComments->unserialize($sParams);
-	}
-
-	/**
-	 * Добавление комментария
-	 * @param <type> $sData
-	 */
-	public function addComment($sData) {
-		return $this->oComments->add($sData);
-	}
-
-	/**
-	 * Получить первый комментарий
-	 */
-	public function getFirstComment() {
-		return $this->oComments->getFirst();
-	}
-
-	/**
-	 * Получение всех комментариев
-	 */
-	public function getComments() {
-		return $this->oComments->getAll();
 	}
 
 	public function setSession() {

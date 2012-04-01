@@ -2,13 +2,12 @@
 /**
  * @name SBShop
  * @author Mukharev Maxim
- * @version 0.1a
- * 
+ *
  * @desription
+ *
+ * SBShop - Интернет-магазин на MODx
  * 
- * Электронный магазин для MODx
- * 
- * Экшен сниппета электронного магазина: Вывод краткой информации корзины
+ * Экшен сниппета: Вывод краткой информации корзины
  * 
  */
 
@@ -270,7 +269,7 @@ class cart_mode {
 						/**
 						 * Получаем название опции и значения по идентификаторам
 						 */
-						$aOptionData = $oProduct->getNamesByNameIdAndValId($sOptKeyId,$sOptValId);
+						$aOptionData = $oProduct->oOptions->getNamesByNameIdAndValId($sOptKeyId,$sOptValId);
 						/**
 						 * Убираем переносы строки у названия
 						 */

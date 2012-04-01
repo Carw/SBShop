@@ -1,18 +1,14 @@
 <?php
-
 /**
  * @name SBShop
  * @author Mukharev Maxim
- * @version 0.1a
- * 
+ *
  * @desription
+ *
+ * SBShop - Интернет-магазин на MODx
  * 
- * Электронный магазин для MODx
- * 
- * Экшен модуля электронного магазина: Стартовая страница модуля
- * 
+ * Экшен модуля: Стартовая страница
  */
-
 
 class home_mode {
 	
@@ -23,7 +19,6 @@ class home_mode {
 	 * @param unknown_type $sAct
 	 */
 	public function __construct($sModuleLink, $sMode, $sAct = '') {
-		global $modx;
 		echo '<div class="sectionHeader"><div class="breadcrumbs">Электронный магазин</div></div>';
 		echo '<div class="sectionBody">';
 		echo '<p><a href="' . $sModuleLink . '&mode=order' . '">Текущие заказы</a></p>';
@@ -44,7 +39,6 @@ class home_mode {
 	 * Получение графика активности в магазине за неделю
 	 */
 	protected function getWeekGraph() {
-		global $modx;
 		/**
 		 * Подключаем библиотеки для рисования диаграмм
 		 */
@@ -199,7 +193,6 @@ class home_mode {
 	 * @return <type>
 	 */
 	public function getOrderDataByStatuses($aStatuses) {
-		global $modx;
 		/**
 		 * Текущая дата
 		 */

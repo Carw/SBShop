@@ -1,16 +1,13 @@
 <?php
-
 /**
  * @name SBShop
  * @author Mukharev Maxim
- * @version 0.1a
  *
  * @desription
  *
- * Электронный магазин для MODx
+ * SBShop - Интернет-магазин на MODx
  *
- * Экшен модуля электронного магазина: Режим массового управления ценами
- *
+ * Экшен модуля: Режим массового управления ценами
  */
 
 class pricing_mode {
@@ -274,7 +271,7 @@ class pricing_mode {
 				/**
 				 * Получаем список опций
 				 */
-				$aOptionNames = $oProduct->getOptionNames();
+				$aOptionNames = $oProduct->oOptions->getOptionNames();
 				/**
 				 * Обрабатываем каждую опцию
 				 */
@@ -282,7 +279,7 @@ class pricing_mode {
 					/**
 					 * Получаем список значений
 					 */
-					$aValues = $oProduct->getValuesByOptionName($sOptionKey);
+					$aValues = $oProduct->oOptions->getValuesByOptionName($sOptionKey);
 					/**
 					 * Если опции установлены
 					 */
@@ -304,7 +301,7 @@ class pricing_mode {
 								/**
 								 * Получаем список значений
 								 */
-								$aValues = $oProduct->getValuesByOptionName($sOptionKey);
+								$aValues = $oProduct->oOptions->getValuesByOptionName($sOptionKey);
 								/**
 								 * Устанавливаем надбавку в массиве значения
 								 */

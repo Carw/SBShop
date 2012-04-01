@@ -1,16 +1,13 @@
 <?php
-
 /**
  * @name SBShop
  * @author Mukharev Maxim
- * @version 0.1a
- * 
+ *
  * @desription
+ *
+ * SBShop - Интернет-магазин на MODx
  * 
- * Электронный магазин для MODx
- * 
- * Экшен модуля электронного магазина: Управление категориями
- * 
+ * Экшен модуля: Управление разделами
  */
 
 class cat_mode {
@@ -240,7 +237,7 @@ class cat_mode {
 		/**
 		 * Получаем список опций
 		 */
-		$aOptionList = $this->oCategory->getOptionNames();
+		$aOptionList = $this->oCategory->oOptions->getOptionNames();
 		/**
 		 * Обрабатываем каждую опцию
 		 */
@@ -291,7 +288,7 @@ class cat_mode {
 			/**
 			 * Получаем сохраненные настройки фильтра
 			 */
-			$aFilterData = $this->oCategory->getFilterById($sFilterId);
+			$aFilterData = $this->oCategory->oFilterList->getFilterById($sFilterId);
 			/**
 			 * Если данных нет
 			 */
@@ -891,7 +888,7 @@ class cat_mode {
 						/**
 						 * Добавляем фильтр
 						 */
-						$this->oCategory->addFilter($aFilter, $aValues);
+						$this->oCategory->oFilterList->add($aFilter, $aValues);
 					} elseif(intval($sKey) > 0) {
 						/**
 						 * делаем перевод в число
@@ -900,7 +897,7 @@ class cat_mode {
 						/**
 						 * Добавляем фильтр
 						 */
-						$this->oCategory->addFilter($aFilter, $aValues);
+						$this->oCategory->oFilterList->add($aFilter, $aValues);
 					}
 
 				}

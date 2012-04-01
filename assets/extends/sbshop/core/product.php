@@ -1,14 +1,13 @@
 <?php 
-
 /**
+ * @name SBShop
  * @author Mukharev Maxim
- * @version 0.1a
- * 
+ *
  * @desription
+ *
+ * SBShop - Интернет-магазин на MODx
  * 
- * Электронный магазин для MODx
- * 
- * Объект товара
+ * Класс управления товаром
  */
 
 class SBProduct {
@@ -298,20 +297,6 @@ class SBProduct {
 	}
 
 	/**
-	 * Получение списка опций
-	 */
-	public function getOptionNames() {
-		return $this->oOptions->getOptionNames();
-	}
-
-	/**
-	 * Получение списка значений опций
-	 */
-	public function getValuesByOptionName($sName) {
-		return $this->oOptions->getValuesByOptionName($sName);
-	}
-
-	/**
 	 * Расчет конечной стоимости с учетом надбавки
 	 */
 	public function getFullPrice() {
@@ -382,50 +367,11 @@ class SBProduct {
 	}
 
 	/**
-	 * Опция является скрытой
-	 * @param <type> $iNameId
-	 * @return <type>
-	 */
-	public function isOptionHidden($iNameId) {
-		return $this->oOptions->isOptionHidden($iNameId);
-	}
-
-	/**
 	 * Получить список опций в комплектации
 	 * @param <type> $iBundleId
 	 */
 	public function getBundleOptions($iBundleId) {
 		return $this->oBundles->getOptionsById($iBundleId);
-	}
-
-	/**
-	 * Получить информацию по значению опции
-	 * @param $iNameId
-	 * @param $iValueId
-	 * @return
-	 */
-	public function getOptionValue($iNameId, $iValueId) {
-		return $this->oOptions->getOptionValue($iNameId,$iValueId);
-	}
-
-	/**
-	 * Получение значения опции по идентификаторам
-	 * @param <type> $iNameId
-	 * @param <type> $iValueId
-	 * @return <type>
-	 */
-	public function getValueByNameIdAndValId($iNameId, $iValueId) {
-		return $this->oOptions->getValueByNameIdAndValId($iNameId,$iValueId);
-	}
-
-	/**
-	 * Получение названия опции и значения по идентификаторам
-	 * @param <type> $iNameId
-	 * @param <type> $iValueId
-	 * @return <type>
-	 */
-	public function getNamesByNameIdAndValId($iNameId, $iValueId) {
-		return $this->oOptions->getNamesByNameIdAndValId($iNameId,$iValueId);
 	}
 
 	/**
@@ -454,7 +400,7 @@ class SBProduct {
 			/**
 			 * Получаем информацию о значении
 			 */
-			$aVal = $this->getOptionValue($iKey, $iVal);
+			$aVal = $this->oOptions->getOptionValue($iKey, $iVal);
 			/**
 			 * Считаем полную стоимость
 			 */

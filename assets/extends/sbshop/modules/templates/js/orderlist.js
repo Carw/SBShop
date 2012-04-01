@@ -1,3 +1,14 @@
+/**
+ * @name SBShop
+ * @author Mukharev Maxim
+ *
+ * @desription
+ *
+ * SBShop - Интернет-магазин на MODx
+ *
+ * Скрипт для управления сортировкой
+ */
+
 function showDate(date) {
     alert(date);
 }
