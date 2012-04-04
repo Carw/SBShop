@@ -92,7 +92,7 @@ $(document).ready(function(){
 		 * Клонируем шаблон опции
 		 */
 		a = $(".option_template .option").clone();
-		a.appendTo('#options .fastlist');
+		a.appendTo('#options .sorttable');
 		/**
 		 * Изменяем заголовок на указанный
 		 */
@@ -117,9 +117,7 @@ $(document).ready(function(){
 				elem.addClass('visible');
 			}
 		});
-		/*$('#options .sorttable').tableDnD({
-			dragHandle: "dragHandle"
-		});*/
+
 		$('#options .sorttable tbody').dragsort({
 			itemSelector: 'tr',
 			dragSelector: "td.dragHandle",
@@ -197,7 +195,7 @@ $(document).ready(function(){
 		 * Клонируем шаблон комплектации
 		 */
 		a = $(".bundle_template .bundle").clone();
-		a.appendTo('#bundles .fastlist');
+		a.appendTo('#bundles .sorttable');
 		/**
 		 * Изменяем заголовок на указанный
 		 */
@@ -224,12 +222,10 @@ $(document).ready(function(){
 		});
 		$('#bundles .sorttable tbody').dragsort({
 			itemSelector: 'tr',
-			dragSelector: "td.dragHandle",
+			dragSelector: 'td.dragHandle',
+			dragSelectorExclude: '.bundle_base',
 			placeHolderTemplate: '<tr class="bundle"><td class="dragHandle"><div>&nbsp;</div></td><td></td></tr>'
 		});
-		/*$('#bundles .sorttable').tableDnD({
-			dragHandle: "dragHandle"
-		});*/
 		bundle_reinit();
 		return false;
 	});
@@ -323,6 +319,7 @@ $(document).ready(function(){
 	$('.sorttable tbody').dragsort({
 		itemSelector: 'tr',
 		dragSelector: "td.dragHandle",
+		dragSelectorExclude: 'tr.bundle_base',
 		placeHolderTemplate: '<tr class="option"><td class="dragHandle"><div>&nbsp;</div></td><td></td></tr>'
 	});
 

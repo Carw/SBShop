@@ -55,13 +55,21 @@ class pricing_mode {
 	 * @return void
 	 */
 	public function editPricing() {
-		global $modx;
+		global $modx, $_lang;
+		/**
+		 * Объединяем системный и модульный языковой массив
+		 */
+		$aLang = array_merge($_lang, $modx->sbshop->lang);
+		/**
+		 * Подготавливаем языковые плейсхолдеры
+		 */
+		$phModule = $modx->sbshop->arrayToPlaceholders($aLang,'lang.');
 		/**
 		 * Служебные плейсхолдеры для модуля
 		 */
-		$aModuleRepl['[+site.url+]'] = MODX_BASE_URL;
-		$aModuleRepl['[+module.link+]'] = $this->sModuleLink;
-		$aModuleRepl['[+module.act+]'] = $this->sAct;
+		$phModule['[+site.url+]'] = MODX_BASE_URL;
+		$phModule['[+module.link+]'] = $this->sModuleLink;
+		$phModule['[+module.act+]'] = $this->sAct;
 		/**
 		 * Получение дерева разделов
 		 */
@@ -85,7 +93,7 @@ class pricing_mode {
 		/**
 		 * Добавляем плейсхолдер для списка разделов
 		 */
-		$aModuleRepl['[+sb.categories+]'] = implode('', $aCategoryRows);
+		$phModule['[+sb.categories+]'] = implode('', $aCategoryRows);
 		/**
 		 * Получаем список производителей
 		 */
@@ -104,11 +112,11 @@ class pricing_mode {
 		/**
 		 * Добавляем плейсхолдер для списка разделов
 		 */
-		$aModuleRepl['[+sb.vendors+]'] = implode('', $aVendorRows);
+		$phModule['[+sb.vendors+]'] = implode('', $aVendorRows);
 		/**
 		 * Вставляем данные в основной шаблон
 		 */
-		return str_replace(array_keys($aModuleRepl), array_values($aModuleRepl), $this->aTemplates['pricing_outer']);
+		return str_replace(array_keys($phModule), array_values($phModule), $this->aTemplates['pricing_outer']);
 	}
 
 	/**

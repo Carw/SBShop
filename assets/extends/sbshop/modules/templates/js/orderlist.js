@@ -6,7 +6,7 @@
  *
  * SBShop - Интернет-магазин на MODx
  *
- * Скрипт для управления сортировкой
+ * Скрипт для списка заказов
  */
 
 function showDate(date) {
@@ -24,10 +24,6 @@ $(document).ready(function(){
 			order.addClass('opened');
 		}
 	});
-
-    /*$('.sb_date_next').datepick({
-        onSelect: showDate
-    });*/
 
 	$(".sb_date_next").dynDateTime({
 		showsTime: true,

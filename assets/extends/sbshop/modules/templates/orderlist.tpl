@@ -14,7 +14,7 @@
 
 <div class="sectionHeader">
 	<div class="breadcrumbs">
-		<a href="[+module.link+]">Электронный магазин</a>
+		<a href="[+module.link+]">[+lang.sbshop+]</a>
 		&raquo;
 		<span>[+lang.order_list_title+]</span>
 	</div>

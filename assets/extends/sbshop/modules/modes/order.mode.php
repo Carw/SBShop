@@ -216,18 +216,18 @@ class order_mode {
 			 */
 			$aOrderRepl['[+sb.status.txt+]'] = $modx->sbshop->lang['order_status_' . $oOrder->getAttribute('status')];
 			/**
-             * Форматируем дату заказа
-             */
-            $aOrderRepl['[+sb.date_edit+]'] = date($modx->sbshop->config['order_date_format'], strtotime($oOrder->getAttribute('date_edit')));
+			 * Форматируем дату заказа
+			 */
+			$aOrderRepl['[+sb.date_edit+]'] = date($modx->sbshop->config['order_date_format'], strtotime($oOrder->getAttribute('date_edit')));
 			/**
-             * Форматируем дату заказа
-             */
+			 * Форматируем дату заказа
+			 */
 			if($oOrder->getAttribute('date_next')) {
 				$aOrderRepl['[+sb.date_next+]'] = date($modx->sbshop->config['order_date_format'], strtotime($oOrder->getAttribute('date_next')));
 			} else {
 				$aOrderRepl['[+sb.date_next+]'] = '---';
 			}
-            /**
+			/**
 			 * Идентификатор заказчика
 			 */
 			$iCustomerId = $oOrder->getAttribute('user');
@@ -452,7 +452,7 @@ class order_mode {
 		/**
 		 * Подготавливаем языковые плейсхолдеры
 		 */
-		$phLang = $modx->sbshop->arrayToPlaceholders($modx->sbshop->lang,'lang.');
+		$phLang = $modx->sbshop->arrayToPlaceholders($modx->sbshop->lang, 'lang.');
 		/**
 		 * Объединяем плейсхолдеры с языковыми
 		 */

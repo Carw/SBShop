@@ -12,7 +12,7 @@
 
 <div class="sectionHeader">
 	<div class="breadcrumbs">
-		<a href="[+module.link+]">Электронный магазин</a>
+		<a href="[+module.link+]">[+lang.sbshop+]</a>
 		&raquo;
 		<span>Редактирование товара</span>
 	</div>
@@ -33,7 +33,7 @@
 					<img src="[+style.icons_save+]" />[+lang.save+]
 				</a>
 			</li>
-			<li id="Button4"><a href="#" onclick="document.location.href='[+product.modulelink+]';"><img src="[+style.icons_cancel+]" />[+lang.cancel+]</a></li>
+			<li id="Button4"><a href="#" onclick="document.location.href='[+module.link+]';"><img src="[+style.icons_cancel+]" />[+lang.cancel+]</a></li>
 		</ul>
 	</div>
 
@@ -197,7 +197,7 @@
 							</td>
 						</tr>
 					</table>
-					<table class="sorttable fastlist">
+					<table class="sorttable">
 						[+options+]
 					</table>
 				</div>
@@ -293,7 +293,7 @@
 							</td>
 						</tr>
 					</table>
-					<table class="sorttable fastlist">
+					<table class="sorttable">
 						<tr class="bundle_base">
 							<td class="nodrag"></td>
 							<td>
@@ -532,6 +532,6 @@
 	<div class="filedel">
 		<input type="image" class="file_del" style="width: auto;" src="/manager/media/style/MODxCarbon/images/icons/delete.png">
 	</div>
-	<a href="[+sb.file+]">[+sb.name+]</a>
+	<a href="[+sb.file+]" title="[+sb.name+]">Link</a>
 	<input type="hidden" class="file_id" name="file[]" value="[+sb.id+]" />
 </div>

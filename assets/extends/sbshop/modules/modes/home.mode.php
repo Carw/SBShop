@@ -11,7 +11,8 @@
  */
 
 class home_mode {
-	
+
+	protected $aTemplates;
 	/**
 	 * Конструктор
 	 * @param unknown_type $sModuleLink
@@ -19,16 +20,39 @@ class home_mode {
 	 * @param unknown_type $sAct
 	 */
 	public function __construct($sModuleLink, $sMode, $sAct = '') {
-		echo '<div class="sectionHeader"><div class="breadcrumbs">Электронный магазин</div></div>';
-		echo '<div class="sectionBody">';
-		echo '<p><a href="' . $sModuleLink . '&mode=order' . '">Текущие заказы</a></p>';
-		echo '<p><a href="' . $sModuleLink . '&mode=order&act=arch' . '">Архив заказов</a></p>';
-		echo '<p><a href="' . $sModuleLink . '&mode=order&act=trash' . '">Брошенные заказы</a></p>';
-		echo '<p><a href="' . $sModuleLink . '&mode=pricing' . '">Управление ценами</a></p>';
-		echo '<p><a href="' . $sModuleLink . '&mode=update' . '">Обновление</a> (нажимать нежно!)</p>';
-		echo '<p><img src="' . MODX_BASE_URL . 'assets/cache/sbshop/week.png" /></p>';
-		echo '</div>';
-
+		global $modx, $_lang;
+		/**
+		 * Записываем служебную информацию модуля, чтобы делать разные ссылки
+		 */
+		$this->sModuleLink = $sModuleLink;
+		$this->sMode = $sMode;
+		$this->sAct = $sAct;
+		/**
+		 * Устанавливаем шаблон
+		 */
+		$this->aTemplates = $modx->sbshop->getModuleTemplate($sMode);
+		/**
+		 * Объединяем системный и модульный языковой массив
+		 */
+		$aLang = array_merge($_lang, $modx->sbshop->lang);
+		/**
+		 * Подготавливаем языковые плейсхолдеры
+		 */
+		$phModule = $modx->sbshop->arrayToPlaceholders($aLang,'lang.');
+		/**
+		 * Служебные плейсхолдеры для модуля
+		 */
+		$phModule['[+site.url+]'] = MODX_BASE_URL;
+		$phModule['[+module.link+]'] = $this->sModuleLink;
+		$phModule['[+module.act+]'] = $this->sAct;
+		/**
+		 * Вставляем данные в шаблон
+		 */
+		$sOutput = str_replace(array_keys($phModule), array_values($phModule), $this->aTemplates['home']);
+		/**
+		 * Вывод страницы
+		 */
+		echo $sOutput;
 		/**
 		 * Рисуем график
 		 */

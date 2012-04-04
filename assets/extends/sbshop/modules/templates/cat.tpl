@@ -10,7 +10,7 @@
 
 <div class="sectionHeader">
 	<div class="breadcrumbs">
-		<a href="[+module.link+]">Электронный магазин</a>
+		<a href="[+module.link+]">[+lang.sbshop+]</a>
 		&raquo;
 		<span>Редактирование категории</span>
 	</div>
@@ -31,7 +31,7 @@
 					<img src="[+style.icons_save+]" />[+lang.save+]
 				</a>
 			</li>
-			<li id="Button4"><a href="#" onclick="document.location.href='[+category.modulelink+]';"><img src="[+style.icons_cancel+]" />[+lang.cancel+]</a></li>
+			<li id="Button4"><a href="#" onclick="document.location.href='[+module.link+]';"><img src="[+style.icons_cancel+]" />[+lang.cancel+]</a></li>
 		</ul>
 	</div>
 
@@ -147,7 +147,7 @@
 							</td>
 						</tr>
 					</table>
-					<table class="sorttable fastlist">
+					<table class="sorttable">
 						[+options+]
 					</table>
 				</div>
@@ -163,7 +163,7 @@
 				<h2 class="tab">[+lang.category_tab_filter+]</h2>
 				<script type="text/javascript">tpResources.addTabPage(document.getElementById("tabFilters"));</script>
 				<div id="filters" style="width:100%">
-					<table class="sorttable fastlist">
+					<table class="sorttable">
 						[+sb.filter+]
 					</table>
 				</div>

@@ -1,7 +1,7 @@
 <!--# orderinfo: Общий шаблон заказа #-->
 <div class="sectionHeader">
 	<div class="breadcrumbs">
-		<a href="[+module.link+]">Электронный магазин</a>
+		<a href="[+module.link+]">[+lang.sbshop+]</a>
 		&raquo;
 		<a href="[+module.link+]&mode=order">[+lang.order_list_title+]</a>
 		&raquo;

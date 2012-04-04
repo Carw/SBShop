@@ -82,7 +82,21 @@ class sort_mode {
 	 * Выводим данные для сортировки разделов
 	 */
 	protected function outputCategorySort() {
-		global $modx;
+		global $modx, $_lang;
+		/**
+		 * Объединяем системный и модульный языковой массив
+		 */
+		$aLang = array_merge($_lang, $modx->sbshop->lang);
+		/**
+		 * Подготавливаем языковые плейсхолдеры
+		 */
+		$phModule = $modx->sbshop->arrayToPlaceholders($aLang,'lang.');
+		/**
+		 * Служебные плейсхолдеры для модуля
+		 */
+		$phModule['[+site.url+]'] = MODX_BASE_URL;
+		$phModule['[+module.link+]'] = $this->sModuleLink;
+		$phModule['[+module.act+]'] = $this->sAct;
 		/**
 		 * Получаем информацию о выбранном разделе
 		 */
@@ -128,9 +142,13 @@ class sort_mode {
 			$sRows .= str_replace(array_keys($aRepl), array_values($aRepl), $this->aTemplates['sort_row']);
 		}
 		/**
+		 * Данные для контейнера
+		 */
+		$phModule['[+sb.wrapper+]'] = $sRows;
+		/**
 		 * Делаем вставку в контейнер
 		 */
-		$sOutput = str_replace('[+sb.wrapper+]', $sRows, $this->aTemplates['sort_outer']);
+		$sOutput = str_replace(array_keys($phModule), array_values($phModule), $this->aTemplates['sort_outer']);
 
 		echo $sOutput;
 	}
@@ -139,7 +157,6 @@ class sort_mode {
 	 * Сохраняем результат сортировки разделов
 	 */
 	protected function saveCategorySort() {
-		global $modx;
 		/**
 		 * Список с новым порядком сортировки
 		 */
@@ -170,7 +187,21 @@ class sort_mode {
 	 * Выводим данные для сортировки товаров
 	 */
 	protected function outputProductSort() {
-		global $modx;
+		global $modx, $_lang;
+		/**
+		 * Объединяем системный и модульный языковой массив
+		 */
+		$aLang = array_merge($_lang, $modx->sbshop->lang);
+		/**
+		 * Подготавливаем языковые плейсхолдеры
+		 */
+		$phModule = $modx->sbshop->arrayToPlaceholders($aLang,'lang.');
+		/**
+		 * Служебные плейсхолдеры для модуля
+		 */
+		$phModule['[+site.url+]'] = MODX_BASE_URL;
+		$phModule['[+module.link+]'] = $this->sModuleLink;
+		$phModule['[+module.act+]'] = $this->sAct;
 		/**
 		 * Получаем информацию о выбранном товаре
 		 */
@@ -215,9 +246,16 @@ class sort_mode {
 
 		}
 		/**
+		 * Данные для контейнера
+		 */
+		$phModule['[+sb.wrapper+]'] = $sRows;
+		/**
+		 * Добавляем языковые данные
+		 */
+		/**
 		 * Делаем вставку в контейнер
 		 */
-		$sOutput = str_replace('[+sb.wrapper+]', $sRows, $this->aTemplates['sort_outer']);
+		$sOutput = str_replace(array_keys($phModule), array_values($phModule), $this->aTemplates['sort_outer']);
 
 		echo $sOutput;
 	}
@@ -226,7 +264,6 @@ class sort_mode {
 	 * Сохраняем результат сортировки товаров
 	 */
 	protected function saveProductSort() {
-		global $modx;
 		/**
 		 * Список с новым порядком сортировки
 		 */

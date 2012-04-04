@@ -1,7 +1,7 @@
 <!--# pricing_outer: Шаблон сервиса для сортировки #-->
 <div class="sectionHeader">
 	<div class="breadcrumbs">
-		<a href="[+module.link+]">Электронный магазин</a>
+		<a href="[+module.link+]">[+lang.sbshop+]</a>
 		&raquo;
 		<span>Управление ценами</span>
 	</div>

@@ -64,6 +64,7 @@ div.sectionHeader {
 .dragHandle {
     width: 16px;
     background: url("images/draghandle.gif") no-repeat 3 4px;
+	cursor: move;
 }
 
 .sorttable td {
@@ -73,6 +74,64 @@ div.sectionHeader {
 
 .sorttable .dragHandle:hover {
     cursor: move;
+}
+
+.sorttable .content {
+	display: none;
+}
+
+.sorttable .content.visible {
+	display: table-row;
+}
+
+.sorttable .content td {
+	padding: 9px;
+}
+
+.sorttable .actions {
+	padding: 3px 9px;
+}
+
+.sorttable .dragHandle div {
+	line-height: 28px;
+	font-size: 12px;
+	color: #6d6d6d;
+}
+
+.sorttable, .sorttable .inner {
+    margin: 0 0 8px 0;
+    padding: 0;
+    border-spacing: 0;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.sorttable .inner tr {
+    padding: 0 9px;
+	background: #EFEFEF url(images/fade.gif) repeat-x top;
+	border: 1px solid #b2baba;
+	line-height: 28px;
+	font-size: 12px;
+	color: #6d6d6d;
+}
+
+.sorttable .inner td.header {
+    padding: 5px 9px;
+}
+
+.sorttable .inner td.header h3 {
+    margin: 0;
+    font-size: 14px;
+    color: #1A32C7;
+    border-bottom: 1px dashed #1A32C7;
+    line-height: 14px;
+    cursor: pointer;
+    display: inline;
+}
+
+.sorttable .inner td.header h3:hover {
+    color: #0f1e76;
+    border-bottom: 1px dashed #0f1e76;
 }
 
 .attribute {
@@ -130,6 +189,34 @@ div.sectionHeader {
 	margin: 15px 15px 15px 0;
 	border: 1px solid #ccc;
 	overflow-x: hidden;
+}
+
+#filebox .file_jpg {
+	background: url(images/icon-jpg.gif) no-repeat center;
+}
+
+#filebox .file_gif {
+	background: url(images/icon-gif.gif) no-repeat center;
+}
+
+#filebox .file_png {
+	background: url(images/icon-png.gif) no-repeat center;
+}
+
+#filebox .file_doc {
+	background: url(images/icon-doc.gif) no-repeat center;
+}
+
+#filebox .file_xls {
+	background: url(images/icon-xls.gif) no-repeat center;
+}
+
+#filebox .file_pdf {
+	background: url(images/icon-pdf.gif) no-repeat center;
+}
+
+#filebox .file_zip {
+	background: url(images/icon-zip.gif) no-repeat center;
 }
 
 .button_add {
@@ -208,22 +295,6 @@ select {
     margin: 5px 0 0 0;
 }
 
-.fastlist .content {
-    display: none;
-}
-
-.fastlist .content.visible {
-    display: table-row;
-}
-
-.fastlist .content td {
-    padding: 9px;
-}
-
-.fastlist .actions {
-    padding: 0 9px;
-}
-
 .values .rng, .values .eqv {
 	display: none;
 }
@@ -248,49 +319,6 @@ select {
 
 .option_bundle_personal {
     margin-left: 16px;
-}
-
-.fastlist .dragHandle div {
-    /*padding: 0;*/
-	line-height: 28px;
-	font-size: 12px;
-	color: #6d6d6d;
-}
-
-.fastlist, .fastlist .inner {
-    margin: 0 0 8px 0;
-    padding: 0;
-    border-spacing: 0;
-    border-collapse: collapse;
-    width: 100%;
-}
-
-.fastlist .inner tr {
-    padding: 0 9px;
-	background: #EFEFEF url(images/fade.gif) repeat-x top;
-	border: 1px solid #b2baba;
-	line-height: 28px;
-	font-size: 12px;
-	color: #6d6d6d;
-}
-
-.fastlist .inner td.header {
-    padding: 5px 9px;
-}
-
-.fastlist .inner td.header h3 {
-    margin: 0;
-    font-size: 14px;
-    color: #1A32C7;
-    border-bottom: 1px dashed #1A32C7;
-    line-height: 14px;
-    cursor: pointer;
-    display: inline;
-}
-
-.fastlist .inner td.header h3:hover {
-    color: #0f1e76;
-    border-bottom: 1px dashed #0f1e76;
 }
 
 .extend {
