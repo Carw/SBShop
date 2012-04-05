@@ -45,7 +45,7 @@ return array(
 	'category_filter_type_rng' => 'Диапазон значений',
 	'category_filter_title' => 'Заголовок условия',
 	'category_filter_value' => 'Условие',
-	'category_filter_del_hint' => 'Удалить значений',
+	'category_filter_del_hint' => 'Удалить значение',
 	'category_error_title' => 'Необходимо задать заголовок раздела',
 	'category_error_alias' => 'Псевдоним может содержать только латинские буквы, цифры и знак "-"',
 	'category_filter_name_all' => 'Все',
