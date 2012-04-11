@@ -5,14 +5,10 @@ if (file_exists("../manager/includes/config.inc.php")) {
     // Include the file so we can test its validity
     include "../manager/includes/config.inc.php";
     // We need to have all connection settings - tho prefix may be empty so we have to ignore it
-	if(!$sbshop_version) {
-		$upgradeable = 0;
-	} else {
-		$upgradeable = 1;
-	}
+    $upgradeable = 0;
 }
 ?>
-<form name="install" id="install_form" action="index.php?action=options" method="post">
+<form name="install" id="install_form" action="index.php?action=install" method="post">
 
 	<?php
 		echo '	<h2>' . $_lang['welcome_message_welcome'] . '</h2>';

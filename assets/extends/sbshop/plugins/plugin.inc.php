@@ -37,10 +37,15 @@ if(!isset($modx->sbshop)) {
 if(!function_exists('SBShop_OnPageNotFound')) {
 	/**
 	 * Функция для обработки события OnPageNotFound
-	 * @param unknown_type $doc_start
 	 */
-	function SBShop_OnPageNotFound($doc_start) {
+	function SBShop_OnPageNotFound() {
 		global $modx;
+		/**
+		 * Если не указан стартовый ресурс, то выходим
+		 */
+		if(!$modx->sbshop->config['doc_start']) {
+			return;
+		}
 		/**
 		 * Если флаг 404 не установлен
 		 */
@@ -48,7 +53,7 @@ if(!function_exists('SBShop_OnPageNotFound')) {
 			/**
 			 * Делаем режирект на базовую страницу каталога
 			 */
-			$modx->sendForward($doc_start);
+			$modx->sendForward($modx->sbshop->config['doc_start']);
 			/**
 			 * Выход, чтобы случайно не сработал повторный редирект
 			 */
@@ -77,7 +82,7 @@ switch ($modx->event->name) {
         /**
     	 * Страница не существует
     	 */
-    	SBShop_OnPageNotFound($doc_start);
+    	SBShop_OnPageNotFound();
 	    break;
 	case 'OnLoadWebDocument':
 		/**

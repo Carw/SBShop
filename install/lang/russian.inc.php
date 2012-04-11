@@ -32,11 +32,10 @@ $_lang = array(
 	'none' => 'Ни один',
 	'checkbox_select_options' => 'Выберите ресурс, который будет базовым для SBShop:',
 	'install_results' => 'Результаты установки',
-	'remove_install_folder_manual' => 'Пожалуйста, удалите папку &quot;<b>sbshop</b>&quot; прежде чем войти в панель управления.',
+	'remove_install_folder_manual' => 'Пожалуйста, удалите папку &quot;<b>install</b>&quot; прежде чем войти в панель управления.',
 	'remove_install_folder_auto' => 'Удалить папку и файлы программы установки с моего сайта <br />&nbsp;(Для выполнения этой операции необходимы права на запись в папку install).',
 	'module_startdoc' => 'Базовый ресурс магазина',
 	
 );
-
 
 ?>

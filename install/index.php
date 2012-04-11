@@ -26,8 +26,8 @@ if(is_file('../assets/extends/sbshop/version.inc.php')) {
 	$sbshop_release_date = '';
 }
 
-if($sbshop_version == '0.3a') {
-	die('Эта версия уже установлена. Необходимо удалить установочные файлы в папке <strong>install</strong>!');
+if($sbshop_version == '1.0') {
+	die('This version is installed. Please delete folder <strong>install</strong>!');
 }
 
 // session loop-back tester

@@ -30,7 +30,7 @@ return array(
 	/**
 	 * Базовый документ магазина
 	 */
-	'doc_start' => 11,
+	'doc_start' => 1,
 	/**
 	 * Настройка списка системных режимов работы магазина
 	 */
@@ -43,14 +43,12 @@ return array(
 	 * Сопоставление шаблонов для режимов
 	 */
 	'template_modes' => array(
-		'main' => 5,
-		'categories' => 5,
-		'product' => 6,
-		'breadcrumbs' => 5,
-		'cart' => 5,
-		'checkout' => 7,
-		'yml' => 8,
-		'price' => 12
+		'main' => 0,
+		'categories' => 0,
+		'product' => 0,
+		'checkout' => 0,
+		'yml' => 0,
+		'price' => 0
 	),
 	/**
 	 * Настройка списка возможных действий

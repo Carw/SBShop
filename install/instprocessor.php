@@ -94,8 +94,6 @@ $ins = array(
 	'description' => $_lang['module_description'],
 	'wrap' => 1,
 	'guid' => $gid,
-	'enable_sharedparams' => 1,
-	'properties' => '&doc_start=' . $_lang['module_startdoc'] . ';string;' . intval($_POST['startdoc']),
 	'modulecode' => $moduleInc,
 );
 $modx->db->insert($ins, $modx->getFullTableName('site_modules'));
