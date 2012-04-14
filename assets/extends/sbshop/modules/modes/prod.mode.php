@@ -807,14 +807,14 @@ class prod_mode {
 			/**
 			 * Устанавливаем параметр URL
 			 */
-			$this->oProduct->setAttribute('url',$sUrl);
+			$this->oProduct->setAttribute('url', $sUrl);
 		}
 		/**
 		 * Проверяем заголовок. Он должен быть.
 		 */
-		if(strlen($modx->db->escape($_POST['title'])) > 0) {
-			$sTitle = $modx->db->escape($_POST['title']);
-			$this->oProduct->setAttribute('title',$sTitle);
+		if(strlen($_POST['title']) > 0) {
+			$sTitle = htmlspecialchars($_POST['title'], ENT_QUOTES);
+			$this->oProduct->setAttribute('title', $sTitle);
 		} else {
 			$this->sError = $modx->sbshop->lang['product_error_title'];
 			$bError = true;
@@ -822,25 +822,23 @@ class prod_mode {
 		/**
 		 * Устанавливаем расширенный заголовок
 		 */
-		$this->oProduct->setAttribute('longtitle',$modx->db->escape($_POST['longtitle']));
+		$this->oProduct->setAttribute('longtitle', htmlspecialchars($_POST['longtitle'], ENT_QUOTES));
 		/**
 		 * Проверяем артикул
 		 */
 		if(strlen($modx->db->escape($_POST['sku'])) > 0) {
-			$this->oProduct->setAttribute('sku',$modx->db->escape($_POST['sku']));
+			$this->oProduct->setAttribute('sku', htmlspecialchars($_POST['sku'], ENT_QUOTES));
 		}
 		/**
-		 * Устанавливаем цену, заменяя предварительно запятую на точку
+		 * Устанавливаем цену, заменяя предварительно запятую на точку и удаляя пробелы
 		 */
-		$sPrice = $_POST['price'];
-		$sPrice = str_replace(',', '.', $sPrice);
-		$this->oProduct->setAttribute('price',floatval($sPrice));
+		$sPrice = str_replace(array(',', ' '), array('.', ''), $_POST['price']);
+		$this->oProduct->setAttribute('price', floatval($sPrice));
 		/**
 		 * Устанавливаем цену, заменяя предварительно запятую на точку
 		 */
-		$sPriceAdd = $_POST['price_add'];
-		$sPriceAdd = str_replace(',', '.', $sPriceAdd);
-		$this->oProduct->setAttribute('price_add',$modx->db->escape(trim($sPriceAdd)));
+		$sPriceAdd = str_replace(array(',', ' '), array('.', ''), trim($_POST['price_add']));
+		$this->oProduct->setAttribute('price_add', htmlspecialchars($sPriceAdd, ENT_QUOTES));
 		/**
 		 * Товар опубликован?
 		 */
@@ -860,19 +858,19 @@ class prod_mode {
 		/**
 		 * Установка модели
 		 */
-		$this->oProduct->setAttribute('model',$_POST['model']);
+		$this->oProduct->setAttribute('model', htmlspecialchars($_POST['model'], ENT_QUOTES));
 		/**
 		 * Установка производителя
 		 */
-		$this->oProduct->setAttribute('vendor',$_POST['vendor']);
+		$this->oProduct->setAttribute('vendor', htmlspecialchars($_POST['vendor'], ENT_QUOTES));
 		/**
 		 * Устанавливаем краткое описание
 		 */
-		$this->oProduct->setAttribute('introtext',$_POST['introtext']);
+		$this->oProduct->setAttribute('introtext', htmlspecialchars($_POST['introtext'], ENT_QUOTES));
 		/**
 		 * Устанавливаем расширенное описание
 		 */
-		$this->oProduct->setAttribute('description',$_POST['description']);
+		$this->oProduct->setAttribute('description', htmlspecialchars($_POST['description'], ENT_QUOTES));
 		/**
 		 * Разбираем параметры
 		 */
@@ -895,12 +893,12 @@ class prod_mode {
 						$sType = 'n';
 					}
 					$aAttribute = array(
-						'title' => $_POST['attribute_name'][$i],
-						'value' => $_POST['attribute_value'][$i],
-						'measure' => $_POST['attribute_measure'][$i],
+						'title' => htmlspecialchars($_POST['attribute_name'][$i], ENT_QUOTES),
+						'value' => htmlspecialchars($_POST['attribute_value'][$i], ENT_QUOTES),
+						'measure' => htmlspecialchars($_POST['attribute_measure'][$i], ENT_QUOTES),
 						'type' => $sType,
 					);
-					$aAttributes[$_POST['attribute_name'][$i]] = $aAttribute;
+					$aAttributes[htmlspecialchars($_POST['attribute_name'][$i], ENT_QUOTES)] = $aAttribute;
 				}
 			}
 		}
@@ -978,8 +976,8 @@ class prod_mode {
 					 */
 					$aTipData = array(
 						'id' => intval($_POST['option_tip_id'][$iOptionId]),
-						'title' => $_POST['option_tip_title'][$iOptionId],
-						'description' => $_POST['option_tip_description'][$iOptionId]
+						'title' => htmlspecialchars($_POST['option_tip_title'][$iOptionId], ENT_QUOTES),
+						'description' => htmlspecialchars($_POST['option_tip_description'][$iOptionId], ENT_QUOTES)
 					);
 					/**
 					 * Устанавливаем данные
@@ -1003,12 +1001,12 @@ class prod_mode {
 				 * Данные опции
 				 */
 				$aOptionData = array(
-					'title' => $_POST['option_name'][$i],
-					'longtitle' => $_POST['option_longname'][$iOptionId],
+					'title' => htmlspecialchars($_POST['option_name'][$i], ENT_QUOTES),
+					'longtitle' => htmlspecialchars($_POST['option_longname'][$iOptionId], ENT_QUOTES),
 					'notbundle' => $iNotbundle,
 					'hidden' => $iHidden,
-					'class' => $_POST['option_class'][$iOptionId],
-					'image' => $_POST['option_image'][$iOptionId],
+					'class' => htmlspecialchars($_POST['option_class'][$iOptionId], ENT_QUOTES),
+					'image' => htmlspecialchars($_POST['option_image'][$iOptionId], ENT_QUOTES),
 					/**
 					 * Записываем в опцию идентификатор подсказки
 					 */
@@ -1035,12 +1033,19 @@ class prod_mode {
 						 * Подготавливаем значения
 						 */
 						if($_POST['option_values_title'][$iOptionId][$k] != '') {
+							/**
+							 * Определяем надбавку, заменяя предварительно запятую на точку
+							 */
+							$sPriceAdd = str_replace(array(',', ' '), array('.', ''), trim($_POST['option_values_add'][$iOptionId][$k]));
+							$fPriceAdd = htmlspecialchars($sPriceAdd, ENT_QUOTES);
+
+
 							$aValues[] = array(
-								'title' => $_POST['option_values_title'][$iOptionId][$k],
-								'price_add' => $_POST['option_values_add'][$iOptionId][$k],
-								'value' => $_POST['option_values_value'][$iOptionId][$k],
-								'class' => $_POST['option_values_class'][$iOptionId][$k],
-								'image' => $_POST['option_values_image'][$iOptionId][$k],
+								'title' => htmlspecialchars($_POST['option_values_title'][$iOptionId][$k], ENT_QUOTES),
+								'price_add' => $fPriceAdd,
+								'value' => htmlspecialchars($_POST['option_values_value'][$iOptionId][$k], ENT_QUOTES),
+								'class' => htmlspecialchars($_POST['option_values_class'][$iOptionId][$k], ENT_QUOTES),
+								'image' => htmlspecialchars($_POST['option_values_image'][$iOptionId][$k], ENT_QUOTES),
 							);
 						}
 					}
@@ -1052,6 +1057,7 @@ class prod_mode {
 			}
 			/**
 			 * Делаем обобщение значений
+			 * @todo Здесь явный перебор с отдельным $oOptions, сериализацией и последующей десериализацией. Нужно упростить.
 			 */
 			$oOptions->optionGeneralization();
 			/**
@@ -1070,7 +1076,7 @@ class prod_mode {
 			/**
 			 * Добавляем информацию о базовой комплектации
 			 */
-			$this->oProduct->setAttribute('base_bundle', $modx->db->escape($_POST['bundle_base_settings']));
+			$this->oProduct->setAttribute('base_bundle', htmlspecialchars($_POST['bundle_base_settings'], ENT_QUOTES));
 		}
 		/**
 		 * Установка комплектаций
@@ -1081,7 +1087,24 @@ class prod_mode {
 			 */
 			$cntBundle = count($_POST['bundle_name']);
 			for ($i=0; $i<$cntBundle; $i++) {
-				$this->oProduct->addBundle($modx->db->escape($_POST['bundle_name'][$i]), $_POST['bundle_settings'][$i], $_POST['bundle_price'][$i], $_POST['bundle_description'][$i], false, $modx->db->escape($_POST['bundle_price_add'][$i]));
+				/**
+				 * Определяем стоимость, заменяя предварительно запятую на точку
+				 */
+				$sPrice = str_replace(array(',', ' '), array('.', ''), trim($_POST['bundle_price'][$i]));
+				if($sPrice) {
+					$fPrice = floatval($sPrice);
+				} else {
+					$fPrice = '';
+				}
+				/**
+				 * Определяем надбавку, заменяя предварительно запятую на точку
+				 */
+				$sPriceAdd = str_replace(array(',', ' '), array('.', ''), trim($_POST['bundle_price_add'][$i]));
+				$fPriceAdd = htmlspecialchars($sPriceAdd, ENT_QUOTES);
+				/**
+				 * Добавляем комплектацию
+				 */
+				$this->oProduct->addBundle(htmlspecialchars($_POST['bundle_name'][$i], ENT_QUOTES), htmlspecialchars($_POST['bundle_settings'][$i], ENT_QUOTES), $fPrice, htmlspecialchars($_POST['bundle_description'][$i], ENT_QUOTES), false, $fPriceAdd);
 			}
 			/**
 			 * Если включена индивидуальная комплектация

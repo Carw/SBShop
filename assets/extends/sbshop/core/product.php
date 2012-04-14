@@ -642,29 +642,29 @@ class SBProduct {
 		$aData = array();
 		foreach ($aKeys as $sKey) {
 			if($this->aProductData[$sKey] !== null) {
-				$aData['product_' . $sKey] = $this->aProductData[$sKey];
+				$aData['product_' . $sKey] = $modx->db->escape($this->aProductData[$sKey]);
 			}
 		}
 		/**
 		 * Подготавливаем дополнительные параметры для сохранения
 		 */
-		$aData['product_attributes'] = $this->oProductExtendData->serializeAttributes();
+		$aData['product_attributes'] = $modx->db->escape($this->oProductExtendData->serializeAttributes());
 		/**
 		 * Подготавливаем комплектации для сохранения
 		 */
-		$aData['product_bundles'] = $this->oBundles->serialize();
+		$aData['product_bundles'] = $modx->db->escape($this->oBundles->serialize());
 		/**
 		 * Подготавливаем опции для сохранения
 		 */
-		$aData['product_options'] = $this->oOptions->serializeOptions();
+		$aData['product_options'] = $modx->db->escape($this->oOptions->serializeOptions());
 		/**
 		 * Подготавливаем изображения для сохранения
 		 */
-		$aData['product_images'] = $this->serializeImages();
+		$aData['product_images'] = $modx->db->escape($this->serializeImages());
 		/**
 		 * Подготавливаем изображения для сохранения
 		 */
-		$aData['product_files'] = $this->serializeFiles();
+		$aData['product_files'] = $modx->db->escape($this->serializeFiles());
 		/**
 		 * Если ID есть, то делаем обновление информации
 		 */

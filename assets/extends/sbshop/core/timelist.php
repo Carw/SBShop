@@ -71,18 +71,6 @@ class SBTimeList {
 		 */
 		$iTime = time();
 		/**
-		 * Массив замен в тексте комментария
-		 */
-		$aRepl = array(
-			'\r\n' => '<br>',
-			'\"' => '&quot;',
-			"\'" => '&quot;',
-		);
-		/**
-		 * Делаем замену
-		 */
-		$sData = str_replace(array_keys($aRepl), array_values($aRepl), $sData);
-		/**
 		 * Добавляем значение
 		 */
 		$this->aTimeList[$iTime] = $sData;

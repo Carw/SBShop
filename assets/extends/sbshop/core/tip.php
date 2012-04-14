@@ -150,7 +150,7 @@ class SBTip {
 		$aData = array();
 		foreach ($aKeys as $sKey) {
 			if($this->aTipData[$sKey] !== null) {
-				$aData['tip_' . $sKey] = $this->aTipData[$sKey];
+				$aData['tip_' . $sKey] = $modx->db->escape($this->aTipData[$sKey]);
 			}
 		}
 		/**

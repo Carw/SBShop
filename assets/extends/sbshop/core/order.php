@@ -744,7 +744,7 @@ class SBOrder {
 		$aData = array();
 		foreach ($aKeys as $sKey) {
 			if($this->aOrderData[$sKey] !== null) {
-				$aData['order_' . $sKey] = $this->aOrderData[$sKey];
+				$aData['order_' . $sKey] = $modx->db->escape($this->aOrderData[$sKey]);
 			}
 		}
 		/**

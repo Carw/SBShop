@@ -73,7 +73,8 @@ class product_mode {
 		/**
 		 * Обрабатываем описание и делим на блоки
 		 */
-		$aReplBlocks = $modx->sbshop->multiarrayToPlaceholders(explode('<!-- ### -->',$modx->sbshop->oGeneralProduct->getAttribute('description')),'num','sb.description.');
+		$sDescription = htmlspecialchars_decode($modx->sbshop->oGeneralProduct->getAttribute('description'), ENT_QUOTES);
+		$aReplBlocks = $modx->sbshop->multiarrayToPlaceholders(explode('<!-- ### -->', $sDescription), 'num', 'sb.description.');
 		/**
 		 * Добавляем изображения
 		 */
@@ -190,7 +191,16 @@ class product_mode {
 						} else {
 							$aValue['price'] = '';
 						}
-
+						/**
+						 * Если изображение есть
+						 */
+						if($aValue['image']) {
+							$aValue['image.url'] = $aValue['image'];
+							$aValue['image'] = '<img src="' . $aValue['image'] . '">';
+						}
+						/**
+						 * Готовим плейсхолдеры
+						 */
 						$aReplVal = $modx->sbshop->arrayToPlaceholders($aValue);
 						/**
 						 * Вставляем данные в шаблон

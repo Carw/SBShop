@@ -128,7 +128,7 @@
 			<input type="radio" id="sboption_[+sb.option.id+]_[+sb.id+]" class="optval" name="sbprod[sboptions][[+sb.option.id+]]" value="[+sb.id+]">
 		</div>
 		<span class="option_price">[+sb.price.format+]</span>
-		[+sb.title+]
+		[+sb.image+][+sb.title+]
 	</label>
 </li>
 <!--# single_bundle_base: Вывод базовой комплектации если других комплектаций нет #-->

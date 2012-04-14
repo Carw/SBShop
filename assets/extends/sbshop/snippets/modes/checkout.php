@@ -451,7 +451,7 @@ class checkout_mode {
 			/**
 			 * Устанавливаем параметр имени
 			 */
-			$modx->sbshop->oCustomer->setAttribute('fullname',$modx->db->escape($_POST['sb_customer_fullname']));
+			$modx->sbshop->oCustomer->setAttribute('fullname', htmlspecialchars($_POST['sb_customer_fullname'], ENT_QUOTES));
 		}
 		/**
 		 * Проверяем телефон
@@ -463,7 +463,7 @@ class checkout_mode {
 			/**
 			 * Устанавливаем параметр имени
 			 */
-			$modx->sbshop->oCustomer->setAttribute('phone',$modx->db->escape($_POST['sb_customer_phone']));
+			$modx->sbshop->oCustomer->setAttribute('phone', htmlspecialchars($_POST['sb_customer_phone'], ENT_QUOTES));
 		}
 		/**
 		 * Проверяем телефон
@@ -475,7 +475,7 @@ class checkout_mode {
 			/**
 			 * Устанавливаем параметр имени
 			 */
-			$modx->sbshop->oCustomer->setAttribute('email',$modx->db->escape($_POST['sb_customer_email']));
+			$modx->sbshop->oCustomer->setAttribute('email', htmlspecialchars($_POST['sb_customer_email'], ENT_QUOTES));
 		}
 		/**
 		 * Проверяем телефон
@@ -487,7 +487,7 @@ class checkout_mode {
 			/**
 			 * Устанавливаем параметр имени
 			 */
-			$modx->sbshop->oCustomer->setAttribute('city',$modx->db->escape($_POST['sb_customer_city']));
+			$modx->sbshop->oCustomer->setAttribute('city', htmlspecialchars($_POST['sb_customer_city'], ENT_QUOTES));
 		}
 		/**
 		 * Проверяем телефон
@@ -499,13 +499,14 @@ class checkout_mode {
 			/**
 			 * Устанавливаем параметр имени
 			 */
-			$modx->sbshop->oCustomer->setAttribute('address',$modx->db->escape($_POST['sb_customer_address']));
+			$modx->sbshop->oCustomer->setAttribute('address', htmlspecialchars($_POST['sb_customer_address'], ENT_QUOTES));
 		}
 		/**
 		 * Проверяем комментарий
+		 * @todo перенести эскейп на сохранение!
 		 */
 		if($_POST['sb_order_comment']) {
-			$modx->sbshop->oOrder->oComments->add($modx->db->escape($_POST['sb_order_comment']));
+			$modx->sbshop->oOrder->oComments->add(htmlspecialchars($_POST['sb_order_comment'], ENT_QUOTES));
 		}
 		/**
 		 * Если ошибок не обнаружено

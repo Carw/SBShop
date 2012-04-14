@@ -168,7 +168,7 @@ class SBCustomer {
 		 */
 		foreach ($aKeys as $sKey) {
 			if($this->aCustomerData[$sKey] !== null) {
-				$aData['customer_' . $sKey] = $this->aCustomerData[$sKey];
+				$aData['customer_' . $sKey] = $modx->db->escape($this->aCustomerData[$sKey]);
 			}
 		}
 		/**

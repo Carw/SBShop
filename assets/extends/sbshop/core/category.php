@@ -311,7 +311,6 @@ class SBCategory {
 		}
 	}
 
-
 	/**
 	 * Сохранение данных категории
 	 */
@@ -325,17 +324,17 @@ class SBCategory {
 		$aData = array();
 		foreach ($aKeys as $sKey) {
 			if($this->aCategoryData[$sKey] !== null) {
-				$aData['category_' . $sKey] = $this->aCategoryData[$sKey];
+				$aData['category_' . $sKey] = $modx->db->escape($this->aCategoryData[$sKey]);
 			}
 		}
 		/**
 		 * Подготавливаем дополнительные параметры для сохранения
 		 */
-		$aData['category_attributes'] = $this->oCategoryExtendData->serializeAttributes();
+		$aData['category_attributes'] = $modx->db->escape($this->oCategoryExtendData->serializeAttributes());
 		/**
 		 * Подготавливаем фильтры для сохранения
 		 */
-		$aData['category_filters'] = $this->oFilterList->serializeFilters();
+		$aData['category_filters'] = $modx->db->escape($this->oFilterList->serializeFilters());
 		/**
 		 * Если ID есть
 		 */
