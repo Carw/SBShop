@@ -20,67 +20,104 @@
 	</div>
 </div>
 <div class="sectionBody table">
-	[+sb.wrapper+]
+	<div id="actionPanel">
+		<form method="post" action="">
+			<ul>
+				<li>
+					<label>
+						Статус заказа:
+						<select name="order_status">
+							<option value="active" [+sb.status_active_selected+]>[+lang.order_list_active+]</option>
+							<option value="10" [+sb.status_10_selected+]>[+lang.order_status_10+]</option>
+							<option value="20" [+sb.status_20_selected+]>[+lang.order_status_20+]</option>
+							<option value="25" [+sb.status_25_selected+]>[+lang.order_status_25+]</option>
+							<option value="30" [+sb.status_30_selected+]>[+lang.order_status_30+]</option>
+							<option value="0" [+sb.status_0_selected+]>[+lang.order_status_0+]</option>
+							<option value="-10" [+sb.status_-10_selected+]>[+lang.order_status_-10+]</option>
+							<option value="-20" [+sb.status_-20_selected+]>[+lang.order_status_-20+]</option>
+							<option value="-30" [+sb.status_-30_selected+]>[+lang.order_status_-30+]</option>
+						</select>
+					</label>
+				</li>
+				<li>
+					<input type="submit" value="Вывести">
+				</li>
+			</ul>
+		</form>
+	</div>
+	<table class="orderlist">
+		[+sb.wrapper+]
+	</table>
 </div>
 <!--# order_row: Шаблон для вывода конкретного заказа #-->
+<tr class="order status[+sb.status+]">
+	<td>
+		<form method="post" action="">
+			<table class="orderinfo">
+				<tr>
+					<td class="header" colspan="2">
+						<div class="opener"></div>
+						Заказ № <span>[+sb.id+]</span> | Дата: <span>[+sb.date_edit+]</span> | Контакт: <span class="date_next">[+sb.date_next+]</span> | <div class="status">[+sb.status.txt+]</div>
+					</td>
+				</tr>
+				<tr class="outer">
+					<td class="col">
+						<h2>Данные заказчика</h2>
+						<div class="content">
+							<div class="contacts">
+								<p>Заказчик: <span>[+sb.customer.fullname+]</span></p>
+								<p>Телефон: <span>[+sb.customer.phone+]</span></p>
+								<p>Email: <span>[+sb.customer.email+]</span></p>
+								<p>Адрес: <span>[+sb.customer.city+], [+sb.customer.address+]</span></p>
+							</div>
+							<h3>Комментарии:</h3>
+							<div class="comments">
+								[+sb.comments+]
+							</div>
+						</div>
+						<h2>Заметки</h2>
+						<div class="content">
+							<textarea id="add_comment" name="sb_comment[[+sb.id+]]"></textarea>
+							<br>
+							<input type="submit" class="right" name="sb_set_status" value="Сохранить комментарий" />
+						</div>
+					</td>
+					<td class="col">
+						<h2>Содержание заказа</h2>
+						<div class="content">
+							[+sb.products+]
+							<p align="right">
+								Общая сумма: <span class="total">[+sb.price.format+]</span> руб
+							</p>
+						</div>
+						<h2>Параметры заказа</h2>
+						<div class="content">
+							<p>
+								Состояние:<br>
+								<select name="sb_status_list[[+sb.id+]]">[+sb.action+]</select>
+								<br>
+								<input type="submit" name="sb_set_status" value="Сохранить состояние" />
+							</p>
+							<p>
+								Дата следующего контакта:<br>
+							</p>
+							<input type="hidden" name="sb_date_next[[+sb.id+]]" class="sb_date_next" value="" />
+							<div class="sb_date_next_calend"></div>
+							<p>
+								<input type="submit" name="sb_set_status" value="Установить дату" />
+							</p>
+						</div>
+					</td>
+				</tr>
+			</table>
+		</form>
+	</td>
+</tr>
+<!--# order_row1: Шаблон для вывода конкретного заказа #-->
 <form method="post" action="">
 
 <table class="order status[+sb.status+]">
-	<tr>
-		<td class="header" colspan="2">
-			<div class="opener"></div>
-			Заказ № <span>[+sb.id+]</span> | Дата: <span>[+sb.date_edit+]</span> | Контакт: <span class="date_next">[+sb.date_next+]</span> | <div class="status">[+sb.status.txt+]</div>
-		</td>
-	</tr>
-	<tr class="outer">
-		<td class="col">
-			<h2>Данные заказчика</h2>
-			<div class="content">
-				<div class="contacts">
-					<p>Заказчик: <span>[+sb.customer.fullname+]</span></p>
-					<p>Телефон: <span>[+sb.customer.phone+]</span></p>
-					<p>Email: <span>[+sb.customer.email+]</span></p>
-					<p>Адрес: <span>[+sb.customer.city+], [+sb.customer.address+]</span></p>
-				</div>
-				<h3>Комментарии:</h3>
-				<div class="comments">
-					[+sb.comments+]
-				</div>
-			</div>
-			<h2>Заметки</h2>
-			<div class="content">
-				<textarea id="add_comment" name="sb_comment[[+sb.id+]]"></textarea>
-				<br>
-				<input type="submit" class="right" name="sb_set_status" value="Сохранить комментарий" />
-			</div>
-		</td>
-		<td class="col">
-			<h2>Содержание заказа</h2>
-			<div class="content">
-				[+sb.products+]
-				<p align="right">
-					Общая сумма: <span class="total">[+sb.price.format+]</span> руб
-				</p>
-			</div>
-			<h2>Параметры заказа</h2>
-			<div class="content">
-				<p>
-					Состояние:<br>
-					<select name="sb_status_list[[+sb.id+]]">[+sb.action+]</select>
-                    <br>
-					<input type="submit" name="sb_set_status" value="Сохранить состояние" />
-				</p>
-				<p>
-					Дата следующего контакта:<br>
-				</p>
-				<input type="hidden" name="sb_date_next[[+sb.id+]]" class="sb_date_next" value="" />
-				<div class="sb_date_next_calend"></div>
-				<p>
-					<input type="submit" name="sb_set_status" value="Установить дату" />
-				</p>
-			</div>
-		</td>
-	</tr>
+
 </table>
 </form>
 <!--# comment_outer: Контейнер для вывода комментариев #-->

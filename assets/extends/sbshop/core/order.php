@@ -173,7 +173,25 @@ class SBOrder {
 	public function getAttribute($sParamName) {
 		return array_pop($this->getAttributes($sParamName));
 	}
-	
+
+	/**
+	 * Установка параметра заказа
+	 * @param $sName
+	 * @param $sValue
+	 */
+	public function setOption($sName, $sValue) {
+		$this->aOptions[$sName] = $sValue;
+	}
+
+	/**
+	 * Установка параметра заказа
+	 * @param $sName
+	 * @param $sValue
+	 */
+	public function getOption($sName) {
+		return $this->aOptions[$sName];
+	}
+
 	/**
 	 * Получение параметров заказа
 	 * @param $aParams
@@ -590,9 +608,10 @@ class SBOrder {
 	 * Получение списка идентификаторов товаров, включая настройку
 	 */
 	public function getProductSetIds() {
-		return array_keys($this->aProducts);
+		if(is_array($this->aProducts)) {
+			return array_keys($this->aProducts);
+		}
 	}
-
 
 	public function getProductIdBySetId($iSetId) {
 		return intval($iSetId);

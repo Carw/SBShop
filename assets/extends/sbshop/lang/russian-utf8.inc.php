@@ -21,8 +21,6 @@ return array(
 	 * Главная страница модуля
 	 */
 	'home_orderlist' => 'Текущие заказы',
-	'home_orders_archive' => 'Архив заказов',
-	'home_orders_lost' => 'Потерянные заказы',
 	'home_price_manager' => 'Управление ценами',
 	/**
 	 * Управление категориями
@@ -156,6 +154,8 @@ return array(
 	/**
 	 * Обработака заказов
 	 */
+	'order_list_active' => 'Активные заказы',
+
 	'order_personal_bundle' => 'Индивидуальная комплектация',
 	'order_base_bundle' => 'Базовая комплектация',
 	'order_list_title' => 'Очередь новых заказов',
@@ -178,7 +178,5 @@ return array(
 	'bundle_personal_title' => 'Индивидуальная комплектация',
 	'bundle_personal_description' => '',
 );
-
-
 
 ?>

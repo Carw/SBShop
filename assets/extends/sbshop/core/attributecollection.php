@@ -279,12 +279,12 @@ class SBAttributeCollection {
 	 * @param unknown_type $aNewAttributes
 	 * @param unknown_type $aOldAttributes
 	 */
-	public function attributeProductGeneralization($oProduct, $oCategory, $aNewAttributesBase, $aOldAttributes) {
+	public function attributeProductGeneralization($oProduct, $oCategory, $aNewAttributes, $aOldAttributes) {
 		global $modx;
 		/**
 		 * Получаем идентификаторы новых параметров 
 		 */
-		$aNewAttributeIds = SBAttributeCollection::getAttributeIdsByNames(array_keys($aNewAttributesBase));
+		$aNewAttributeIds = SBAttributeCollection::getAttributeIdsByNames(array_keys($aNewAttributes));
 		/**
 		 * Массив добавляемых параметров
 		 */
@@ -294,24 +294,19 @@ class SBAttributeCollection {
 		 */
 		$aAttrRemoved = array();
 		/**
+		 * Запоминаем массив новых параметров
+		 */
+		$aNewAttributesBase = $aNewAttributes;
+		/**
 		 * Перерабатываем массив новых параметров для внесения идентификатора в качестве ключа
 		 */
 		$aNewAttributes = array();
-        $aCatAttributes = array();
-		foreach($aNewAttributesBase as $sKey => $aNewAttribute) {
+		foreach($aNewAttributesBase as $aNewAttribute) {
 			/**
 			 * Добавляем идентификатор параметра
 			 */
 			$aNewAttribute['id'] = $aNewAttributeIds[$aNewAttribute['title']];
 			$aNewAttributes[$aNewAttributeIds[$aNewAttribute['title']]] = $aNewAttribute;
-            /**
-             * Параметры для категории
-             */
-            $aCatAttributes[$sKey] = array(
-                'title' => $aNewAttribute['title'],
-                'measure' => $aNewAttribute['measure'],
-                'type' => $aNewAttribute['type']
-            );
 		}
 		/**
 		 * Если товар новый
@@ -415,7 +410,7 @@ class SBAttributeCollection {
 		/**
 		 * задаем расширенные параметры для раздела
 		 */
-		$oCategory->setExtendAttributes($aCatAttributes);
+		$oCategory->setExtendAttributes($aNewAttributesBase);
 		/**
 		 * Совмещаем список параметров для последующего запроса в базу
 		 */

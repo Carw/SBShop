@@ -595,6 +595,11 @@ class SBShop {
 				 * Добавляем значение к массиву
 				 */
 				$phData['[+' . $sPrefix . $sKey . $sSuffix . '+]'] = $sVal;
+			} else {
+				/**
+				 * Добавляем значение к массиву
+				 */
+				$phData['[+' . $sPrefix . $sKey . $sSuffix . '+]'] = '';
 			}
 		}
 		return $phData;
@@ -731,6 +736,79 @@ class SBShop {
 		 * Возвращаем результат
 		 */
 		return $aTemplates;
+	}
+
+	/**
+	 * Обертка для поддержки плагинов в виде файлов
+	 * @param $evtName
+	 * @param array $extParams
+	 */
+	public function invokeEvent($sEvtName, $aExtParams= array ()) {
+		global $modx;
+		/**
+		 * Результат работы
+		 */
+		$aResults = array ();
+		/**
+		 * Проверка наличия файла
+		 */
+		if(isset($modx->sbshop->config['plugins'][$sEvtName])) {
+			/**
+			 * Путь до плагина
+			 */
+			$sPluginPath = MODX_BASE_PATH . 'assets/plugins/sbshop/' . $modx->sbshop->config['plugins'][$sEvtName] . '/' . $modx->sbshop->config['plugins'][$sEvtName] . '.inc.php';
+			/**
+			 * Если есть плагин в виде файла
+			 */
+			if(is_file($sPluginPath)) {
+
+				$e = &$modx->Event;
+				$e->_resetEventObject();
+				$e->name = $sEvtName;
+				$e->activePlugin = $modx->sbshop->config['plugins'][$sEvtName];
+				/**
+				 * Получаем код
+				 */
+				$sPluginCode = file_get_contents($sPluginPath);
+				/**
+				 * Убираем лишние конструкции
+				 */
+				$sPluginCode = str_replace(array('<?php', '<?', '?>'),'', $sPluginCode);
+				/**
+				 * Загрузка параметров
+				 */
+				$aParameters = $aExtParams;
+				/**
+				 * Запускаем плагин
+				 */
+				$modx->evalPlugin($sPluginCode, $aParameters);
+				/**
+				 * Записываем результат
+				 */
+				if ($e->_output != "") {
+					$aResults[]= $e->_output;
+				}
+				if ($e->_propagate != true) {
+					// Эта часть необходима, если будет запуск плагинов в цикле
+					//break;
+				}
+				$e->activePlugin= "";
+			} else {
+				/**
+				 * Отдаем управление запуском плагина MODX
+				 */
+				$aResults = $modx->invokeEvent($sEvtName, $aExtParams);
+			}
+		} else {
+			/**
+			 * Отдаем управление запуском плагина MODX
+			 */
+			$aResults = $modx->invokeEvent($sEvtName, $aExtParams);
+		}
+		/**
+		 * Возвращаем результат
+		 */
+		return $aResults;
 	}
 
 	/**

@@ -124,6 +124,10 @@ return array(
 		),
 	),
 	/**
+	 * Базовая директория SBShop
+	 */
+	'base_dir' => MODX_BASE_PATH . 'assets/extends/sbshop/',
+	/**
 	 * Базовая директория размещения изображений
 	 */
 	'image_base_dir' => MODX_BASE_PATH . 'assets/images/sbshop/',

@@ -17,7 +17,6 @@ div.sectionHeader {
 	display: none;
 }
 
-
 .optiondel, .attributedel, .bundledel, .imagedel, .filedel {
 	float: right;
 }
@@ -380,10 +379,29 @@ select {
 	margin-top: 9px;
 }
 
-.order {
-	margin-bottom: 10px;
+#actionPanel {
+	margin: 5px;
+}
+
+#actionPanel ul {
+	margin: 2px 0 10px;
+	padding: 3px 0;
+}
+
+#actionPanel li {
+	display: inline;
+	margin-right: 10px;
+	padding: 0;
+	list-style: none;
+}
+
+.orderlist, .order, .order .orderinfo {
 	border-collapse: collapse;
 	width: 100%;
+}
+
+.order .orderinfo {
+	margin-bottom: 5px;
 }
 
 .order .header {

@@ -82,7 +82,8 @@ class product_mode {
 		/**
 		 * Подготавливает массив миниатюр
 		 */
-		$aImages = $modx->sbshop->oGeneralProduct->getImagesByKey('x104');
+		$aThumbsImages = $modx->sbshop->oGeneralProduct->getImagesByKey('x104');
+		$aBigImages = $modx->sbshop->oGeneralProduct->getImagesByKey('x480');
 		/**
 		 * Переменная для блока миниатюр
 		 */
@@ -90,11 +91,16 @@ class product_mode {
 		/**
 		 * Обрабатываем каждую картинку
 		 */
-		foreach ($aImages as $sImage) {
+		$cntImages = count($aThumbsImages);
+		for ($i = 0; $i < $cntImages; $i++) {
+			$aReplImages = array(
+				'[+sb.image+]' => $aThumbsImages[$i],
+				'[+sb.image.big+]' => $aBigImages[$i]
+			);
 			/**
-			 * Вставляем линк
+			 * Вставляем миниатюру в шаблон
 			 */
-			$sImages .= str_replace('[+sb.image+]', $sImage, $this->aTemplates['thumbs_row']);
+			$sImages .= str_replace(array_keys($aReplImages), array_values($aReplImages), $this->aTemplates['thumbs_row']);
 		}
 		/**
 		 * Вставляем картинки в контейнер
