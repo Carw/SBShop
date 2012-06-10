@@ -57,6 +57,10 @@ class product_mode {
 		$modx->setPlaceholder('sb.product.title', $aProductData['title']);
 		$modx->setPlaceholder('sb.product.longtitle', $aProductData['longtitle']);
 		/**
+		 * Установка артикула в виде глобального плейсхолдера
+		 */
+		$modx->setPlaceholder('sb.sku', $aProductData['sku']);
+		/**
 		 * Если установлен параметр "Есть в наличии"
 		 */
 		if($modx->sbshop->oGeneralProduct->getAttribute('existence')) {
@@ -259,12 +263,8 @@ class product_mode {
 			/**
 			 * Вставляем в общий контейнер
 			 */
-			$sOptions = str_replace('[+sb.wrapper+]',$sOptions,$this->aTemplates['options_outer']);
+			$aReplBlocks['[+sb.options+]'] = str_replace('[+sb.wrapper+]',$sOptions,$this->aTemplates['options_outer']);
 		}
-		/**
-		 * Добавляем плейсхолдер
-		 */
-		$aReplBlocks['[+sb.options+]'] = $sOptions;
 		/**
 		 * Переменная для комплектаций
 		 */
@@ -273,6 +273,163 @@ class product_mode {
 		 * Получаем список комплектаций
 		 */
 		$aBundles = $modx->sbshop->oGeneralProduct->getBundleList();
+		unset($aBundles['personal']);
+		/**
+		 * Настройка индивидуальной комплектации
+		 */
+		$sPersonalOptions = $modx->sbshop->oGeneralProduct->getAttribute('personal_bundle');
+		/**
+		 * Если есть индивидуальная комплектация
+		 */
+		if($sPersonalOptions) {
+			/**
+			 * Массив опций для индивидуальной комплектации
+			 */
+			$aPersonalOptions = explode(',', $sPersonalOptions);
+			/**
+			 * Обрабатываем список опций
+			 */
+			foreach ($aPersonalOptions as $sOptionKey) {
+				/**
+				 * Если опция не является скрытой
+				 */
+				$aOption = $modx->sbshop->oGeneralProduct->oOptions->getOptionNameByNameId(intval($sOptionKey));
+				/**
+				 * Если опция не является скрытой
+				 */
+				if(!$aOption['hidden']) {
+					/**
+					 * Значения
+					 */
+					$sOptRaw = '';
+					/**
+					 * Если есть изображение
+					 */
+					if($aOption['image']) {
+						$aOption['image.url'] = $aOption['image'];
+						$aOption['image'] = '<img src="' . $aOption['image'] . '">';
+					} elseif($aGeneralOptions[$aOption['title']]['image']) {
+						/**
+						 * Наследование изображения от раздела
+						 */
+						$aOption['image.url'] = $aGeneralOptions[$aOption['title']]['image'];
+						$aOption['image'] = '<img src="' . $aGeneralOptions[$aOption['title']]['image'] . '">';
+					}
+					/**
+					 * Если не указан класс и есть данные у раздела
+					 */
+					if(!$aOption['class'] && $aGeneralOptions[$aOption['title']]['class']) {
+						$aOption['class'] = $aGeneralOptions[$aOption['title']]['class'];
+					}
+					/**
+					 * Массив значений
+					 */
+					$aValues = $modx->sbshop->oGeneralProduct->oOptions->getValuesByOptionName($aOption['title']);
+					/**
+					 * Если есть только одно значение
+					 */
+					if(count($aValues) == 1) {
+						/**
+						 * Получаем первую запись
+						 */
+						$aValue = current($aValues);
+						/**
+						 * Если значение находится в списке исключаемых
+						 */
+						if(in_array($aValue['id'], $modx->sbshop->config['hide_option_values'])) {
+							$aValue['title'] = '';
+						}
+						/**
+						 * Если значение равно null, то устанавливаем цену опции
+						 */
+						if($aValue['value'] != 'null') {
+							$aValue['price'] = $modx->sbshop->setPriseIncrement($aValue['value'], $aValue['price_add']);
+						} else {
+							$aValue['price'] = '';
+						}
+						/**
+						 * Создаем плейсхолдеры
+						 */
+						$aReplVal = $modx->sbshop->arrayToPlaceholders($aValue);
+						/**
+						 * Вставляем данные в шаблон
+						 */
+						$sOptRaw = str_replace(array_keys($aReplVal), array_values($aReplVal), $this->aTemplates['single_option_personal_row']);
+					} else {
+						/**
+						 * Обрабатываем значения
+						 */
+						foreach ($aValues as $aValue) {
+							if($aValue['value'] !== 'null') {
+								$aValue['price'] = $modx->sbshop->setPriseIncrement($aValue['value'], $aValue['price_add']);
+							} else {
+								$aValue['price'] = '';
+							}
+							/**
+							 * Если изображение есть
+							 */
+							if($aValue['image']) {
+								$aValue['image.url'] = $aValue['image'];
+								$aValue['image'] = '<img src="' . $aValue['image'] . '">';
+							}
+							/**
+							 * Готовим плейсхолдеры
+							 */
+							$aReplVal = $modx->sbshop->arrayToPlaceholders($aValue);
+							/**
+							 * Вставляем данные в шаблон
+							 */
+							$sOptRaw .= str_replace(array_keys($aReplVal), array_values($aReplVal), $this->aTemplates['multi_option_personal_row']);
+						}
+					}
+					/**
+					 * Плейсхолдеры для опции
+					 */
+					$aReplOpt['[+sb.wrapper+]'] = $sOptRaw;
+					$aReplOpt = array_merge($aReplOpt,$modx->sbshop->arrayToPlaceholders($aOption,'sb.option.'));
+					/**
+					 * Если есть подсказка
+					 */
+					if($aOption['tip']) {
+						$aReplTip = array(
+							'[+sb.id+]' => $aOption['tip'],
+						);
+						$sReplOpt = str_replace(array_keys($aReplTip), array_values($aReplTip), $this->aTemplates['option_tip']);
+					} elseif ($aGeneralOptions[$aOption['title']]['tip']) {
+						$aReplTip = array(
+							'[+sb.id+]' => $aGeneralOptions[$aOption['title']]['tip'],
+						);
+						$sReplOpt = str_replace(array_keys($aReplTip), array_values($aReplTip), $this->aTemplates['option_tip']);
+					} else {
+						$sReplOpt = "";
+					}
+					$aReplOpt['[+sb.option.tip+]'] = $sReplOpt;
+					/**
+					 * Если значение одно
+					 */
+					if(count($aValues) == 1) {
+						/**
+						 * Используем контейнер для одного значения
+						 */
+						$sOptions .= str_replace(array_keys($aReplOpt), array_values($aReplOpt), $this->aTemplates['single_option_personal_outer']);
+					} else {
+						/**
+						 * Используем контейнер для нескольких значений
+						 */
+						$sOptions .= str_replace(array_keys($aReplOpt), array_values($aReplOpt), $this->aTemplates['multi_option_personal_outer']);
+					}
+				}
+			}
+		}
+		/**
+		 * Если опции есть
+		 */
+		if($sOptions != '') {
+			/**
+			 * Вставляем в общий контейнер
+			 */
+			$aReplBlocks['[+sb.personal_bundle+]'] = str_replace('[+sb.bundle.options+]',$sOptions,$this->aTemplates['personal_bundle']);
+		}
 		/**
 		 * Если комплектации существуют
 		 */
@@ -281,21 +438,6 @@ class product_mode {
 			 * Обрабатываем каждую запись
 			 */
 			foreach ($aBundles as $iBundleId => $aBundle) {
-				/**
-				 * Если это индивидуальная комплектация
-				 */
-				if($aBundle['title'] === 'personal') {
-					$iBundleId = 'personal';
-					$aBundle = array (
-						'title' => $modx->sbshop->lang['bundle_personal_title'],
-						'price' => $modx->sbshop->oGeneralProduct->getAttribute('price_full'),
-						'options' => array(),
-						'description' => $modx->sbshop->lang['bundle_personal_description'],
-					);
-				}
-				/**
-				 * Плейсхолдеры для замены
-				 */
 				/**
 				 * Добавляем идентификатор в плейсхолдеры
 				 */

@@ -64,7 +64,10 @@ class categories_mode {
 		/**
 		 * Устанавливаем шаблоны
 		 */
-		$this->setTemplates();
+		$this->aTemplates = array_merge($modx->sbshop->getSnippetTemplate('categories'), $modx->sbshop->getSnippetTemplate('productlist'));
+		/**
+		 * Если определена настройка "помещать в плейсхолдер"
+		 */
 		if($toPlaceholder) {
 			/**
 			 * Вывод информации о вложенных категория в плейсхолдер [+sb.innercat+]
@@ -74,23 +77,21 @@ class categories_mode {
 			 * Вывод списка товаров
 			 */
 			$modx->setPlaceholder('sb.productlist',$this->outputProducts());
+		} else {
+			/**
+			 * Вывод информации о вложенных категориях
+			 */
+			echo $this->outputInnerCat();
+			/**
+			 * Вывод списка товаров
+			 */
+			echo $this->outputProducts();
 		}
 	}
-	
-	/**
-	 * Формирование набора стандартных шаблонов
-	 * @param unknown_type $sTemplate
-	 */
-	public function setTemplates($sTemplate = false) {
-		global $modx;
-		/**
-		 * Загружаем стандартный файл с шаблонами
-		 */
-		$this->aTemplates = array_merge($modx->sbshop->getSnippetTemplate('categories'), $modx->sbshop->getSnippetTemplate('productlist'));
-	}
-	
+
 	/**
 	 * Вывод информации для вложенных категорий
+	 * @todo Нужно сделать учет вложенности по разделам еще, я его временно убил
 	 */
 	public function outputInnerCat() {
 		global $modx;
@@ -130,51 +131,52 @@ class categories_mode {
 			$modx->setPlaceholder('sb.category.longtitle', $sLongTitle);
 		}
 		/**
-		 * Если основной режим работы не 'product'
+		 * Если включен режим товара, то выходим
 		 */
-		if($aModes[0] !== 'product') {
+		if($aModes[0] == 'product') {
+			return;
+		}
+		/**
+		 * Получаем набор уровней
+		 */
+		$aLevels = $this->oCatTree->getCatTreeLevels();
+		/**
+		 * Если нет данных, то на выход
+		 */
+		if(count($aLevels) == 0) {
+			return;
+		}
+		/**
+		 * Обрабатываем каждый уровень вложенности
+		 */
+		foreach($aLevels as $iLevel => $aCatIds) {
 			/**
-			 * Получаем набор уровней
+			 * Делим список разделов на ряды, по заданным в конфигурации условиям
 			 */
-			$aLevels = $this->oCatTree->getCatTreeLevels();
-			/**
-			 * Если нет данных, то на выход
-			 */
-			if(count($aLevels) == 0) {
-				return;
+			if($modx->sbshop->config['category_columns'] > 0) {
+				$aCatRows = array_chunk($aCatIds, $modx->sbshop->config['category_columns'], true);
+			} else {
+				$aCatRows[0] = $aCatIds;
 			}
 			/**
-			 * Записываем в содержимое основной контейнер
+			 * Массив рядов
 			 */
-			$sOutput = '[+sb.wrapper+]';
+			$sCatRowsOut = '';
 			/**
-			 * Счетчик уровня вложенности
+			 * Обрабатываем каждый ряд
 			 */
-			$iLevel = 0;
-			foreach ($aLevels as $aLevel) {
+			foreach($aCatRows as $aCatRow) {
 				/**
-				 * Увеличиваем счетчик
+				 * Массив разделов для ряда
 				 */
-				$iLevel++;
+				$sCatRowOut = '';
 				/**
-				 * Данные с пунктами
+				 * Обрабатываем каждый раздел в ряду
 				 */
-				$sRows = '';
-				/**
-				 * Набор плейсхолдеров рядов для вставки
-				 */
-				$aRepl = array();
-				/**
-				 * Идентификатор враппера
-				 */
-				$iParentId = 0;
-				/**
-				 * Обрабатываем каждый вложенный пункт
-				 */
-				foreach ($aLevel as $iCatId) {
+				foreach($aCatRow as $iCatId) {
 					/**
-					 * Получаем раздел
-					 */
+					* Получаем раздел
+					*/
 					$oCategory = $this->oCatTree->getCategoryById($iCatId);
 					/**
 					 * Получаем массив параметров раздела
@@ -198,84 +200,36 @@ class categories_mode {
 						$aAttributes = $PlOut[0];
 					}
 					/**
-					 * Получаем список плейсхолдеров
-					 */
-					$aPlaceholders = $modx->sbshop->arrayToPlaceholders($aAttributes);
-					/**
 					 * Заголовок маленькими буквами
 					 */
-					$aPlaceholders['[+sb.title.l+]'] = mb_strtolower($aAttributes['title'],'UTF-8');
+					$aAttributes['title.l'] = mb_strtolower($aAttributes['title'],'UTF-8');
 					/**
 					 * Плейсхолдер для вложенных пунктов по идентификатору
 					 */
-					$aPlaceholders['[+sb.wrapper+]'] = '[+sb.wrapper.' . $aAttributes['id'] . '+]';
+					$aAttributes['wrapper'] = '[+sb.wrapper.' . $aAttributes['id'] . '+]';
 					/**
-					 * Устанавливаем идентификатор родителя раздела
+					 * Получаем список плейсхолдеров
 					 */
-					$iParentId = $aAttributes['parent'];
+					$phAttr = $modx->sbshop->arrayToPlaceholders($aAttributes);
 					/**
-					 * Первый уровень обрабатывается отдельно
+					 * Добавляем товар в ряд
 					 */
-					if($iLevel == 1) {
-						/**
-						 * Делаем вставку данных в шаблон row
-						 */
-						$sRows = str_replace(array_keys($aPlaceholders),array_values($aPlaceholders),$this->aTemplates['category_row']);
-					} else {
-						/**
-						 * Делаем вставку в шаблон innerrow
-						 */
-						$sRows = str_replace(array_keys($aPlaceholders),array_values($aPlaceholders),$this->aTemplates['category_innerrow']);
-					}
-					$sWrapper = '[+sb.wrapper+]';
-					/**
-					 * Делаем вставку в контейнер если это не первый уровень
-					 */
-					if($iLevel != 1) {
-						$sRows = str_replace('[+sb.wrapper+]',$sRows,$this->aTemplates['category_inner']);
-						$sWrapper = '[+sb.wrapper.' . $iParentId . '+]';
-					}
-					$aRepl[$sWrapper] .= $sRows;
+					$sCatRowOut .= str_replace(array_keys($phAttr), array_values($phAttr), $this->aTemplates['category_item']);
 				}
-
 				/**
-				 * Вставляем подготовленную информацию в основное содержимое
+				 * Добавляем ряд
 				 */
-				$sOutput = str_replace(array_keys($aRepl), array_values($aRepl),$sOutput);
+				$sCatRowsOut .= str_replace('[+sb.wrapper+]', $sCatRowOut, $this->aTemplates['category_row']);
 			}
-			/**
-			 * Если основной режим не 'main'
-			 */
-			if($aModes[0] !== 'main') {
-				/**
-				 * Подготавливаем данные для текущего раздела
-				 */
-				$aCategory = $modx->sbshop->oGeneralCategory->getAttributes();
-				if($aCategory['longtitle'] === '') {
-					$aCategory['longtitle'] = $aCategory['title'];
-				}
-				$aRepl = $modx->sbshop->arrayToPlaceholders($aCategory);
-			} else {
-				/**
-				 * Берем ограниченные данные из языкового файла
-				 */
-				$aRepl = array(
-					'[+sb.title+]' => $modx->sbshop->lang['shop_title'],
-					'[+sb.longtitle+]' => $modx->sbshop->lang['shop_longtitle'],
-				);
-			}
-			$aRepl['[+sb.wrapper+]'] = $sOutput;
-			/**
-			 * Делаем вставку
-			 */
-			$sOutput = str_replace(array_keys($aRepl), array_values($aRepl), $this->aTemplates['category_outer']);
-			/**
-			 * Отдаем результат
-			 */
-			return $sOutput;
 		}
+		/**
+		 * Вставляем данные в общий контейнер
+		 */
+		$sOutput = str_replace('[+sb.wrapper+]', $sCatRowsOut, $this->aTemplates['category_outer']);
+
+		return $sOutput;
 	}
-	
+
 	/**
 	 * Вывод списка товаров для текущей категории
 	 */
@@ -328,10 +282,6 @@ class categories_mode {
 			return '';
 		}
 		/**
-		 * Переменная для вывода
-		 */
-		$sOutput = '';
-		/**
 		 * Получаем список товаров
 		 */
 		$oProducts = new SBProductList($oCategory->getAttribute('id'), false, $iLimit);
@@ -361,11 +311,11 @@ class categories_mode {
 			/**
 			 * Если используется группировка
 			 */
-			if($modx->sbshop->config['category_columns'] > 0) {
+			if($modx->sbshop->config['product_columns'] > 0) {
 				/**
 				 * Разбиваем массив товаров на группы
 				 */
-				$aProductGroups = array_chunk($aProducts, $modx->sbshop->config['category_columns'], true);
+				$aProductGroups = array_chunk($aProducts, $modx->sbshop->config['product_columns'], true);
 			} else {
 				/**
 				 * Делаем одну группу, где содержатся все товары
@@ -483,15 +433,15 @@ class categories_mode {
 					 * Если товар в наличии
 					 */
 					if($oProduct->getAttribute('existence')) {
-						$aRows[] = str_replace(array_keys($aRepl),array_values($aRepl),$this->aTemplates['product_row']);
+						$aRows[] = str_replace(array_keys($aRepl),array_values($aRepl),$this->aTemplates['product_item']);
 					} else {
-						$aRows[] = str_replace(array_keys($aRepl),array_values($aRepl),$this->aTemplates['product_absent_row']);
+						$aRows[] = str_replace(array_keys($aRepl),array_values($aRepl),$this->aTemplates['product_absent_item']);
 					}
 				}
 				/**
 				 * Вставляем ряды в шаблон группы
 				 */
-				$aGroupRows[] = str_replace('[+sb.wrapper+]', implode('', $aRows), $this->aTemplates['category_group']);
+				$aGroupRows[] = str_replace('[+sb.wrapper+]', implode('', $aRows), $this->aTemplates['product_row']);
 			}
 			/**
 			 * Информация о текущей категории

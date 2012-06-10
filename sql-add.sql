@@ -1,0 +1,1 @@
+ALTER TABLE  `modx_sbshop_products` ADD  `product_personal_bundle` VARCHAR( 255 ) NOT NULL AFTER  `product_base_bundle`;

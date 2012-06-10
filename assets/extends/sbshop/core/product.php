@@ -19,6 +19,7 @@ class SBProduct {
 	protected $aImages; // массив изображений
 	protected $aFiles; // массив файлов
 	protected $aBaseBundle; // Базовая комплектация
+	protected $aPersonalBundle; // Индивидуальная комплектация
 	protected $oBundles; // Дополнительные комплектации
 
 
@@ -54,6 +55,7 @@ class SBProduct {
 			'bundles' => null, // комплектации
 			'existence' => null, // наличие товара
 			'base_bundle' => null, // опции для базовой комплектации
+			'personal_bundle' => null, // опции для индивидуальной комплектации
 		);
 		/**
 		 * Массив расширенных параметров товара
@@ -126,6 +128,9 @@ class SBProduct {
 						break;
 						case 'base_bundle':
 							$this->unserializeBaseBundle($sVal);
+						break;
+						case 'personal_bundle':
+							$this->unserializePersonalBundle($sVal);
 						break;
 						case 'price':
 						case 'price_add':
@@ -591,6 +596,18 @@ class SBProduct {
 			return false;
 		}
 		$this->aBaseBundle = $this->oBundles->parse($sParams);
+	}
+
+	/**
+	 *
+	 * @param <type> $sParams
+	 * @return <type>
+	 */
+	public function unserializePersonalBundle($sParams) {
+		if($sParams == '') {
+			return false;
+		}
+		$this->aPersonalBundle = array_keys($this->oBundles->parse($sParams));
 	}
 
 	/**

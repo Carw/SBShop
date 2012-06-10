@@ -43,6 +43,26 @@ class SBOptionList {
 		$this->aOptionList[$iNameId]['values'][$iValueId] = $aValue;
 	}
 
+	/**
+	 * Получение опции по идентификатору
+	 * @return array
+	 */
+	public function getOptionNameByNameId($iNameId) {
+		foreach ($this->aOptionList as $aOption) {
+			/**
+			 * Если это запись с нужным идентификатором
+			 */
+			if($aOption['id'] == $iNameId) {
+				unset($aOption['values']);
+				return $aOption;
+			}
+		}
+	}
+
+	/**
+	 * Получение списка опций
+	 * @return array
+	 */
 	public function getOptionNames() {
 		$aNames = array();
 		if(count($this->aOptionList) > 0) {

@@ -334,6 +334,12 @@
 					</p>
 					<div class="split"></div>
 				</div>
+				<div class="personal_bundle">
+					<h3>Индивидуальная комплектация:</h3>
+					<p>
+						<input type="text" name="personal_bundle_settings" id="personal_bundle" value="[+product.personal_bundle+]">
+					</p>
+				</div>
 				<script type="text/javascript">
 					// Заголовок комплектации по умолчанию
 					bundle_name = '[+lang.product_bundle_name+]';

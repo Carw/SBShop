@@ -731,7 +731,7 @@ class prod_mode {
 		 * Установка идентификатора
 		 */
 		if(intval($_POST['prodid']) > 0) {
-			$this->oProduct->setAttribute('id',intval($_POST['prodid']));
+			$this->oProduct->setAttribute('id', intval($_POST['prodid']));
 			/**
 			 * Указываем флаг, что товар не новый, а редактируется
 			 */
@@ -750,7 +750,7 @@ class prod_mode {
 			/**
 			 * Устанавливаем идентификатор категории
 			 */
-			$this->oProduct->setAttribute('category',$iCategoryId);
+			$this->oProduct->setAttribute('category', $iCategoryId);
 			/**
 			 * Загружаем информацию о категории
 			 */
@@ -767,8 +767,8 @@ class prod_mode {
 		/**
 		 * Проверяем псевдоним. Он должен быть стандартным.
 		 */
-		if($_POST['alias'] == '' || preg_match('/^[\w\-\_]+$/i',$_POST['alias'])) {
-			$this->oProduct->setAttribute('alias',$_POST['alias']);
+		if($_POST['alias'] == '' || preg_match('/^[\w\-\_]+$/i', $_POST['alias'])) {
+			$this->oProduct->setAttribute('alias', $_POST['alias']);
 			/**
 			 * Для дальнейшей установки URL выделим переменную
 			 */
@@ -782,15 +782,15 @@ class prod_mode {
 				/**
 				 * Получаем алиас на основе заголовка
 				 */
-				$sAlias = $oTrans->stripAlias($_POST['title'],$modx->sbshop->config['transalias_char_restrict'],$modx->sbshop->config['transalias_word_separator']);
+				$sAlias = $oTrans->stripAlias($_POST['title'], $modx->sbshop->config['transalias_char_restrict'], $modx->sbshop->config['transalias_word_separator']);
 			} else {
 				/**
 				 * Псевдоним задан, его и берем
 				 */
-				$this->oProduct->setAttribute('alias',$_POST['alias']);
+				$this->oProduct->setAttribute('alias', $_POST['alias']);
 				$sAlias = $_POST['alias'];
 			}
-			$this->oProduct->setAttribute('alias',$sAlias);
+			$this->oProduct->setAttribute('alias', $sAlias);
 		} else {
 			$this->sError = $modx->sbshop->lang['product_error_alias'];
 			$bError = true;
@@ -1077,6 +1077,15 @@ class prod_mode {
 			 * Добавляем информацию о базовой комплектации
 			 */
 			$this->oProduct->setAttribute('base_bundle', htmlspecialchars($_POST['bundle_base_settings'], ENT_QUOTES));
+		}
+		/**
+		 * Если есть информация об индивидуальной комплектации
+		 */
+		if($_POST['personal_bundle_settings']) {
+			/**
+			 * Добавляем информацию о базовой комплектации
+			 */
+			$this->oProduct->setAttribute('personal_bundle', htmlspecialchars($_POST['personal_bundle_settings'], ENT_QUOTES));
 		}
 		/**
 		 * Установка комплектаций

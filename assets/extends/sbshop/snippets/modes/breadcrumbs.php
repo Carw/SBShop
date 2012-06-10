@@ -74,7 +74,7 @@ class breadcrumbs_mode {
 		/**
 		 * Добавляем разделитель
 		 */
-		$sRepl = implode($this->aTemplates['breadcrumbs_separator'],$aRows);
+		$sRepl = implode($this->aTemplates['breadcrumbs_separator'], $aRows);
 		/**
 		 * Делаем вставку в контейнер
 		 */
