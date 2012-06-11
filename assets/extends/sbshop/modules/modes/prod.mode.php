@@ -1115,15 +1115,6 @@ class prod_mode {
 				 */
 				$this->oProduct->addBundle(htmlspecialchars($_POST['bundle_name'][$i], ENT_QUOTES), htmlspecialchars($_POST['bundle_settings'][$i], ENT_QUOTES), $fPrice, htmlspecialchars($_POST['bundle_description'][$i], ENT_QUOTES), false, $fPriceAdd);
 			}
-			/**
-			 * Если включена индивидуальная комплектация
-			 */
-			if($_POST['bundle_personal']) {
-				/**
-				 * Добавляем персональную комплектацию к основному списку
-				 */
-				$this->oProduct->addBundle('personal', '0:0', false, '', 'personal');
-			}
 		}
 
 		return !$bError;

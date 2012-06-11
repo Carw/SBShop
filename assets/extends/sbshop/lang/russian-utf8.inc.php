@@ -120,7 +120,7 @@ return array(
 	'product_option_extend_image' => 'Изображение',
 	'product_option_extend_add' => 'Надбавка к стоимости',
 	'product_tab_bundles' => 'Комплектации',
-	'product_bundles_personal' => 'Доступна индивидуальная комплектация',
+	'product_bundles_personal' => 'Индивидуальная комплектация',
 	'product_bundle' => 'Комплектации',
 	'product_bundle_tips' => 'Работает в тестовом режиме',
 	'product_bundle_add' => 'Добавить комплектацию',

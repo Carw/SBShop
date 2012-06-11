@@ -327,15 +327,10 @@
 							<input type="text" id="new_bundle_name" value=""> <button class="button_add" id="new_bundle_add">[+lang.product_bundle_add+]</button>
 						</label>
 					</p>
-					<p>
-						<label>
-							<input type="checkbox" class="option_bundle_personal" name="bundle_personal" value="1" [+bundle.personal.checked+]> [+lang.product_bundles_personal+]
-						</label>
-					</p>
 					<div class="split"></div>
 				</div>
 				<div class="personal_bundle">
-					<h3>Индивидуальная комплектация:</h3>
+					<h3>[+lang.product_bundles_personal+]</h3>
 					<p>
 						<input type="text" name="personal_bundle_settings" id="personal_bundle" value="[+product.personal_bundle+]">
 					</p>
