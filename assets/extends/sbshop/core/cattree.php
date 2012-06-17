@@ -20,7 +20,7 @@ class SBCatTree {
 	protected $aCatTreeChildren; // Массив дерева разделов
 	protected $aCatTreeLevels; // Массив дерева разделов
 
-	public function  __construct($oParentCategory = false,$iLevel = false, $bDeleted = false) {
+	public function  __construct($oParentCategory = false, $iLevel = false, $bDeleted = false) {
 		global $modx;
 		/**
 		 * Инициализируем основной массив
@@ -58,7 +58,7 @@ class SBCatTree {
 		/**
 		 * Делаем загрузку дерева категорий
 		 */
-		$this->load($sPath,$iLevel,$bDeleted);
+		$this->load($sPath, $iLevel, $bDeleted);
 	}
 
 	/**
@@ -79,9 +79,9 @@ class SBCatTree {
 		 */
 		$sPath .= '.%';
 		if(!$bDeleted) {
-			$rs = $modx->db->select('*',$modx->getFullTableName('sbshop_categories'),' category_deleted = 0 AND category_published = 1 AND category_path like "' . $sPath . '" AND category_level < ' . $iEndLevel,'category_order');
+			$rs = $modx->db->select('*',$modx->getFullTableName('sbshop_categories'), ' category_deleted = 0 AND category_published = 1 AND category_path like "' . $sPath . '" AND category_level <= ' . $iEndLevel, 'category_order');
 		} else {
-			$rs = $modx->db->select('*',$modx->getFullTableName('sbshop_categories'),' category_path like "' . $sPath . '" AND category_level < ' . $iEndLevel,'category_order');
+			$rs = $modx->db->select('*',$modx->getFullTableName('sbshop_categories'), ' category_path like "' . $sPath . '" AND category_level <= ' . $iEndLevel, 'category_order');
 		}
 		$aRaws = $modx->db->makeArray($rs);
 		/**
@@ -111,7 +111,42 @@ class SBCatTree {
 	}
 
 	public function getChildrenById($iCategoryId) {
-		return $this->aCatTreeChildren[$iCategoryId];
+		/**
+		 * Массив дочерних разделов
+		 */
+		$aCatIds = array();
+		/**
+		 * Если для указанного раздела есть дочерние разделы
+		 */
+		if($this->aCatTreeChildren[$iCategoryId]) {
+			/**
+			 * Массив для обхода
+			 */
+			$aCatData = $this->aCatTreeChildren[$iCategoryId];
+			/**
+			 * Массив разделов
+			 */
+			$aCatIds = $aCatData;
+			/**
+			 * Извлекаем идентификатор из массива
+			 */
+			while ($iCatId = array_shift($aCatData)) {
+				/**
+				 * Если есть дочерние разделы
+				 */
+				if($this->aCatTreeChildren[$iCatId]) {
+					/**
+					 * Добавляем их в массив дочерних разделов
+					 */
+					$aCatIds = array_merge($aCatIds, $this->aCatTreeChildren[$iCatId]);
+					/**
+					 * Добавляем в массив обхода
+					 */
+					$aCatData = array_merge($aCatData, $this->aCatTreeChildren[$iCatId]);
+				}
+			}
+		}
+		return $aCatIds;
 	}
 
 	/**

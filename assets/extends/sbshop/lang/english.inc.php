@@ -90,6 +90,7 @@ return array(
 	'product_attribute_measure' => 'Measure',
 	'product_attribute_type_normal' => 'Normal',
 	'product_attribute_type_primary' => 'Primary',
+	'product_attribute_type_shortcut' => 'Shortcut',
 	'product_attribute_type_hidden' => 'Hidden',
 	'product_attribute_add' => 'Add Attribute',
 	'product_attribute_name' => 'Title',

@@ -57,6 +57,7 @@ class categories_mode {
 			$this->oCatTree = new SBCatTree($this->oCategory);
 			/**
 			 * Получаем список товаров
+			 * @todo Здесь можно оптимизировать работу за счет счетчика товаров в разделе
 			 */
 			$this->oProductList = new SBProductList();
 			$this->oProductList->loadFilteredListByCategoryId($this->oCategory->getAttribute('id'), false, $this->oCategory->oFilterList->getFilterSelected());
@@ -147,16 +148,21 @@ class categories_mode {
 			return;
 		}
 		/**
+		 * Конечный результат для вывода списка разделов
+		 */
+		$sOutput = '';
+		/**
 		 * Обрабатываем каждый уровень вложенности
 		 */
-		foreach($aLevels as $iLevel => $aCatIds) {
+		$iLevel = 0;
+		foreach($aLevels as $aCatIds) {
 			/**
 			 * Делим список разделов на ряды, по заданным в конфигурации условиям
 			 */
 			if($modx->sbshop->config['category_columns'] > 0) {
 				$aCatRows = array_chunk($aCatIds, $modx->sbshop->config['category_columns'], true);
 			} else {
-				$aCatRows[0] = $aCatIds;
+				$aCatRows = array($aCatIds);
 			}
 			/**
 			 * Массив рядов
@@ -169,7 +175,7 @@ class categories_mode {
 				/**
 				 * Массив разделов для ряда
 				 */
-				$sCatRowOut = '';
+				$sCatItem = '';
 				/**
 				 * Обрабатываем каждый раздел в ряду
 				 */
@@ -185,7 +191,7 @@ class categories_mode {
 					/**
 					 * Получаем информацию о вложенных товарах и добавляем в массив
 					 */
-					$aAttributes['products'] = $this->outputInnerProducts($oCategory);
+					$aAttributes['products'] = $this->outputInnerProducts($iCatId);
 					/**
 					 * Вызов плагинов до вставки данных по разделу
 					 */
@@ -214,19 +220,36 @@ class categories_mode {
 					/**
 					 * Добавляем товар в ряд
 					 */
-					$sCatRowOut .= str_replace(array_keys($phAttr), array_values($phAttr), $this->aTemplates['category_item']);
+					$sCatItem .= str_replace(array_keys($phAttr), array_values($phAttr), $this->aTemplates['category_item']);
 				}
 				/**
 				 * Добавляем ряд
 				 */
-				$sCatRowsOut .= str_replace('[+sb.wrapper+]', $sCatRowOut, $this->aTemplates['category_row']);
+				$sCatRowsOut .= str_replace('[+sb.wrapper+]', $sCatItem, $this->aTemplates['category_row']);
 			}
+			/**
+			 * Если это первый уровень
+			 */
+			if($iLevel == 0) {
+				$sOutput = $sCatRowsOut;
+			} else {
+				/**
+				 * @todo Здесь нужно добавить вложенность
+				 */
+			}
+			/**
+			 * Счетчик уровней.
+			 * @todo Нужно исправить этот костыль (#36)
+			 */
+			$iLevel++;
 		}
 		/**
 		 * Вставляем данные в общий контейнер
 		 */
-		$sOutput = str_replace('[+sb.wrapper+]', $sCatRowsOut, $this->aTemplates['category_outer']);
-
+		$sOutput = str_replace('[+sb.wrapper+]', $sOutput, $this->aTemplates['category_outer']);
+		/**
+		 * Возвращаем результат
+		 */
 		return $sOutput;
 	}
 
@@ -266,7 +289,7 @@ class categories_mode {
 	 * Вывод вложенных в категорию товаров
 	 * @param <type> $iProductId
 	 */
-	public function outputInnerProducts($oCategory) {
+	public function outputInnerProducts($iCatId) {
 		global $modx;
 		/**
 		 * Получаем лимит количества товаров на категорию
@@ -282,9 +305,24 @@ class categories_mode {
 			return '';
 		}
 		/**
+		 * Получаем список вложенных разделов
+		 */
+		$aCatIds = $this->oCatTree->getChildrenById($iCatId);
+		/**
+		 * Если вложенные разделы есть
+		 */
+		if($aCatIds) {
+			/**
+			 * Добавляем текущий раздел
+			 */
+			array_unshift($aCatIds, $iCatId);
+		} else {
+			$aCatIds = $iCatId;
+		}
+		/**
 		 * Получаем список товаров
 		 */
-		$oProducts = new SBProductList($oCategory->getAttribute('id'), false, $iLimit);
+		$oProducts = new SBProductList($aCatIds, false, $iLimit);
 		/**
 		 * Получение списка товаров
 		 */
@@ -292,7 +330,7 @@ class categories_mode {
 		/**
 		 * Формируем список товаров
 		 */
-		$sOutput = $this->getProductList($aProducts, $oCategory);
+		$sOutput = $this->getProductList($aProducts);
 		/**
 		 * Отдаем результат
 		 */
@@ -302,7 +340,7 @@ class categories_mode {
 	/**
 	 * Формирование списка товаров
 	 */
-	public function getProductList($aProducts, $oCategory = false) {
+	public function getProductList($aProducts) {
 		global $modx;
 		/**
 		 * Если есть записи
@@ -323,14 +361,6 @@ class categories_mode {
 				$aProductGroups = array($aProducts);
 			}
 			/**
-			 * Получаем набор ключей параметров раздела
-			 */
-			if($oCategory) {
-				$aGeneralAttributes = array_keys($oCategory->getExtendAttributes());
-			} else {
-				$aGeneralAttributes = array_keys($modx->sbshop->oGeneralCategory->getExtendAttributes());
-			}
-			/**
 			 * Массив групп
 			 */
 			$aGroupRows = array();
@@ -346,6 +376,22 @@ class categories_mode {
 				 * Обрабатываем каждую запись для вывода
 				 */
 				foreach ($aGroup as $oProduct) {
+					/**
+					 * Идентификатор раздела
+					 */
+					$iCatId = $oProduct->getAttribute('category');
+					/**
+					 * Получаем раздел
+					 */
+					$oCategory = $this->oCatTree->getCategoryById($iCatId);
+					/**
+					 * Получаем набор ключей параметров раздела
+					 */
+					if($oCategory) {
+						$aGeneralAttributes = array_keys($oCategory->getExtendAttributes());
+					} else {
+						$aGeneralAttributes = array_keys($modx->sbshop->oGeneralCategory->getExtendAttributes());
+					}
 					/**
 					 * Подготавливаем информацию для вставки в шаблон
 					 */

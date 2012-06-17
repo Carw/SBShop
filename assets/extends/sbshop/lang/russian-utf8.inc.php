@@ -88,6 +88,7 @@ return array(
 	'product_attribute_measure' => 'Единица измерения',
 	'product_attribute_type_normal' => 'стандартный',
 	'product_attribute_type_primary' => 'избранный',
+	'product_attribute_type_shortcut' => 'укороченный',
 	'product_attribute_type_hidden' => 'скрытый',
 	'product_attribute_add' => 'Добавить параметр',
 	'product_attribute_name' => 'Название параметра',

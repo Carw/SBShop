@@ -236,6 +236,8 @@ class prod_mode {
 			 */
 			if($aAttribute['type'] == 'p') {
 				$aRepl['[+attribute.type.primary+]'] = 'selected="selected"';
+			} elseif ($aAttribute['type'] == 's') {
+				$aRepl['[+attribute.type.shortcut+]'] = 'selected="selected"';
 			} elseif ($aAttribute['type'] == 'h') {
 				$aRepl['[+attribute.type.hidden+]'] = 'selected="selected"';
 			} else {
@@ -887,6 +889,8 @@ class prod_mode {
 				if($_POST['attribute_name'][$i] !== '') {
 					if($_POST['attribute_type'][$i] == 'p') {
 						$sType = 'p';
+					} elseif ($_POST['attribute_type'][$i] == 's') {
+						$sType = 's';
 					} elseif ($_POST['attribute_type'][$i] == 'h') {
 						$sType = 'h';
 					} else {

@@ -16,8 +16,6 @@ if(!defined('MODX_BASE_PATH')) {
 
 include_once MODX_BASE_PATH . 'assets/extends/sbshop/snippets/modes/categories.php';
 
-$oCatMode = new categories_mode('category',false,$catId);
-
-echo $oCatMode->outputInnerCat();
+$oCatMode = new categories_mode('category', false, $catId);
 
 ?>

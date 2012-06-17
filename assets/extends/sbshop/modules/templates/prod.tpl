@@ -148,6 +148,7 @@
 						<select name="attribute_type[]">
 							<option value="n" selected="selected">[+lang.product_attribute_type_normal+]</option>
 							<option value="p" style="color: green;">[+lang.product_attribute_type_primary+]</option>
+							<option value="s">[+lang.product_attribute_type_shortcut+]</option>
 							<option value="h" style="color: silver;">[+lang.product_attribute_type_hidden+]</option>
 						</select>
 					</div>
@@ -518,6 +519,7 @@
 	<select name="attribute_type[]">
 		<option value="n" [+attribute.type.normal+]>[+lang.product_attribute_type_normal+]</option>
 		<option value="p" style="color: green" [+attribute.type.primary+]>[+lang.product_attribute_type_primary+]</option>
+		<option value="s" [+attribute.type.shortcut+]>[+lang.product_attribute_type_shortcut+]</option>
 		<option value="h" style="color: silver;" [+attribute.type.hidden+]>[+lang.product_attribute_type_hidden+]</option>
 	</select>
 </div>

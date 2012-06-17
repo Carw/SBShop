@@ -18,7 +18,7 @@ class SBProductList {
 	 * Конструктор
 	 * @param $iCatId Категория для списка
 	 */
-	public function __construct($iCatId = false,$aProductIds = false,$iLimit = false) {
+	public function __construct($iCatIds = false, $aProductIds = false, $iLimit = false) {
 		/**
 		 * Инициализируем основной массив 
 		 */
@@ -30,17 +30,17 @@ class SBProductList {
 			/**
 			 * Делаем загрузку списка товаров по заданному массиву идентификаторов
 			 */
-			$this->loadListByIds($aProductIds,$iLimit);
-		} elseif(is_array ($iCatId)) {
+			$this->loadListByIds($aProductIds, $iLimit);
+		} elseif(is_array ($iCatIds)) {
 			/**
 			 * Делаем загрузку списка товаров по списку категорий
 			 */
-			$this->loadListByCategoryIds($iCatId,$iLimit);
-		} elseif($iCatId !== false) {
+			$this->loadListByCategoryIds($iCatIds, $iLimit);
+		} elseif($iCatIds !== false) {
 			/**
 			 * Делаем загрузку списка товаров по категории
 			 */
-			$this->loadListByCategoryId($iCatId,$iLimit);
+			$this->loadListByCategoryId($iCatIds, $iLimit);
 		}
 	}
 	

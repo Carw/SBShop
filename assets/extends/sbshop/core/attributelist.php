@@ -113,7 +113,7 @@ class SBAttributeList {
 							/**
 							 * Если параметр входит в видимый список и имеет ключ 'p' или 'n'
 							 */
-							if($aVal['type'] == 'p' or $aVal['type'] == 'n') {
+							if($aVal['type'] == 'p' or $aVal['type'] == 's' or $aVal['type'] == 'n') {
 								$aResult[$sKey] = $aVal;
 							}
 							break;

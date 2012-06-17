@@ -222,7 +222,7 @@ class product_mode {
 				 * Плейсхолдеры для опции
 				 */
 				$aReplOpt['[+sb.wrapper+]'] = $sOptRaw;
-				$aReplOpt = array_merge($aReplOpt,$modx->sbshop->arrayToPlaceholders($aOption,'sb.option.'));
+				$aReplOpt = array_merge($aReplOpt, $modx->sbshop->arrayToPlaceholders($aOption,'sb.option.'));
 				/**
 				 * Если есть подсказка
 				 */
@@ -263,7 +263,7 @@ class product_mode {
 			/**
 			 * Вставляем в общий контейнер
 			 */
-			$aReplBlocks['[+sb.options+]'] = str_replace('[+sb.wrapper+]',$sOptions,$this->aTemplates['options_outer']);
+			$aReplBlocks['[+sb.options+]'] = str_replace('[+sb.wrapper+]', $sOptions, $this->aTemplates['options_outer']);
 		}
 		/**
 		 * Переменная для комплектаций
@@ -633,6 +633,10 @@ class product_mode {
 		 */
 		$sAttrRows = '';
 		/**
+		 * Ряды сокращенного списка параметров
+		 */
+		$sAttrShortRows = '';
+		/**
 		 * Обрабатываем каждый параметр
 		 */
 		foreach ($aAttributes as $aAttrVal) {
@@ -641,11 +645,22 @@ class product_mode {
 			 * Формируем ряд
 			 */
 			$sAttrRows .= str_replace(array_keys($aAttrRepl), array_values($aAttrRepl), $this->aTemplates['attribute_row']);
+			/**
+			 * Если параметр входит в сокращенный список
+			 */
+			if($aAttrVal['type'] == 's' or $aAttrVal['type'] == 'p') {
+				$aAttrShortRepl = $aAttrRepl;
+				$sAttrShortRows .= str_replace(array_keys($aAttrRepl), array_values($aAttrRepl), $this->aTemplates['attribute_shortcut_row']);
+			}
 		}
 		/**
 		 * Вставляем параметры в контейнер
 		 */
 		$aReplBlocks['[+sb.attributes+]'] = str_replace('[+sb.wrapper+]', $sAttrRows, $this->aTemplates['attribute_outer']);
+		/**
+		 * Вставляем параметры сокращенного списка в контейнер
+		 */
+		$aReplBlocks['[+sb.shortattributes+]'] = str_replace('[+sb.wrapper+]', $sAttrShortRows, $this->aTemplates['attribute_shortcut_outer']);
 		/**
 		 * Если товар есть в наличии
 		 */
