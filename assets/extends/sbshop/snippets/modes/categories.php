@@ -159,7 +159,7 @@ class categories_mode {
 			/**
 			 * Делим список разделов на ряды, по заданным в конфигурации условиям
 			 */
-			if($modx->sbshop->config['category_columns'] > 0) {
+			if($iLevel == 0 and $modx->sbshop->config['category_columns'] > 0) {
 				$aCatRows = array_chunk($aCatIds, $modx->sbshop->config['category_columns'], true);
 			} else {
 				$aCatRows = array($aCatIds);
@@ -175,7 +175,7 @@ class categories_mode {
 				/**
 				 * Массив разделов для ряда
 				 */
-				$sCatItem = '';
+				$sCatItems = '';
 				/**
 				 * Обрабатываем каждый раздел в ряду
 				 */
@@ -214,18 +214,40 @@ class categories_mode {
 					 */
 					$aAttributes['wrapper'] = '[+sb.wrapper.' . $aAttributes['id'] . '+]';
 					/**
+					 * Устанавливаем идентификатор родителя раздела
+					 */
+					$iParentId = $aAttributes['parent'];
+					/**
 					 * Получаем список плейсхолдеров
 					 */
 					$phAttr = $modx->sbshop->arrayToPlaceholders($aAttributes);
 					/**
-					 * Добавляем товар в ряд
+					 * Если уровень вложенности начальный
 					 */
-					$sCatItem .= str_replace(array_keys($phAttr), array_values($phAttr), $this->aTemplates['category_item']);
+					if($iLevel == 0) {
+						/**
+						 * Добавляем основной раздел в ряд
+						 */
+						$sCatItems .= str_replace(array_keys($phAttr), array_values($phAttr), $this->aTemplates['category_item']);
+					} else {
+						/**
+						 * Добавляем вложенный раздел в ряд
+						 */
+						$sCatItems .= str_replace(array_keys($phAttr), array_values($phAttr), $this->aTemplates['category_inneritem']);
+					}
+
 				}
 				/**
-				 * Добавляем ряд
+				 * Если это начальный уровень вложенности
 				 */
-				$sCatRowsOut .= str_replace('[+sb.wrapper+]', $sCatItem, $this->aTemplates['category_row']);
+				if($iLevel == 0) {
+					/**
+					 * Добавляем ряд
+					 */
+					$sCatRowsOut .= str_replace('[+sb.wrapper+]', $sCatItems, $this->aTemplates['category_row']);
+				} else {
+					$sCatRowsOut = $sCatItems;
+				}
 			}
 			/**
 			 * Если это первый уровень
@@ -234,8 +256,17 @@ class categories_mode {
 				$sOutput = $sCatRowsOut;
 			} else {
 				/**
-				 * @todo Здесь нужно добавить вложенность
+				 * Добавляем подразделы в контейнер
 				 */
+				$sCatRowsOut = str_replace('[+sb.wrapper+]', $sCatRowsOut, $this->aTemplates['category_inner']);
+				/**
+				 * Готовим необходимый враппер
+				 */
+				$sWrapper = '[+sb.wrapper.' . $iParentId . '+]';
+				/**
+				 * Вставляем подразделы в разделы
+				 */
+				$sOutput = str_replace($sWrapper, $sCatRowsOut, $sOutput);
 			}
 			/**
 			 * Счетчик уровней.
