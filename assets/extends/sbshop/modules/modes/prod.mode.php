@@ -551,13 +551,17 @@ class prod_mode {
 		 */
 		if($this->oProduct->getAttribute('published') == 0) {
 			/**
+			 * Обновляем счетчики
+			 */
+			$this->updateCount($this->oProduct->getAttribute('category'), 0, 1);
+			/**
 			 * Устанавливаем значение опубликованности
 			 */
-			$this->oProduct->setAttribute('published',1);
+			$this->oProduct->setAttribute('published', 1);
 			/**
 			 * Задаем дату модификации
 			 */
-			$this->oProduct->setAttribute('date_edit',date('Y-m-d G:i:s'));
+			$this->oProduct->setAttribute('date_edit', date('Y-m-d G:i:s'));
 			/**
 			 * Сохраняем результат
 			 */
@@ -582,6 +586,10 @@ class prod_mode {
 		 * Если товар опубликован
 		 */
 		if($this->oProduct->getAttribute('published') == 1) {
+			/**
+			 * Обновляем счетчики
+			 */
+			$this->updateCount($this->oProduct->getAttribute('category'), 1, 0);
 			/**
 			 * Снимаем значение опубликованности
 			 */
@@ -709,6 +717,10 @@ class prod_mode {
 			 */
 			SBAttributeCollection::attributeProductGeneralization($this->oProduct, $this->oCategory, $this->oProduct->getExtendAttributes(), $this->oOldProduct->getExtendAttributes());
 			/**
+			 * Обновление счетчиков разделов
+			 */
+			$this->updateCount($this->oCategory->getAttribute('id'), $this->oOldProduct->getAttribute('published'), $this->oProduct->getAttribute('published'));
+			/**
 			 * Сохраняем раздел
 			 */
 			$this->oCategory->save();
@@ -721,7 +733,83 @@ class prod_mode {
 			return false;
 		}
 	}
-	
+
+	/**
+	 * Обновление счетчика родительских разделов
+	 */
+	protected function updateCount($iBaseCatId, $iOldStatus, $iNewStatus) {
+		/**
+		 * Если текущий раздел не загружен
+		 */
+		if($this->oCategory->getAttribute('id') != $iBaseCatId) {
+			$this->oCategory->load($iBaseCatId);
+		}
+		/**
+		 * Получаем массив родительских разделов
+		 */
+		$aCatIds = $this->oCategory->getPath();
+		/**
+		 * Обрабатываем каждый раздел
+		 */
+		foreach($aCatIds as $iCatId) {
+			/**
+			 * Если идентификатор 0
+			 */
+			if($iCatId == 0) {
+				/**
+				 * Пропускаем обработку
+				 */
+				continue;
+			}
+			/**
+			 * Если это текущий раздел
+			 */
+			if($iCatId == $this->oCategory->getAttribute('id')) {
+				/**
+				 * Используем текущий раздел
+				 */
+				$oCategory = &$this->oCategory;
+			} else {
+				/**
+				 * Загружаем нужный раздел
+				 */
+				$oCategory = new SBCategory();
+				$oCategory->load($iCatId);
+			}
+			/**
+			 * Если товар новый и опубликован
+			 */
+			if($this->sAct == 'new' and $iNewStatus == 1) {
+				/**
+				 * Прибавляем счетчик
+				 */
+				$oCategory->setAttribute('count', $oCategory->getAttribute('count') + 1);
+			} elseif($this->sAct == 'edit' or $this->sAct == 'pub' or $this->sAct == 'unpub') {
+				/**
+				 * Если ранее товар не был опубликован, а теперь опубликован
+				 */
+				if($iNewStatus == 1 and $iOldStatus == 0) {
+					/**
+					 * Прибавляем счетчик
+					 */
+					$oCategory->setAttribute('count', $oCategory->getAttribute('count') + 1);
+					/**
+					 * Если ранее товар был опубликован, а теперь нет
+					 */
+				} elseif($iNewStatus == 0 and $iOldStatus == 1) {
+					/**
+					 * Уменьшаем счетчик
+					 */
+					$oCategory->setAttribute('count', $oCategory->getAttribute('count') - 1);
+				}
+			}
+			/**
+			 * Сохраняем
+			 */
+			$oCategory->save();
+		}
+	}
+
 	/**
 	 * Проверка полученных из формы данных
 	 */
@@ -1057,7 +1145,7 @@ class prod_mode {
 				/**
 				 * Добавляем опцию со значениями
 				 */
-				$oOptions->add($aOptionData,$aValues);
+				$oOptions->add($aOptionData, $aValues);
 			}
 			/**
 			 * Делаем обобщение значений
@@ -1071,7 +1159,7 @@ class prod_mode {
 			/**
 			 * Устанавливаем строку для товара
 			 */
-			$this->oProduct->setAttribute('options',$sOptions);
+			$this->oProduct->setAttribute('options', $sOptions);
 		}
 		/**
 		 * Если есть информация о базовой комплектации

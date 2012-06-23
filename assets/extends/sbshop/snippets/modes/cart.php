@@ -229,6 +229,10 @@ class cart_mode {
 			 */
 			$aRows = array();
 			/**
+			 * Общее количество товара в заказе
+			 */
+			$iQuantity = 0;
+			/**
 			 * Обрабатываем товары
 			 */
 			foreach ($aIds as $iSetId) {
@@ -248,6 +252,10 @@ class cart_mode {
 				 * Получаем информацию о количестве и прочих условиях заказа товара
 				 */
 				$aOrderInfo = $modx->sbshop->oOrder->getOrderSetInfo($iSetId);
+				/**
+				 * Прибавляем количество товара
+				 */
+				$iQuantity += $aOrderInfo['quantity'];
 				/**
 				 * Делаем рассчет цены товара
 				 */
@@ -300,7 +308,7 @@ class cart_mode {
 					/**
 					 * Объединяем ряды и вставляем в контейнер
 					 */
-					$sOptions = str_replace('[+sb.wrapper+]', implode($this->aTemplates['option_separator'],$aOptions), $this->aTemplates['option_outer']);
+					$sOptions = str_replace('[+sb.wrapper+]', implode($this->aTemplates['option_separator'], $aOptions), $this->aTemplates['option_outer']);
 					$aRowData['options'] = $sOptions;
 				} else {
 					$aRowData['options'] = '';
@@ -335,6 +343,10 @@ class cart_mode {
 			 * Данные заказа
 			 */
 			$aOrderData = $modx->sbshop->oOrder->getAttributes();
+			/**
+			 * Добавляем количество товара
+			 */
+			$aOrderData['quantity'] = $iQuantity;
 			/**
 			 * Добавляем ссылку на оформление заказа
 			 */

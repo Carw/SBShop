@@ -178,6 +178,28 @@ class SBCatTree {
 	}
 
 	/**
+	 * Получить полный список идентификаторов разделов
+	 */
+	public function getCategoryIds() {
+		/**
+		 * Массив с результатом
+		 */
+		$aResult = array();
+		/**
+		 * Разбираем каждый раздел
+		 */
+		foreach ($this->aCatTree as $oCategory) {
+			/**
+			 * Если раздел опубликован и не удален
+			 */
+			if($oCategory->getAttribute('published') and !$oCategory->getAttribute('deleted')) {
+				$aResult[] = $oCategory->getAttribute('id');
+			}
+		}
+		return $aResult;
+	}
+
+	/**
 	 * Получение массива всех разделов не зависимо от статуса
 	 */
 	public function getAllCategories() {

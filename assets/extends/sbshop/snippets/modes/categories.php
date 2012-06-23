@@ -115,8 +115,10 @@ class categories_mode {
 			 */
 			$sTitle = $modx->sbshop->oGeneralCategory->getAttribute('title');
 			$sLongTitle = $modx->sbshop->oGeneralCategory->getAttribute('longtitle');
+			$iCount = $modx->sbshop->oGeneralCategory->getAttribute('count');
 
 			$modx->setPlaceholder('sb.category.title', $sTitle);
+			$modx->setPlaceholder('sb.category.count', $iCount);
 			/**
 			 * Если расширенный заголовок не установлен
 			 */

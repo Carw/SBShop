@@ -103,6 +103,11 @@ class cat_mode {
 				 */
 				if(isset($_POST['ok'])) {
 					/**
+					 * Делаем загрузку информации о категории
+					 */
+					$iCatId = intval($_REQUEST['catid']);
+					$this->oCategory->load($iCatId, true);
+					/**
 					 * Сохраняем
 					 */
 					if($this->saveCategory()) {
@@ -554,6 +559,27 @@ class cat_mode {
 			 * Делаем обобщение параметров
 			 */
 			SBAttributeCollection::attributeCategoryGeneralization($this->oCategory, $this->oCategory->getExtendAttributes(), $this->oOldCategory->getExtendAttributes());
+			/**
+			 * Определяем количество товаров в разделе
+			 */
+			$oCatTree = new SBCatTree($this->oCategory, 10);
+			/**
+			 * Массив разделов
+			 */
+			$aCategoryIds = $oCatTree->getCategoryIds() ;
+			/**
+			 * Добавляем текущий раздел
+			 */
+			$aCategoryIds[] = $this->oCategory->getAttribute('id');
+			/**
+			 * Получаем количество товара в разделах
+			 */
+			$oProductlist = new SBProductList();
+			$iCount = $oProductlist->getCountByCatIds($aCategoryIds);
+			/**
+			 * Устанавливаем количество товара для раздела
+			 */
+			$this->oCategory->setAttribute('count', $iCount);
 			/**
 			 * Снова сохраняем.
 			 */

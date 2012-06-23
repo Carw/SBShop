@@ -43,6 +43,35 @@ class SBProductList {
 			$this->loadListByCategoryId($iCatIds, $iLimit);
 		}
 	}
+
+	/**
+	 * Получение количества товара по идентификаторам разделов
+	 */
+	public function getCountByCatIds($aCatIds) {
+		global $modx;
+		/**
+		 * Если массив пустой
+		 */
+		if(!is_array($aCatIds) or count($aCatIds) == 0) {
+			return false;
+		}
+		/**
+		 * Список идентификаторов для запроса
+		 */
+		$sCatIds = implode(',', $aCatIds);
+		/**
+		 * Делаем запрос
+		 */
+		$rs = $modx->db->select('count(*)', $modx->getFullTableName('sbshop_products'), '  product_deleted = 0 AND product_published = 1 AND product_category in (' . $sCatIds . ')');
+		/**
+		 * Получаем количество
+		 */
+		$iCount = $modx->db->getValue($rs);
+		/**
+		 * Возвращаем результат
+		 */
+		return $iCount;
+	}
 	
 	/**
 	 * Загрузка списка товаров в заданной категории

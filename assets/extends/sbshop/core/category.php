@@ -43,6 +43,7 @@ class SBCategory {
 			'parent' => null, // родительский раздел
 			'alias' => null, // псевдоним
 			'options' => null, // опции
+			'count' => null, // счетчик товаров
 			'path' => null, // путь раздела
 			'level' => null, // уровень вложенности
 			'url' => null, // URL раздела
@@ -208,6 +209,13 @@ class SBCategory {
 		 * Возвращаем
 		 */
 		return $aOutput;
+	}
+
+	/**
+	 * Получить массив родительских разделов
+	 */
+	public function getPath() {
+		return explode('.', $this->getAttribute('path'));
 	}
 
 	/**
