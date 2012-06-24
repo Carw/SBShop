@@ -67,6 +67,7 @@ class checkout_mode {
 				if(isset($_POST['sb_cart_update'])) {
 					$this->updateCart();
 				}
+
 				/**
 				 * Если нажата кнопка "очистить корзину"
 				 */
@@ -74,21 +75,15 @@ class checkout_mode {
 					$this->clearCart();
 				}
 				/**
-				 * Вывод информации в корзине
-				 */
-				$this->cartCheckout();
-			break;
-			case 'register':
-				/**
 				 * Если нажата кнопка далее
 				 */
 				if(isset($_POST['sb_customer_submit'])) {
 					$this->saveRegisterCheckout();
 				}
 				/**
-				 * Вывод информации в регистрации пользователя
+				 * Вывод информации в корзине
 				 */
-				$this->registerCheckout();
+				$this->cartCheckout();
 			break;
 			case 'ok':
 				/**
@@ -360,6 +355,47 @@ class checkout_mode {
 			 */
 			$aRepl = $modx->sbshop->arrayToPlaceholders($aOrderData);
 			/**
+			 * Готовим набор данных пользователя
+			 */
+			$aCustomer = $modx->sbshop->oCustomer->getAttributes();
+			/**
+			 * Город по умолчанию
+			 */
+			if($aCustomer['city'] == '' and $modx->sbshop->config['default_city'] != '') {
+				$aCustomer['city'] = $modx->sbshop->config['default_city'];
+			}
+			/**
+			 * Готовим набор плесхолдеров
+			 */
+			$aRepl = array_merge($aRepl, $modx->sbshop->arrayToPlaceholders($aCustomer));
+			/**
+			 * Если есть информация об ошибках
+			 */
+			if(count($this->aError) > 0) {
+				/**
+				 * Обрабатываем каждую ошибку
+				 */
+				$sErrorRows = '';
+				foreach ($this->aError as $sErrKey => $sErrVal) {
+					/**
+					 * Добавляем класс ошибки
+					 */
+					$aRepl['[+error_' . $sErrKey . '+]'] = 'error';
+					/**
+					 * Добавляем информацию об ошибке в шаблон
+					 */
+					$sErrorRows .= str_replace('[+sb.row+]', $sErrVal, $this->aTemplates['error_row']);
+				}
+				/**
+				 * Добавляем информацию в контейнер
+				 */
+				$aRepl['[+sb.error+]'] = str_replace('[+sb.wrapper+]', $sErrorRows, $this->aTemplates['error_outer']);
+			}
+			/**
+			 * Комментарий
+			 */
+			$aRepl['[+sb.comment+]'] = $modx->sbshop->oOrder->oComments->getFirst();
+			/**
 			 * Вставляем список товаров в контейнер корзины
 			 */
 			$sOutput = str_replace(array_keys($aRepl), array_values($aRepl), $this->aTemplates['cart_filled']);
@@ -368,73 +404,8 @@ class checkout_mode {
 	}
 
 	/**
-	 * Получение регистрационной информации от пользователя
+	 * Сохранение информации полученной от пользователя
 	 */
-	public function registerCheckout() {
-		global $modx;
-		/**
-		 * Заголовок
-		 */
-		$modx->setPlaceholder('sb.longtitle',$modx->sbshop->lang['checkout_register_title']);
-		/**
-		 * Инициализируем переменную для вывода результата
-		 */
-		$sOutput = '';
-		/**
-		 * Готовим набор данных пользователя
-		 */
-		$aCustomer = $modx->sbshop->oCustomer->getAttributes();
-		/**
-		 * Добавляем шаблон для вывода
-		 */
-		$sOutput = $this->aTemplates['register_form'];
-		/**
-		 * Подготавливаем языковые данные
-		 */
-		$aLang = $modx->sbshop->arrayToPlaceholders($modx->sbshop->lang,'lang.');
-		/**
-		 * Готовим набор плесхолдеров
-		 */
-		$aRepl = $modx->sbshop->arrayToPlaceholders($aCustomer);
-		/**
-		 * Объединяем плейсхолдеры с информацией о клиенте и языковой информацией
-		 */
-		$aRepl = array_merge($aRepl,$aLang);
-		/**
-		 * Если есть информация об ошибках
-		 */
-		if(count($this->aError) > 0) {
-			/**
-			 * Обрабатываем каждую ошибку
-			 */
-			$sErrorRows = '';
-			foreach ($this->aError as $sErrKey => $sErrVal) {
-				/**
-				 * Добавляем класс ошибки
-				 */
-				$aRepl['[+error_' . $sErrKey . '+]'] = 'error';
-				/**
-				 * Добавляем информацию об ошибке в шаблон
-				 */
-				$sErrorRows .= str_replace('[+sb.row+]', $sErrVal, $this->aTemplates['error_row']);
-			}
-			/**
-			 * Добавляем информацию в контейнер
-			 */
-			$aRepl['[+sb.error+]'] = str_replace('[+sb.wrapper+]', $sErrorRows, $this->aTemplates['error_outer']);
-		}
-		/**
-		 * Комментарий
-		 */
-		$aRepl['[+sb.comment+]'] = $modx->sbshop->oOrder->oComments->getFirst();
-		/**
-		 * Делаем замену
-		 */
-		$sOutput = str_replace(array_keys($aRepl), array_values($aRepl), $sOutput);
-
-		echo $sOutput;
-	}
-
 	public function saveRegisterCheckout() {
 		global $modx;
 		/**

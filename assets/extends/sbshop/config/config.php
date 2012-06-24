@@ -28,6 +28,10 @@ return array(
 	 */
 	'notice_email' => 'info@example.com',
 	/**
+	 * Город по-умолчанию
+	 */
+	'default_city' => 'Екатеринбург',
+	/**
 	 * Базовый документ магазина
 	 */
 	'doc_start' => 1,
