@@ -123,37 +123,64 @@ class cart_mode {
 				 */
 				$aParams = array();
 				/**
-				 * Обрабатываем каждый элемент
+				 * Если задана комплектация
 				 */
-				foreach ($_POST['sbprod'] as $sKey => $sVal) {
+				if(isset($_POST['sbprod']['bundle'])) {
+					$sVal = $_POST['sbprod']['bundle'];
 					/**
-					 * Обработка разной информации по ключам
+					 * Если установлена индивидиуальная комплектация
 					 */
-					switch ($sKey) {
-						case 'quantity':
+					if($sVal === 'personal') {
+						/**
+						 * Если есть опции из индивидуальной комплектации
+						 */
+						if(is_array($_POST['sbprod']['personaloptions']) and count($_POST['sbprod']['personaloptions']) > 0) {
 							/**
-							 * Прибавляем количество
+							 * Обрабатываем опции
 							 */
-							$aParams['quantity'] = intval($sVal);
-						break;
-						case 'sboptions':
-							/**
-							 * Проверяем каждое значение
-							 */
-							foreach ($sVal as $sOptKey => $sOptVal) {
+							foreach ($_POST['sbprod']['personaloptions'] as $sOptKey => $sOptVal) {
 								/**
 								 * Заносим в общий массив значений переводя все значения в числа
 								 */
 								$aParams['sboptions'][intval($sOptKey)] = intval($sOptVal);
 							}
-						break;
-						case 'bundle':
-							if($sVal !== 'base' and $sVal !== 'personal') {
-								$sVal = intval($sVal);
-							}
-							$aParams['bundle'] = $sVal;
-						break;
+						} else {
+							$sVal = 'base';
+						}
+					} elseif($sVal !== 'base' and $sVal !== 'personal') {
+						$sVal = intval($sVal);
 					}
+					$aParams['bundle'] = $sVal;
+				} else {
+					$aParams['bundle'] = 'base';
+				}
+				/**
+				 * Если установлены опции
+				 */
+				if($_POST['sbprod']['sboptions']) {
+					/**
+					 * Обрабатываем опции
+					 */
+					foreach ($_POST['sbprod']['sboptions'] as $sOptKey => $sOptVal) {
+						/**
+						 * Заносим в общий массив значений переводя все значения в числа
+						 */
+						$aParams['sboptions'][intval($sOptKey)] = intval($sOptVal);
+					}
+				}
+				/**
+				 * Если задано количество
+				 */
+				if($_POST['sbprod']['quantity']) {
+					/**
+					 * Устанавливаем количество
+					 */
+					$aParams['quantity'] = intval($_POST['sbprod']['quantity']);
+				} else {
+					/**
+					 * Устанавливаем 1 по умолчанию
+					 */
+					$aParams['quantity'] = 1;
 				}
 				/**
 				 * Вызов плагинов перед обработкой добавляемого товара

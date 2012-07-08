@@ -223,15 +223,12 @@ class SBOrder {
 	}
 	
 	/**
-	 * Установка заданного параметра для продукта в заказе
-	 * @param unknown_type $iProductId
-	 * @param unknown_type $sParamName
-	 * @param unknown_type $sParamValue
+	 * Добавление товара к заказу
+	 *
+	 * @param $iProductId
+	 * @param bool $aParams
+	 * @return string
 	 */
-	/*public function setProduct($iProductId,$sParamName, $sParamValue) {
-		$this->setProducts($iProductId,array($sParamName => $sParamValue));
-	}*/
-
 	public function addProduct($iProductId,$aParams = false) {
 		/**
 		 * Если передан массив значений
@@ -261,6 +258,7 @@ class SBOrder {
 			}
 			/**
 			 * Если передана комплектация или опции
+			 * @todo Здесь нужно все значительно упростить благодаря полной прозраности типа комплектации
 			 */
 			if(isset($aParams['bundle']) or (isset($aParams['sboptions']) and count($aParams['sboptions']) > 0)) {
 				/**

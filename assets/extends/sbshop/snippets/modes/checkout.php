@@ -251,6 +251,257 @@ class checkout_mode {
 				 */
 				$aRowData['set_id'] = $iSetId;
 				/**
+				 * Готовим изображения
+				 */
+				$aThumbsImages = $oProduct->getImagesByKey('x104');
+				/**
+				 * Добавляем для вывода первое изображение
+				 */
+				$aRowData['image.1'] = $aThumbsImages[0];
+				/**
+				 * Если установлена комплектация
+				 */
+				if(!isset($aOrderInfo['bundle']) or ($aOrderInfo['bundle'] === 'base')) {
+					/**
+					 * Получаем набор базовых комплектаций
+					 */
+					$aBaseBundle = $oProduct->getBaseBundle();
+					/**
+					 * Если есть опции
+					 */
+					if(count($aBaseBundle) > 0) {
+						/**
+						 * Обрабатываем каждую опцию
+						 */
+						$aBaseBundleOptions = array();
+						foreach ($aBaseBundle as $iOptKey => $iOptVal) {
+							/**
+							 * Плейсхолдеры для опций в коплектации
+							 */
+							$aOptionRepl = $modx->sbshop->arrayToPlaceholders($oProduct->oOptions->getNamesByNameIdAndValId($iOptKey, $iOptVal));
+							/**
+							 * Разделитель между опцией и значением
+							 */
+							$aOptionRepl['[+sb.separator+]'] = $modx->sbshop->config['option_separator'];
+							/**
+							 * Если значение находится в списке скрываемых
+							 */
+							if(in_array($iOptVal, $modx->sbshop->config['hide_option_values'])) {
+								/**
+								 * Очищаем разделитель и значение
+								 */
+								$aOptionRepl['[+sb.value+]'] = '';
+								$aOptionRepl['[+sb.separator+]'] = '';
+							}
+							/**
+							 * Создаем ряд с опцией
+							 */
+							$aBaseBundleOptions[] = str_replace(array_keys($aOptionRepl), array_values($aOptionRepl), $this->aTemplates['bundle_option_row']);
+						}
+						/**
+						 * Плейсхолдеры
+						 */
+						$aRepl = array(
+							'[+sb.wrapper+]' => implode('', $aBaseBundleOptions),
+							'[+sb.title+]' => $modx->sbshop->lang['order_base_bundle']
+						);
+
+						/**
+						 * Делаем вставку в контенер для опций
+						 */
+						$sBaseBundleRepl = str_replace(array_keys($aRepl), array_values($aRepl), $this->aTemplates['bundle_option_outer']);
+					} else {
+						$sBaseBundleRepl = '';
+					}
+					/**
+					 * Записываем плейсхолдер
+					 */
+					$aRowData['bundle'] = $sBaseBundleRepl;
+				} elseif($aOrderInfo['bundle'] === 'personal') {
+					/**
+					 * Получаем список индивидуальных комплектующих
+					 */
+					$sPersonalOptions = $oProduct->getAttribute('personal_bundle');
+					$aPersonalOptions = explode(',', $sPersonalOptions);
+					/**
+					 * Получаем набор базовых комплектаций
+					 */
+					$aBaseBundle = $oProduct->getBaseBundle();
+					/**
+					 * Если есть опции
+					 */
+					if(count($aBaseBundle) > 0) {
+						/**
+						 * Обрабатываем каждую опцию
+						 */
+						$aBaseBundleOptions = array();
+						foreach ($aBaseBundle as $iOptKey => $iOptVal) {
+							/**
+							 * Плейсхолдеры для опций в коплектации
+							 */
+							$aOptionRepl = $modx->sbshop->arrayToPlaceholders($oProduct->oOptions->getNamesByNameIdAndValId($iOptKey, $iOptVal));
+							/**
+							 * Разделитель между опцией и значением
+							 */
+							$aOptionRepl['[+sb.separator+]'] = $modx->sbshop->config['option_separator'];
+							/**
+							 * Если значение находится в списке скрываемых
+							 */
+							if(in_array($iOptVal, $modx->sbshop->config['hide_option_values'])) {
+								/**
+								 * Очищаем разделитель и значение
+								 */
+								$aOptionRepl['[+sb.value+]'] = '';
+								$aOptionRepl['[+sb.separator+]'] = '';
+							}
+							/**
+							 * Создаем ряд с опцией
+							 */
+							$aBaseBundleOptions[] = str_replace(array_keys($aOptionRepl), array_values($aOptionRepl), $this->aTemplates['bundle_option_row']);
+						}
+					} else {
+						$aBaseBundleOptions = array();
+					}
+					/**
+					 * Обрабатываем каждую индивидуальную опцию
+					 */
+					$aPersonalBundleOptions = array();
+					foreach($aPersonalOptions as $sPersonalOption) {
+						/**
+						 * Если эта опция была выбрана
+						 */
+						if(isset($aOrderInfo['sboptions'][intval($sPersonalOption)])) {
+							/**
+							 * Название опции
+							 */
+							$iOptKey = intval($sPersonalOption);
+							/**
+							 * Значение опции
+							 */
+							$iOptVal = $aOrderInfo['sboptions'][intval($sPersonalOption)];
+							/**
+							 * Удаляем опцию из массива выбранных
+							 */
+							unset($aOrderInfo['sboptions'][intval($sPersonalOption)]);
+							/**
+							 * Плейсхолдеры для опций в коплектации
+							 */
+							$aOptionRepl = $modx->sbshop->arrayToPlaceholders($oProduct->oOptions->getNamesByNameIdAndValId($iOptKey, $iOptVal));
+							/**
+							 * Разделитель между опцией и значением
+							 */
+							$aOptionRepl['[+sb.separator+]'] = $modx->sbshop->config['option_separator'];
+							/**
+							 * Если значение находится в списке скрываемых
+							 */
+							if(in_array($iOptVal, $modx->sbshop->config['hide_option_values'])) {
+								/**
+								 * Очищаем разделитель и значение
+								 */
+								$aOptionRepl['[+sb.value+]'] = '';
+								$aOptionRepl['[+sb.separator+]'] = '';
+							}
+							/**
+							 * Создаем ряд с опцией
+							 */
+							$aPersonalBundleOptions[] = str_replace(array_keys($aOptionRepl), array_values($aOptionRepl), $this->aTemplates['bundle_option_row']);
+						}
+					}
+					/**
+					 * Если индивидуальные комплектующие утасновлены
+					 */
+					if(count($aPersonalBundleOptions) > 0) {
+						/**
+						 * Объединяем базовые и индивидуальные комплектующие
+						 */
+						$aPersonalBundleOptions = array_merge($aBaseBundleOptions, $aPersonalBundleOptions);
+						/**
+						 * Плейсхолдеры
+						 */
+						$aRepl = array(
+							'[+sb.wrapper+]' => implode('', $aPersonalBundleOptions),
+							'[+sb.title+]' => $modx->sbshop->lang['order_personal_bundle']
+						);
+						/**
+						 * Делаем вставку в контенер для опций
+						 */
+						$sPersonalBundleRepl = str_replace(array_keys($aRepl), array_values($aRepl), $this->aTemplates['bundle_option_outer']);
+					} else {
+						$sPersonalBundleRepl = '';
+					}
+					/**
+					 * Записываем плейсхолдер
+					 */
+					$aRowData['bundle'] = $sPersonalBundleRepl;
+				} else {
+					/**
+					 * Получаем данные по комплектации
+					 */
+					$aBundle = $oProduct->getBundleById($aOrderInfo['bundle']);
+					/**
+					 * Массив опций в комплектации
+					 */
+					$aBundleOptions = array();
+					/**
+					 * Если опции есть
+					 */
+					if(count($aBundle['options']) > 0) {
+						/**
+						 * Обрабатываем список опций в комплектации
+						 */
+						foreach ($aBundle['options'] as $iOptKey => $iOptVal) {
+							/**
+							 * Удаляем опцию из массива выбранных
+							 */
+							unset($aOrderInfo['sboptions'][$iOptKey]);
+							/**
+							 * Плейсхолдеры для опций в коплектации
+							 */
+							$aOptionRepl = $modx->sbshop->arrayToPlaceholders($oProduct->oOptions->getNamesByNameIdAndValId($iOptKey, $iOptVal));
+							/**
+							 * Разделитель между опцией и значением
+							 */
+							$aOptionRepl['[+sb.separator+]'] = $modx->sbshop->config['option_separator'];
+							/**
+							 * Если значение находится в списке скрываемых
+							 */
+							if(in_array($iOptVal, $modx->sbshop->config['hide_option_values'])) {
+								/**
+								 * Очищаем разделитель и значение
+								 */
+								$aOptionRepl['[+sb.value+]'] = '';
+								$aOptionRepl['[+sb.separator+]'] = '';
+							}
+							/**
+							 * Создаем ряд
+							 */
+							$aBundleOptions[] = str_replace(array_keys($aOptionRepl), array_values($aOptionRepl), $this->aTemplates['bundle_option_row']);
+						}
+					}
+					/**
+					 * Если индивидуальные комплектующие утасновлены
+					 */
+					if(count($aBundleOptions) > 0) {
+						/**
+						 * Плейсхолдеры
+						 */
+						$aRepl = array(
+							'[+sb.wrapper+]' => implode('', $aBundleOptions),
+							'[+sb.title+]' => str_replace('[+sb.title+]', $aBundle['title'], $modx->sbshop->lang['order_ready_bundle'])
+						);
+						/**
+						 * Делаем вставку в контенер для опций
+						 */
+						$sReadyBundleRepl = str_replace(array_keys($aRepl), array_values($aRepl), $this->aTemplates['bundle_option_outer']);
+					} else {
+						$sReadyBundleRepl = '';
+					}
+					/**
+					 * Записываем плейсхолдер
+					 */
+					$aRowData['bundle'] = $sReadyBundleRepl;
+				}
+				/**
 				 * Если установлены опции в товаре
 				 */
 				$aOptions = array();

@@ -21,8 +21,6 @@ return array(
 	 * Главная страница модуля
 	 */
 	'home_orderlist' => 'Current orders',
-	'home_orders_archive' => 'Orders Archive',
-	'home_orders_lost' => 'Lost Orders',
 	'home_price_manager' => 'Price Management',
 	/**
 	 * Управление категориями
@@ -159,6 +157,7 @@ return array(
 	 */
 	'order_personal_bundle' => 'Personal Bundle',
 	'order_base_bundle' => 'Base Bundle',
+	'order_ready_bundle' => 'Bundle "[+sb.title+]"',
 	'order_list_title' => 'Order List',
 	'order_status_10' => 'Waiting confirmation',
 	'order_status_20' => 'Processed',

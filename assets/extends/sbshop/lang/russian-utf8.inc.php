@@ -159,6 +159,7 @@ return array(
 
 	'order_personal_bundle' => 'Индивидуальная комплектация',
 	'order_base_bundle' => 'Базовая комплектация',
+	'order_ready_bundle' => 'Комплектация «[+sb.title+]»',
 	'order_list_title' => 'Очередь новых заказов',
 	'order_status_10' => 'Заказ ждет подтверждения',
 	'order_status_20' => 'Заказ обработан',

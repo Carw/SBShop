@@ -583,12 +583,17 @@ class SBShop {
 						 * Добавляем отформатированное значение с дополнительным суффиксом
 						 */
 						$phData['[+' . $sPrefix . $sKey . '.format' . $sSuffix . '+]'] = number_format(round($sVal, $this->config['price_round']['precision']), $this->config['price_round']['decimals'], $this->config['price_round']['dec_point'], $this->config['price_round']['thousands_sep']);
-                        /**
+						/**
+						 * Добавляем значение валюты
+						 */
+						$phData['[+' . $sPrefix . 'currency' . $sSuffix . '+]'] = $modx->sbshop->config['price_currency'];
+						/**
                          * А основное значение просто округляем
                          */
                         $sVal = round($sVal, $this->config['price_round']['precision']);
 					} else {
 						$phData['[+' . $sPrefix . $sKey . '.format' . $sSuffix . '+]'] = '';
+						$phData['[+' . $sPrefix . 'currency' . $sSuffix . '+]'] = '';
 					}
 				}
 				/**

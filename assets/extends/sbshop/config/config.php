@@ -196,6 +196,10 @@ return array(
 		'thousands_sep' => ' ' // разделитель тысяч
 	),
 	/**
+	 * Формат вывода цены
+	 */
+	'price_currency' => 'руб.',
+	/**
 	 * Плагины
 	 */
 	'plugins' => array(
