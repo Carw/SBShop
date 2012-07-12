@@ -892,7 +892,18 @@ class cat_mode {
 										'max' => intval($_POST['filter_value_max'][$sKey][$iValueId]),
 									);
 								}
-							} else {
+							} elseif($_POST['filter_type'][$sKey] == 'vrng') {
+								/**
+								 * Если есть минимальное или максимальное значений
+								 */
+								if($_POST['filter_value_min'][$sKey][$iValueId] != '' and $_POST['filter_value_max'][$sKey][$iValueId] != '') {
+									$aValues[intval($_POST['filter_value_min'][$sKey][$iValueId]) . '-' . intval($_POST['filter_value_max'][$sKey][$iValueId])] = array(
+										'title' => $sValueTitle,
+										'min' => intval($_POST['filter_value_min'][$sKey][$iValueId]),
+										'max' => intval($_POST['filter_value_max'][$sKey][$iValueId]),
+									);
+								}
+							} elseif($_POST['filter_type'][$sKey] == 'eqv') {
 								$aValues[mb_strtolower($_POST['filter_value_eqv'][$sKey][$iValueId], 'UTF-8')] = array(
 									'title' => $sValueTitle,
 									'eqv' => mb_strtolower($_POST['filter_value_eqv'][$sKey][$iValueId], 'UTF-8'),

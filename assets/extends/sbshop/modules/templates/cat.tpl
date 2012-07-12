@@ -211,6 +211,7 @@
 							<select id="filter_type_[+sb.id+]" class="filter_type" name="filter_type[[+sb.id+]]">
 								<option value="eqv" [+sb.eqv+]>[+lang.category_filter_type_evq+]</option>
 								<option value="rng" [+sb.rng+]>[+lang.category_filter_type_rng+]</option>
+								<option value="vrng" [+sb.vrng+]>[+lang.category_filter_type_vrng+]</option>
 							</select>
 						</div>
 						<div class="split"></div>
@@ -236,7 +237,7 @@
 		<input class="filter_value_title" style="width: 200px;" type="text" name="filter_value_title[[+sb.id+]][]" value="[+sb.value.title+]">
 	</div>
 	<div class="col3">
-		<div class="rng [+sb.rng.visible+]">
+		<div class="rng [+sb.rng.visible+][+sb.vrng.visible+]">
 			<input class="filter_value_min" type="text" style="width: 100px;" name="filter_value_min[[+sb.id+]][]" value="[+sb.value.min+]">
 			&ndash;
 			<input class="filter_value_max" type="text" style="width: 100px;" name="filter_value_max[[+sb.id+]][]" value="[+sb.value.max+]">

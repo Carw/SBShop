@@ -61,9 +61,14 @@ $(document).ready(function(){
 			$(this).parents('div.values').remove();
 			return false;
 		});
-		if($('#filter_type_' + id).val() == 'rng') {
+
+		var filter_type = $('#filter_type_' + id).val();
+
+		if(filter_type == 'rng') {
 			a.find('.rng').addClass('visible');
-		} else {
+		} else if(filter_type == 'vrng') {
+			a.find('.rng').addClass('visible');
+		} else{
 			a.find('.eqv').addClass('visible');
 		}
 		return false;
@@ -160,6 +165,9 @@ $(document).ready(function(){
 	$('.filter_type').change(function(){
 		a = $(this).parents('#filters .content');
 		if($(this).val() == 'rng') {
+			a.find('.eqv').removeClass('visible');
+			a.find('.rng').addClass('visible');
+		} else if($(this).val() == 'vrng') {
 			a.find('.eqv').removeClass('visible');
 			a.find('.rng').addClass('visible');
 		} else {

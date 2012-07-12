@@ -155,31 +155,92 @@ class SBFilterList {
 			 */
 			$aFilters = array();
 			/**
-			 * Разбиваем фильтр на массив значений
+			 * Разбиваем список фильтров
 			 */
-			$aFilterRaws = explode(';',$aQueries['filter']);
+			$aFilterRaws = explode(';', $aQueries['filter']);
+			/**
+			 * Обрабатываем каждый фильтр
+			 */
 			foreach($aFilterRaws as $sFilterRaw) {
-				list($sFilterId,$sFilterValue) = explode('::',$sFilterRaw);
+				list($sFilterId, $sFilterValue) = explode('::', $sFilterRaw);
 				/**
 				 * Если такой фильтр есть в настройках
 				 */
-				if(isset($this->aFilterList['general'][$sFilterId]['values'][$sFilterValue])) {
+				if(isset($this->aFilterList['general'][$sFilterId])) {
 					/**
-					 * Если указан компактный режим
+					 * Данные фильтра
 					 */
-					if($bCompact) {
+					$aFilter = $this->aFilterList['general'][$sFilterId];
+					$sFilterSrc = 'general';
+				} elseif (isset($this->aFilterList['extended'][$sFilterId])) {
+					$aFilter = $this->aFilterList['extended'][$sFilterId];
+					$sFilterSrc = 'extended';
+				} else {
+					continue;
+				}
+				/**
+				 * Если тип фильтра "eqv"
+				 */
+				if($aFilter['type'] === 'eqv' or $aFilter['type'] === 'rng') {
+					/**
+					 * Если значение существует
+					 */
+					if(isset($aFilter['values'][$sFilterValue])) {
 						/**
-						 * Не указываем тип фильтра
+						 * Если указан компактный режим
 						 */
-						$aFilters[$sFilterId] = $sFilterValue;
+						if($bCompact) {
+							/**
+							 * Не указываем тип фильтра
+							 */
+							$aFilters[$sFilterId] = $sFilterValue;
+						} else {
+							/**
+							 * Указываем в результате тип фильтра
+							 */
+							$aFilters[$sFilterSrc][$sFilterId] = $aFilter['values'][$sFilterValue];
+							$aFilters[$sFilterSrc][$sFilterId]['type'] = $aFilter['type'];
+						}
 					} else {
-						/**
-						 * Указываем в результате тип фильтра
-						 */
-						$aFilters['general'][$sFilterId] = $this->aFilterList['general'][$sFilterId]['values'][$sFilterValue];
-						$aFilters['general'][$sFilterId]['type'] = $this->aFilterList['general'][$sFilterId]['type'];
+						continue;
 					}
-				} elseif(isset($this->aFilterList['extended'][$sFilterId]['values'][$sFilterValue])) {
+				} elseif($aFilter['type'] === 'vrng') {
+					/**
+					 * Получаем ключ первого значения
+					 */
+					$aFilterKeys = array_keys($aFilter['values']);
+					/**
+					 * Первый ключ
+					 */
+					$sFilterKey = $aFilterKeys[0];
+					/**
+					 * Разбиваем значение на минимум-максимум
+					 */
+					list($sMinValue, $sMaxValue) = explode('-', $sFilterValue);
+					/**
+					 * Проверяем минимальное значение
+					 */
+					if(intval($sMinValue) < $aFilter['values'][$sFilterKey]['min']) {
+						$iMinValue = $aFilter['values'][$sFilterKey]['min'];
+					} else {
+						$iMinValue = intval($sMinValue);
+					}
+					/**
+					 * Проверяем максимальное значение
+					 */
+					if(intval($sMaxValue) > intval($aFilter['values'][$sFilterKey]['max'])) {
+						$iMaxValue = $aFilter['values'][$sFilterKey]['max'];
+					} else {
+						$iMaxValue = intval($sMaxValue);
+					}
+					/**
+					 * Если минимальное значение больше максимального
+					 */
+					if($iMinValue > $iMaxValue) {
+						$iTmp = $iMinValue;
+						$iMinValue = $iMaxValue;
+						$iMaxValue = $iTmp;
+					}
 					/**
 					 * Если указан компактный режим
 					 */
@@ -187,13 +248,16 @@ class SBFilterList {
 						/**
 						 * Не указываем тип фильтра
 						 */
-						$aFilters[$sFilterId] = $sFilterValue;
+						$aFilters[$sFilterId] = $iMinValue . '-' . $iMaxValue;
 					} else {
 						/**
 						 * Указываем в результате тип фильтра
 						 */
-						$aFilters['extended'][$sFilterId] = $this->aFilterList['extended'][$sFilterId]['values'][$sFilterValue];
-						$aFilters['extended'][$sFilterId]['type'] = $this->aFilterList['extended'][$sFilterId]['type'];
+						$aFilters[$sFilterSrc][$sFilterId] = array(
+							'min' => $iMinValue,
+							'max' => $iMaxValue,
+							'type' => $aFilter['type']
+						);
 					}
 				}
 			}

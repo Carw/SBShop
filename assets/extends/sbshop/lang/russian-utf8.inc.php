@@ -41,6 +41,7 @@ return array(
 	'category_filter' => 'Управление фильтрами',
 	'category_filter_type_evq' => 'Точное соответствие',
 	'category_filter_type_rng' => 'Диапазон значений',
+	'category_filter_type_vrng' => 'Динамический диапазон',
 	'category_filter_title' => 'Заголовок условия',
 	'category_filter_value' => 'Условие',
 	'category_filter_del_hint' => 'Удалить значение',

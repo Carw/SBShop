@@ -41,6 +41,7 @@ return array(
 	'category_filter' => 'Filters Management',
 	'category_filter_type_evq' => 'Exact Match',
 	'category_filter_type_rng' => 'Range Match',
+	'category_filter_type_vrng' => 'Динамический диапазон',
 	'category_filter_title' => 'Title',
 	'category_filter_value' => 'Value',
 	'category_filter_del_hint' => 'Delete Value',

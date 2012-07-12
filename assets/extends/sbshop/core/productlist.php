@@ -121,7 +121,7 @@ class SBProductList {
 		/**
 		 * Получаем информацию из базы
 		 */
-		$rs = $modx->db->select('*',$modx->getFullTableName('sbshop_products'),' product_category = ' . $iCatId,'product_order',$iLimit);
+		$rs = $modx->db->select('*',$modx->getFullTableName('sbshop_products'), ' product_category = ' . $iCatId,'product_order',$iLimit);
 		$aRaws = $modx->db->makeArray($rs);
 		/**
 		 * Устанавливаем список
@@ -133,7 +133,7 @@ class SBProductList {
 	 * Загрузка списка товаров в заданной категории
 	 * @param unknown_type $iCatId
 	 */
-	public function loadFilteredListByCategoryId($iCatId,$iLimit = false,$aFilterList = false) {
+	public function loadFilteredListByCategoryId($iCatId, $iLimit = false, $aFilterList = false) {
 		global $modx;
 		/**
 		 * Если категория не определена, то просто выходим
@@ -167,12 +167,12 @@ class SBProductList {
 				/**
 				 * Если есть параметр на соответствие
 				 */
-				if($aFilter['type'] == 'eqv') {
+				if($aFilter['type'] === 'eqv') {
 					/**
 					 * Добавляем условие на равенство
 					 */
 					$aFilterGeneralParams[] = $sTableKey . 'product_' . $sFilterKey . '="' . $aFilter['eqv'] .  '"';
-				} elseif($aFilter['type'] == 'rng') {
+				} elseif($aFilter['type'] === 'rng' or $aFilter['type'] === 'vrng') {
 					/**
 					 * Если установлено min и max значение
 					 */
@@ -202,7 +202,7 @@ class SBProductList {
 				/**
 				 * Если есть параметр на соответствие
 				 */
-				if($aFilter['type'] == 'eqv') {
+				if($aFilter['type'] === 'eqv') {
 					/**
 					 * Добавляем условие на равенство
 					 */
@@ -211,7 +211,7 @@ class SBProductList {
 					 * Счетчик
 					 */
 					$cntExtendedFilters++;
-				} elseif($aFilter['type'] == 'rng') {
+				} elseif($aFilter['type'] === 'rng' or $aFilter['type'] === 'vrng') {
 					/**
 					 * Если установлено min и max значение
 					 */
@@ -243,7 +243,7 @@ class SBProductList {
 			/**
 			 * Получаем информацию из базы с учетом фильтров только по основным параметрам
 			 */
-			$rs = $modx->db->select('*',$modx->getFullTableName('sbshop_products'),' product_deleted = 0 AND product_published = 1 AND product_category = ' . $iCatId . $sFilter,'product_order',$iLimit);
+			$rs = $modx->db->select('*', $modx->getFullTableName('sbshop_products'), ' product_deleted = 0 AND product_published = 1 AND product_category = ' . $iCatId . $sFilter,'product_order',$iLimit);
 			$aRaws = $modx->db->makeArray($rs);
 		} else {
 			/**
