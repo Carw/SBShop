@@ -142,6 +142,7 @@ class SBShop {
 	 * Роутер. Определение режима работы и действий
 	 */
 	public function route() {
+		global $modx;
 		/**
 		 * Определяем $sURL
 		 */
@@ -163,6 +164,18 @@ class SBShop {
 				 */
 				$this->bError404 = false;
 			} elseif($this->oGeneralCategory->searchCategoryByURL($sUrl)) {
+				/**
+				 * Устанавливаем активные фильтры
+				 */
+				$sRedirect = $this->oGeneralCategory->oFilterList->setFilterSelected();
+				/**
+				 * Если редирект необходим
+				 */
+				if($sRedirect) {
+					$modx->sendRedirect($this->getFullUrl() . '?filter=' . $sRedirect);
+				} elseif($sRedirect === '') {
+					$modx->sendRedirect($this->getFullUrl());
+				}
 				/**
 				 * Директория найдена по адресу. Добавляем режим категории
 				 */

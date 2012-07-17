@@ -55,7 +55,7 @@ class filter_mode {
 		/**
 		 * Данные фильтра
 		 */
-		$aFilterSelected = $this->oCategory->oFilterList->getFilterSelected(true);
+		$aFilterSelected = $this->oCategory->oFilterList->getFilterSelected();
 		/**
 		 * Записываем основной контейнер
 		 */
@@ -87,16 +87,30 @@ class filter_mode {
 			/**
 			 * Добавляем системное значение 'all'
 			 */
-			$aFilterValues = array('all' => array('title' => $modx->sbshop->lang['category_filter_name_all'])) + $aFilterValues;
+//			if($aFilter['type'] !== 'vrng') {
+//				$aFilterValues = array('all' => array('title' => $modx->sbshop->lang['category_filter_name_all'])) + $aFilterValues;
+//			}
 			/**
 			 * Обрабатываем каждое значение
 			 */
 			$aValueRows = array();
 			foreach($aFilterValues as $aFilterValueId => $aFilterValue) {
 				/**
+				 * Значение фильтра активно
+				 */
+				if($aFilter['type'] === 'eqv') {
+					/**
+					 * Обрабатываем каждое выделенное значение и сравниваем с текущим
+					 */
+					//foreach()
+
+				}
+
+
+				/**
 				 * Если есть выбранные значения
 				 */
-				if(is_array($aFilterSelected) and count($aFilterSelected) > 0) {
+				if(count($aFilterSelected) > 0 and is_array($aFilterSelected)) {
 					/**
 					 * Создаем новый массив значений для URL, который включает выделенные значения и текущее
 					 */
@@ -119,7 +133,11 @@ class filter_mode {
 						 */
 						$aFilters = array();
 						foreach($aFilterURL as $sFilterKey => $sFilterValue) {
-							$aFilters[] = $sFilterKey . '::' . urlencode($sFilterValue);
+							if(is_array($sFilterValue)) {
+								$aFilters[] = $sFilterKey . '::' . urlencode(implode('|', $sFilterValue));
+							} else {
+								$aFilters[] = $sFilterKey . '::' . urlencode($sFilterValue);
+							}
 						}
 						$sFilterLink = '?filter=' . implode(';', $aFilters);
 					} else {
@@ -138,15 +156,35 @@ class filter_mode {
 				$aRepl = array(
 					'[+sb.id+]' => $aFilterValueId,
 					'[+sb.title+]' => $aFilterValue['title'],
+					'[+sb.min+]' => $aFilterValue['min'],
+					'[+sb.max+]' => $aFilterValue['max'],
 					'[+sb.link+]' => $modx->sbshop->getFullUrl() . $sFilterLink,
 					'[+sb.filter.id+]' => $sFilterId
 				);
+				/**
+				 * Если тип "vrng"
+				 */
+				if($aFilter['type'] === 'vrng') {
+					if(isset($aFilterSelected[$sFilterId]['min'])) {
+						$aRepl['[+sb.min+]'] = $aFilterSelected[$sFilterId]['min'];
+					}
+					if(isset($aFilterSelected[$sFilterId]['max'])) {
+						$aRepl['[+sb.max+]'] = $aFilterSelected[$sFilterId]['max'];
+					}
+				}
+				/**
+				 * Добавляем выделение для активного значения
+				 */
 				if($aFilterValueId == 'all' and !isset($aFilterSelected[$sFilterId])) {
 					$aRepl['[+sb.style+]'] = 'active';
-				} elseif($aFilterSelected[$sFilterId] == $aFilterValueId) {
+					$aRepl['[+sb.checked+]'] = 'checked="checked"';
+					$aRepl['[+sb.selected+]'] = 'selected="selected"';
+				} elseif((is_array($aFilterSelected[$sFilterId]) and in_array($aFilterValueId, $aFilterSelected[$sFilterId]))) {
 					$aRepl['[+sb.style+]'] = 'active';
+					$aRepl['[+sb.checked+]'] = 'checked="checked"';
+					$aRepl['[+sb.selected+]'] = 'selected="selected"';
 				}
-				$aValueRows[] = str_replace(array_keys($aRepl), array_values($aRepl), $this->aTemplates['filter_value']);
+				$aValueRows[] = str_replace(array_keys($aRepl), array_values($aRepl), $this->aTemplates['filter_' . $aFilter['type'] . '_value']);
 			}
 			/**
 			 * Готовим плейсхолдеры
@@ -158,7 +196,7 @@ class filter_mode {
 			/**
 			 * Добавляем фильтр
 			 */
-			$aFilterRows[] = str_replace(array_keys($aRepl), array_values($aRepl), $this->aTemplates['filter_row']);
+			$aFilterRows[] = str_replace(array_keys($aRepl), array_values($aRepl), $this->aTemplates['filter_' . $aFilter['type'] . '_row']);
 		}
 		/**
 		 * Вставляем фильтры в общий контейнер
@@ -170,5 +208,4 @@ class filter_mode {
 		return $sOutput;
 
 	}
-
 }

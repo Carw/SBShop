@@ -60,7 +60,7 @@ class categories_mode {
 			 * @todo Здесь можно оптимизировать работу за счет счетчика товаров в разделе
 			 */
 			$this->oProductList = new SBProductList();
-			$this->oProductList->loadFilteredListByCategoryId($this->oCategory->getAttribute('id'), false, $this->oCategory->oFilterList->getFilterSelected());
+			$this->oProductList->loadFilteredListByCategoryId($this->oCategory->getAttribute('id'), false, $this->oCategory->oFilterList);
 		}
 		/**
 		 * Устанавливаем шаблоны

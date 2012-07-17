@@ -131,9 +131,12 @@ class SBProductList {
 
 	/**
 	 * Загрузка списка товаров в заданной категории
-	 * @param unknown_type $iCatId
+	 * @param $iCatId
+	 * @param bool $iLimit
+	 * @param SBFilterList $oFilterList
+	 * @return bool
 	 */
-	public function loadFilteredListByCategoryId($iCatId, $iLimit = false, $aFilterList = false) {
+	public function loadFilteredListByCategoryId($iCatId, $iLimit = false, $oFilterList = false) {
 		global $modx;
 		/**
 		 * Если категория не определена, то просто выходим
@@ -150,40 +153,109 @@ class SBProductList {
 		 */
 		$aFilterExtendedParams = array();
 		/**
+		 * Список основных параметров
+		 */
+		$aGeneralFilterList = $oFilterList->getGeneralSelectedList();
+		/**
+		 * Список дополнительных параметров
+		 */
+		$aExtendedFilterList = $oFilterList->getExtendedSelectedList();
+		/**
 		 * Если есть фильтры по основным параметрам
 		 */
-		if($aFilterList['general']) {
+		if(count($aGeneralFilterList) > 0) {
 			/**
 			 * Если есть дополнительные параметры вводим ключ для таблицы
 			 */
 			$sTableKey = '';
-			if($aFilterList['extended']) {
+			if(count($aExtendedFilterList) > 0) {
 				$sTableKey = 'a.';
 			}
 			/**
 			 * Обрабатываем основные фильтры
 			 */
-			foreach($aFilterList['general'] as $sFilterKey => $aFilter) {
+			foreach($aGeneralFilterList as $sFilterKey => $aFilterValues) {
+				/**
+				 * Получение типа фильтров
+				 */
+				$aFilter = $oFilterList->getFilterById($sFilterKey);
 				/**
 				 * Если есть параметр на соответствие
 				 */
 				if($aFilter['type'] === 'eqv') {
 					/**
-					 * Добавляем условие на равенство
+					 * Если передан массив значений
 					 */
-					$aFilterGeneralParams[] = $sTableKey . 'product_' . $sFilterKey . '="' . $aFilter['eqv'] .  '"';
-				} elseif($aFilter['type'] === 'rng' or $aFilter['type'] === 'vrng') {
-					/**
-					 * Если установлено min и max значение
-					 */
-					if(isset($aFilter['min']) and isset($aFilter['max'])) {
-						$aFilterGeneralParams[] = $sTableKey . 'product_' . $sFilterKey . ' BETWEEN ' . $aFilter['min'] .  ' and ' . $aFilter['max'];
-					} elseif (isset($aFilter['min'])) {
-						$aFilterGeneralParams[] = $sTableKey . 'product_' . $sFilterKey . ' >= ' . $aFilter['min'];
-					} elseif (isset($aFilter['max'])) {
-						$aFilterGeneralParams[] = $sTableKey . 'product_' . $sFilterKey . ' <= ' . $aFilter['max'];
+					if(is_array($aFilterValues)) {
+						/**
+						 * Массив значений
+						 */
+						$aValues = array();
+						/**
+						 * Обарабатываем каждое значение
+						 */
+						foreach($aFilterValues as $sValue) {
+							$aValues[] = '"' . $aFilter['values'][$sValue]['eqv'] . '"';
+						}
+						/**
+						 * Добавляем объединенный список условий на равенство
+						 */
+						$aFilterGeneralParams[] = $sTableKey . 'product_' . $sFilterKey . ' in (' . implode(',', $aValues) .  ')';
 					}
-
+				} elseif($aFilter['type'] === 'rng') {
+					/**
+					 * Если передан массив значений
+					 */
+					if(is_array($aFilterValues)) {
+						/**
+						 * Массив значений
+						 */
+						$aValues = array();
+						/**
+						 * Обарабатываем каждое значение
+						 */
+						foreach($aFilterValues as $sValue) {
+							/**
+							 * Минимальное значение
+							 */
+							$sMinValue = $aFilter['values'][$sValue]['min'];
+							/**
+							 * Максимальное значение
+							 */
+							$sMaxValue = $aFilter['values'][$sValue]['max'];
+							/**
+							 * Если установлено min и max значение
+							 */
+							if(isset($sMinValue) and isset($sMaxValue)) {
+								$aValues[] = $sTableKey . 'product_' . $sFilterKey . ' BETWEEN ' . $sMinValue .  ' and ' . $sMaxValue;
+							} elseif (isset($sMinValue)) {
+								$aValues[] = $sTableKey . 'product_' . $sFilterKey . ' >= ' . $sMinValue;
+							} elseif (isset($sMaxValue)) {
+								$aValues[] = $sTableKey . 'product_' . $sFilterKey . ' <= ' . $sMaxValue;
+							}
+						}
+					}
+					/**
+					 * Добавляем объединенный список условий на равенство
+					 */
+					$aFilterGeneralParams[] = '(' . implode(' or ', $aValues) . ')';
+				} elseif($aFilter['type'] === 'vrng') {
+					/**
+					 * Минимальное значение
+					 */
+					$iMinValue = $aFilterValues['min'];
+					/**
+					 * Максимальное значение
+					 */
+					$iMaxValue = $aFilterValues['max'];
+					/**
+					 * Формируем условие
+					 */
+					$sValues = $sTableKey . 'product_' . $sFilterKey . ' BETWEEN ' . $iMinValue .  ' and ' . $iMaxValue;
+					/**
+					 * Добавляем объединенный список условий на равенство
+					 */
+					$aFilterGeneralParams[] = $sValues;
 				}
 			}
 		}
@@ -192,36 +264,102 @@ class SBProductList {
 		 */
 		$cntExtendedFilters = 0;
 		/**
-		 * Если есть фильтры на дополнительные параметры
+		 * Если есть фильтры по дополнительным параметрам
 		 */
-		if($aFilterList['extended']) {
+		if(count($aExtendedFilterList) > 0) {
 			/**
-			 * Обрабатываем основные фильтры
+			 * Обрабатываем дополнительные фильтры
 			 */
-			foreach($aFilterList['extended'] as $sFilterKey => $aFilter) {
+			foreach($aExtendedFilterList as $sFilterKey => $aFilterValues) {
+				/**
+				 * Получение типа фильтров
+				 */
+				$aFilter = $oFilterList->getFilterById($sFilterKey);
 				/**
 				 * Если есть параметр на соответствие
 				 */
 				if($aFilter['type'] === 'eqv') {
 					/**
-					 * Добавляем условие на равенство
+					 * Если передан массив значений
 					 */
-					$aFilterExtendedParams[] = 'b.attribute_id =' . $sFilterKey . ' and b.attribute_value="' . $aFilter['eqv'] .  '"';
+					if(is_array($aFilterValues)) {
+						/**
+						 * Массив значений
+						 */
+						$aValues = array();
+						/**
+						 * Обарабатываем каждое значение
+						 */
+						foreach($aFilterValues as $sValue) {
+							$aValues[] = '"' . $aFilter['values'][$sValue]['eqv'] . '"';
+						}
+						/**
+						 * Добавляем объединенный список условий на равенство
+						 */
+						$aFilterExtendedParams[] = 'b.attribute_id =' . $sFilterKey . ' and b.attribute_value in(' . implode(',' ,$aValues) .  ')';
+						/**
+						 * Счетчик
+						 */
+						$cntExtendedFilters++;
+					}
+				} elseif($aFilter['type'] === 'rng') {
+					/**
+					 * Если передан массив значений
+					 */
+					if(is_array($aFilterValues)) {
+						/**
+						 * Массив значений
+						 */
+						$aValues = array();
+						/**
+						 * Обарабатываем каждое значение
+						 */
+						foreach($aFilterValues as $sValue) {
+							/**
+							 * Минимальное значение
+							 */
+							$sMinValue = $aFilter['values'][$sValue]['min'];
+							/**
+							 * Максимальное значение
+							 */
+							$sMaxValue = $aFilter['values'][$sValue]['max'];
+							/**
+							 * Если установлено min и max значение
+							 */
+							if(isset($sMinValue) and isset($sMaxValue)) {
+								$aValues[] = 'b.attribute_value BETWEEN ' . $sMinValue .  ' and ' . $sMaxValue;
+							} elseif (isset($sMinValue)) {
+								$aValues[] = 'b.attribute_value >= ' . $sMinValue;
+							} elseif (isset($sMaxValue)) {
+								$aValues[] = 'b.attribute_value <= ' . $sMaxValue;
+							}
+						}
+					}
+					/**
+					 * Добавляем объединенный список условий на равенство
+					 */
+					$aFilterExtendedParams[] = 'b.attribute_id =' . $sFilterKey . ' and (' . implode(' or ', $aValues) . ')';
 					/**
 					 * Счетчик
 					 */
 					$cntExtendedFilters++;
-				} elseif($aFilter['type'] === 'rng' or $aFilter['type'] === 'vrng') {
+				} elseif($aFilter['type'] === 'vrng') {
 					/**
-					 * Если установлено min и max значение
+					 * Минимальное значение
 					 */
-					if(isset($aFilter['min']) and isset($aFilter['max'])) {
-						$aFilterExtendedParams[] = 'b.attribute_id =' . $sFilterKey . ' and b.attribute_value BETWEEN ' . $aFilter['min'] .  ' and ' . $aFilter['max'];
-					} elseif (isset($aFilter['min'])) {
-						$aFilterExtendedParams[] = 'b.attribute_id =' . $sFilterKey . ' and b.attribute_value >= ' . $aFilter['min'];
-					} elseif (isset($aFilter['max'])) {
-						$aFilterExtendedParams[] = 'b.attribute_id =' . $sFilterKey . ' and b.attribute_value <= ' . $aFilter['max'];
-					}
+					$iMinValue = $aFilterValues['min'];
+					/**
+					 * Максимальное значение
+					 */
+					$iMaxValue = $aFilterValues['max'];
+					/**
+					 * Формируем условие
+					 */
+					$sValues = 'b.attribute_value BETWEEN ' . $iMinValue .  ' and ' . $iMaxValue;
+					/**
+					 * Добавляем объединенный список условий на равенство
+					 */
+					$aFilterExtendedParams[] = $sValues;
 					/**
 					 * Счетчик
 					 */
@@ -229,10 +367,50 @@ class SBProductList {
 				}
 			}
 		}
+
+
+		/**
+		 * Если есть фильтры на дополнительные параметры
+		 */
+//		if($aFilterList['extended']) {
+//			/**
+//			 * Обрабатываем основные фильтры
+//			 */
+//			foreach($aFilterList['extended'] as $sFilterKey => $aFilter) {
+//				/**
+//				 * Если есть параметр на соответствие
+//				 */
+//				if($aFilter['type'] === 'eqv') {
+//					/**
+//					 * Добавляем условие на равенство
+//					 */
+//					$aFilterExtendedParams[] = 'b.attribute_id =' . $sFilterKey . ' and b.attribute_value="' . $aFilter['eqv'] .  '"';
+//					/**
+//					 * Счетчик
+//					 */
+//					$cntExtendedFilters++;
+//				} elseif($aFilter['type'] === 'rng' or $aFilter['type'] === 'vrng') {
+//					/**
+//					 * Если установлено min и max значение
+//					 */
+//					if(isset($aFilter['min']) and isset($aFilter['max'])) {
+//						$aFilterExtendedParams[] = 'b.attribute_id =' . $sFilterKey . ' and b.attribute_value BETWEEN ' . $aFilter['min'] .  ' and ' . $aFilter['max'];
+//					} elseif (isset($aFilter['min'])) {
+//						$aFilterExtendedParams[] = 'b.attribute_id =' . $sFilterKey . ' and b.attribute_value >= ' . $aFilter['min'];
+//					} elseif (isset($aFilter['max'])) {
+//						$aFilterExtendedParams[] = 'b.attribute_id =' . $sFilterKey . ' and b.attribute_value <= ' . $aFilter['max'];
+//					}
+//					/**
+//					 * Счетчик
+//					 */
+//					$cntExtendedFilters++;
+//				}
+//			}
+//		}
 		/**
 		 * Если не установлены фильтры на расширенные параметры
 		 */
-		if(!$aFilterList['extended']) {
+		if(count($aExtendedFilterList) == 0) {
 			/**
 			 * Если параметры фильтров есть
 			 */

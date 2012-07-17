@@ -15,6 +15,7 @@ class SBFilterList {
 	 * Массив фильтров
 	 */
 	protected $aFilterList;
+	protected $aFilterSelected;
 
 	public function __construct() {
 		/**
@@ -24,6 +25,10 @@ class SBFilterList {
 			'general' => array(),
 			'extended' => array(),
 		);
+		/**
+		 * Массив активных фильтров
+		 */
+		$this->aFilterSelected = array();
 	}
 
 	/**
@@ -137,32 +142,89 @@ class SBFilterList {
 	}
 
 	/**
-	 * Получение данных выбора фильтров
+	 * Получить полный список активных фильтров
+	 * @return array
+	 */
+	public function getFilterSelected() {
+		return $this->aFilterSelected;
+	}
+
+	/**
+	 * Получить список основных фильтров
+	 * @return array
+	 */
+	public function getGeneralSelectedList() {
+		/**
+		 * Массив основных фильтров
+		 */
+		$aFilterIds = array();
+		/**
+		 * Обрабатываем каждый ключ в массиве активных фильтров
+		 */
+		foreach(array_keys($this->aFilterSelected) as $sFilterId) {
+			if(isset($this->aFilterList['general'][$sFilterId])) {
+				$aFilterIds[$sFilterId] = $this->aFilterSelected[$sFilterId];
+			}
+		}
+		/**
+		 * Возвращаем массив значений
+		 */
+		return $aFilterIds;
+	}
+
+	/**
+	 * Список дополнительных фильтров
+	 * @return array
+	 */
+	public function getExtendedSelectedList() {
+		/**
+		 * Массив основных фильтров
+		 */
+		$aFilterIds = array();
+		/**
+		 * Обрабатываем каждый ключ в массиве активных фильтров
+		 */
+		foreach(array_keys($this->aFilterSelected) as $sFilterId) {
+			if(isset($this->aFilterList['extended'][$sFilterId])) {
+				$aFilterIds[$sFilterId] = $this->aFilterSelected[$sFilterId];
+			}
+		}
+		/**
+		 * Возвращаем массив значений
+		 */
+		return $aFilterIds;
+	}
+
+	/**
+	 * Установка информации об активных фильтрах
 	 * @return bool
 	 */
-	public function getFilterSelected($bCompact = false) {
+	public function setFilterSelected() {
 		global $modx;
 		/**
 		 * Получаем все переданные параметры
 		 */
 		$aQueries = $modx->sbshop->getQueries();
 		/**
-		 * Если переданы данные по фильтру
+		 * Переменная для актуального URL с активными фильтрами
 		 */
-		if(isset($aQueries['filter'])) {
+		$aParamURL = array();
+		/**
+		 * Редирект на ссылку с установленным фильтром
+		 */
+		$sRedirect = false;
+		/**
+		 * Массив параметров фильтров
+		 */
+		$aFilters = array();
+		/**
+		 * Если передано значение через POST
+		 */
+		if($_POST['filter']) {
 			/**
-			 * Массив параметров фильтров
+			 * Разбираем каждый фильтр
 			 */
-			$aFilters = array();
-			/**
-			 * Разбиваем список фильтров
-			 */
-			$aFilterRaws = explode(';', $aQueries['filter']);
-			/**
-			 * Обрабатываем каждый фильтр
-			 */
-			foreach($aFilterRaws as $sFilterRaw) {
-				list($sFilterId, $sFilterValue) = explode('::', $sFilterRaw);
+			foreach($_POST['filter'] as $sFilterId => $aFilterValue) {
 				/**
 				 * Если такой фильтр есть в настройках
 				 */
@@ -171,65 +233,176 @@ class SBFilterList {
 					 * Данные фильтра
 					 */
 					$aFilter = $this->aFilterList['general'][$sFilterId];
-					$sFilterSrc = 'general';
 				} elseif (isset($this->aFilterList['extended'][$sFilterId])) {
 					$aFilter = $this->aFilterList['extended'][$sFilterId];
-					$sFilterSrc = 'extended';
 				} else {
 					continue;
 				}
 				/**
-				 * Если тип фильтра "eqv"
+				 * Если тип фильтра "eqv" или "rng"
 				 */
 				if($aFilter['type'] === 'eqv' or $aFilter['type'] === 'rng') {
 					/**
-					 * Если значение существует
+					 * Если значения переданы не в виде массива, то преобразуем в массив
 					 */
-					if(isset($aFilter['values'][$sFilterValue])) {
-						/**
-						 * Если указан компактный режим
-						 */
-						if($bCompact) {
-							/**
-							 * Не указываем тип фильтра
-							 */
-							$aFilters[$sFilterId] = $sFilterValue;
-						} else {
-							/**
-							 * Указываем в результате тип фильтра
-							 */
-							$aFilters[$sFilterSrc][$sFilterId] = $aFilter['values'][$sFilterValue];
-							$aFilters[$sFilterSrc][$sFilterId]['type'] = $aFilter['type'];
-						}
-					} else {
-						continue;
+					if(!is_array($aFilterValue['val'])) {
+						$aFilterValue['val'] = array($aFilterValue['val']);
 					}
-				} elseif($aFilter['type'] === 'vrng') {
 					/**
-					 * Получаем ключ первого значения
+					 * Обрабатываем каждое значение
 					 */
-					$aFilterKeys = array_keys($aFilter['values']);
+					foreach($aFilterValue['val'] as $sFilterValue) {
+						/**
+						 * Добавляем значение
+						 */
+						$aFilters[$sFilterId][] = $sFilterValue;
+					}
 					/**
-					 * Первый ключ
+					 * Параметр в URL
 					 */
-					$sFilterKey = $aFilterKeys[0];
+					$aParamURL[$sFilterId] = $sFilterId . '::' . implode('|', $aFilters[$sFilterId]);
+				} elseif ($aFilter['type'] === 'vrng') {
 					/**
-					 * Разбиваем значение на минимум-максимум
+					 * Переданное минимальное значение
 					 */
-					list($sMinValue, $sMaxValue) = explode('-', $sFilterValue);
+					$iMinValue = intval(str_replace(' ', '', $aFilterValue['min']));
+					/**
+					 * Переданное максимальное значение
+					 */
+					$iMaxValue = intval(str_replace(' ', '', $aFilterValue['max']));
+					/**
+					 * Установленные значения фильтра
+					 */
+					$aFilterValues = array_shift($aFilter['values']);
 					/**
 					 * Проверяем минимальное значение
 					 */
-					if(intval($sMinValue) < $aFilter['values'][$sFilterKey]['min']) {
-						$iMinValue = $aFilter['values'][$sFilterKey]['min'];
+					if($iMinValue < $aFilterValues['min']) {
+						$iMinValue = intval($aFilterValues['min']);
+					} elseif($iMinValue > $aFilterValues['max']) {
+						$iMinValue = intval($aFilterValues['min']);
+					}
+					/**
+					 * Проверяем максимальное значение
+					 */
+					if($iMaxValue > intval($aFilterValues['max'])) {
+						$iMaxValue = intval($aFilterValues['max']);
+					} elseif($iMaxValue < intval($aFilterValues['min'])) {
+						$iMaxValue = intval($aFilterValues['max']);
+					}
+					/**
+					* Если минимальное значение больше максимального
+					*/
+					if($iMinValue > $iMaxValue) {
+						$iTmp = $iMinValue;
+						$iMinValue = $iMaxValue;
+						$iMaxValue = $iTmp;
+					}
+					/**
+					 * Проверяем пограничные значения если они равны, то пропускаем фильтр
+					 */
+					if($iMinValue == $aFilterValues['min'] and $iMaxValue == intval($aFilterValues['max'])) {
+						continue;
+					}
+					/**
+					 * Устанавливаем минимальное значение
+					 */
+					$aFilters[$sFilterId]['min'] = $iMinValue;
+					/**
+					 * Устанавливаем максимальное значение
+					 */
+					$aFilters[$sFilterId]['max'] = $iMaxValue;
+					/**
+					 * Параметр в URL
+					 */
+					$aParamURL[$sFilterId] = $sFilterId . '::' . $iMinValue . '-' . $iMaxValue;
+				}
+				/**
+				 * Удаляем дубли значений
+				 */
+				$aFilters[$sFilterId] = array_unique($aFilters[$sFilterId]);
+			}
+			/**
+			 * Устанавливаем редирект
+			 */
+			if(count($aParamURL) > 0) {
+				$sRedirect = implode(';', $aParamURL);
+			} else {
+				$sRedirect = '';
+			}
+		} elseif(isset($aQueries['filter'])) {
+			/**
+			 * Разбиваем список фильтров
+			 */
+			$aFilterRaws = explode(';', $aQueries['filter']);
+			/**
+			 * Обрабатываем каждый фильтр
+			 */
+			foreach($aFilterRaws as $sFilterRaw) {
+				/**
+				 * Разделяем идентификатор фильтра и значения
+				 */
+				list($sFilterId, $sFilterValue) = explode('::', $sFilterRaw);
+				/**
+				 * Массив значений
+				 */
+				$aFilterValues = explode('|', $sFilterValue);
+				/**
+				 * Если такой фильтр есть в настройках
+				 */
+				if(isset($this->aFilterList['general'][$sFilterId])) {
+					/**
+					 * Данные фильтра
+					 */
+					$aFilter = $this->aFilterList['general'][$sFilterId];
+				} elseif (isset($this->aFilterList['extended'][$sFilterId])) {
+					$aFilter = $this->aFilterList['extended'][$sFilterId];
+				} else {
+					continue;
+				}
+				/**
+				 * Если тип фильтра "eqv" или "rng"
+				 */
+				if($aFilter['type'] === 'eqv' or $aFilter['type'] === 'rng') {
+					/**
+					 * Обрабатываем каждое значение
+					 */
+					foreach($aFilterValues as $sFilterValue) {
+						/**
+						 * Добавляем значение
+						 */
+						$aFilters[$sFilterId][] = $sFilterValue;
+					}
+					/**
+					 * Параметр в URL
+					 */
+					$aParamURL[$sFilterId] = $sFilterId . '::' . implode('|', $aFilters[$sFilterId]);
+				} elseif ($aFilter['type'] === 'vrng') {
+					/**
+					 * Переданные значения
+					 */
+					list($sMinValue, $sMaxValue) = explode('-', $sFilterValue);
+					/**
+					 * Установленные значения фильтра
+					 */
+					$aFilterValues = array_shift($aFilter['values']);
+					/**
+					 * Проверяем минимальное значение
+					 */
+					if(intval($sMinValue) < $aFilterValues['min']) {
+						$iMinValue = $aFilterValues['min'];
+					} elseif(intval($sMinValue) > $aFilterValues['max']) {
+						$iMinValue = $aFilterValues['min'];
 					} else {
 						$iMinValue = intval($sMinValue);
 					}
 					/**
 					 * Проверяем максимальное значение
 					 */
-					if(intval($sMaxValue) > intval($aFilter['values'][$sFilterKey]['max'])) {
-						$iMaxValue = $aFilter['values'][$sFilterKey]['max'];
+					if(intval($sMaxValue) > intval($aFilterValues['max'])) {
+						$iMaxValue = $aFilterValues['max'];
+					} elseif(intval($sMaxValue) < intval($aFilterValues['min'])) {
+						$iMaxValue = $aFilterValues['max'];
 					} else {
 						$iMaxValue = intval($sMaxValue);
 					}
@@ -242,29 +415,32 @@ class SBFilterList {
 						$iMaxValue = $iTmp;
 					}
 					/**
-					 * Если указан компактный режим
+					 * Устанавливаем минимальное значение
 					 */
-					if($bCompact) {
-						/**
-						 * Не указываем тип фильтра
-						 */
-						$aFilters[$sFilterId] = $iMinValue . '-' . $iMaxValue;
-					} else {
-						/**
-						 * Указываем в результате тип фильтра
-						 */
-						$aFilters[$sFilterSrc][$sFilterId] = array(
-							'min' => $iMinValue,
-							'max' => $iMaxValue,
-							'type' => $aFilter['type']
-						);
-					}
+					$aFilters[$sFilterId]['min'] = $iMinValue;
+					/**
+					 * Устанавливаем максимальное значение
+					 */
+					$aFilters[$sFilterId]['max'] = $iMaxValue;
+					/**
+					 * Параметр в URL
+					 */
+					$aParamURL[$sFilterId] = $sFilterId . '::' . $iMinValue . '-' . $iMaxValue;
 				}
+				/**
+				 * Удаляем дубли значений
+				 */
+				$aFilters[$sFilterId] = array_unique($aFilters[$sFilterId]);
 			}
-			return $aFilters;
-		} else {
-			return false;
 		}
+		/**
+		 * Устанавливаем информацию об активных фильтрах
+		 */
+		$this->aFilterSelected = $aFilters;
+		/**
+		 * Возвращаем информацию о редиректе
+		 */
+		return $sRedirect;
 	}
 
 	/**
