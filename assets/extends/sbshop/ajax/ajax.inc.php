@@ -62,8 +62,8 @@ class SBAjax {
 			/**
 			 * Устанавливаем данные
 			 */
-			$this->aResult['title'] = $oTip->getAttribute('title');
-			$this->aResult['description'] = $oTip->getAttribute('description');
+			$this->aResult['title'] = htmlspecialchars_decode($oTip->getAttribute('title'), ENT_QUOTES);
+			$this->aResult['description'] = htmlspecialchars_decode($oTip->getAttribute('description'), ENT_QUOTES);
 		}
 	}
 
