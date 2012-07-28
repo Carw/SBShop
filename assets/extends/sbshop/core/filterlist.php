@@ -323,13 +323,9 @@ class SBFilterList {
 				$aFilters[$sFilterId] = array_unique($aFilters[$sFilterId]);
 			}
 			/**
-			 * Устанавливаем редирект
+			 * Указываем необходимость редиректа
 			 */
-			if(count($aParamURL) > 0) {
-				$sRedirect = implode(';', $aParamURL);
-			} else {
-				$sRedirect = '';
-			}
+			$sRedirect = true;
 		} elseif(isset($aQueries['filter'])) {
 			/**
 			 * Разбиваем список фильтров
@@ -358,6 +354,13 @@ class SBFilterList {
 				} elseif (isset($this->aFilterList['extended'][$sFilterId])) {
 					$aFilter = $this->aFilterList['extended'][$sFilterId];
 				} else {
+					/**
+					 * Необходим редирект
+					 */
+					$sRedirect = true;
+					/**
+					 * Пропускаем дальнейшую обработку этого фильтра
+					 */
 					continue;
 				}
 				/**
@@ -369,14 +372,29 @@ class SBFilterList {
 					 */
 					foreach($aFilterValues as $sFilterValue) {
 						/**
-						 * Добавляем значение
+						 * Если значение есть в списке
 						 */
-						$aFilters[$sFilterId][] = $sFilterValue;
+						if(isset($aFilter['values'][$sFilterValue])) {
+							/**
+							 * Добавляем значение
+							 */
+							$aFilters[$sFilterId][] = $sFilterValue;
+						} else {
+							/**
+							 * Необходим редирект
+							 */
+							$sRedirect = true;
+						}
 					}
 					/**
-					 * Параметр в URL
+					 * Если есть хоть одно значение
 					 */
-					$aParamURL[$sFilterId] = $sFilterId . '::' . implode('|', $aFilters[$sFilterId]);
+					if(isset($aFilters[$sFilterId])) {
+						/**
+						 * Параметр в URL
+						 */
+						$aParamURL[$sFilterId] = $sFilterId . '::' . implode('|', $aFilters[$sFilterId]);
+					}
 				} elseif ($aFilter['type'] === 'vrng') {
 					/**
 					 * Переданные значения
@@ -391,7 +409,15 @@ class SBFilterList {
 					 */
 					if(intval($sMinValue) < $aFilterValues['min']) {
 						$iMinValue = $aFilterValues['min'];
+						/**
+						 * Необходим редирект
+						 */
+						$sRedirect = true;
 					} elseif(intval($sMinValue) > $aFilterValues['max']) {
+						/**
+						 * Необходим редирект
+						 */
+						$sRedirect = true;
 						$iMinValue = $aFilterValues['min'];
 					} else {
 						$iMinValue = intval($sMinValue);
@@ -401,8 +427,16 @@ class SBFilterList {
 					 */
 					if(intval($sMaxValue) > intval($aFilterValues['max'])) {
 						$iMaxValue = $aFilterValues['max'];
+						/**
+						 * Необходим редирект
+						 */
+						$sRedirect = true;
 					} elseif(intval($sMaxValue) < intval($aFilterValues['min'])) {
 						$iMaxValue = $aFilterValues['max'];
+						/**
+						 * Необходим редирект
+						 */
+						$sRedirect = true;
 					} else {
 						$iMaxValue = intval($sMaxValue);
 					}
@@ -413,6 +447,10 @@ class SBFilterList {
 						$iTmp = $iMinValue;
 						$iMinValue = $iMaxValue;
 						$iMaxValue = $iTmp;
+						/**
+						 * Необходим редирект
+						 */
+						$sRedirect = true;
 					}
 					/**
 					 * Устанавливаем минимальное значение
@@ -428,9 +466,33 @@ class SBFilterList {
 					$aParamURL[$sFilterId] = $sFilterId . '::' . $iMinValue . '-' . $iMaxValue;
 				}
 				/**
-				 * Удаляем дубли значений
+				 * Если есть хоть одно значение
 				 */
-				$aFilters[$sFilterId] = array_unique($aFilters[$sFilterId]);
+				if(isset($aFilters[$sFilterId])) {
+					/**
+					 * Удаляем дубли значений
+					 */
+					$aFilters[$sFilterId] = array_unique($aFilters[$sFilterId]);
+				}
+			}
+		}
+		/**
+		 * Если нужен редирект
+		 */
+		if($sRedirect) {
+			/**
+			 * Если есть записи URL для фильтра
+			 */
+			if(count($aParamURL) > 0) {
+				/**
+				 * Объединяем записи в общий URL
+				 */
+				$sRedirect = implode(';', $aParamURL);
+			} else {
+				/**
+				 * Задаем пустую запись - фильтров нет
+				 */
+				$sRedirect = '';
 			}
 		}
 		/**

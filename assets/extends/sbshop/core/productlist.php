@@ -249,9 +249,19 @@ class SBProductList {
 					 */
 					$iMaxValue = $aFilterValues['max'];
 					/**
-					 * Формируем условие
+					 * Если есть минимальное и максимальное значение
 					 */
-					$sValues = $sTableKey . 'product_' . $sFilterKey . ' BETWEEN ' . $iMinValue .  ' and ' . $iMaxValue;
+					if($iMinValue !== null && $iMaxValue !== null) {
+						/**
+						 * Формируем условие
+						 */
+						$sValues = $sTableKey . 'product_' . $sFilterKey . ' BETWEEN ' . $iMinValue .  ' and ' . $iMaxValue;
+					} elseif($iMinValue !== null) {
+						/**
+						 * Формируем условие
+						 */
+						$sValues = $sTableKey . 'product_' . $sFilterKey . ' = ' . $iMinValue;
+					}
 					/**
 					 * Добавляем объединенный список условий на равенство
 					 */
@@ -353,13 +363,27 @@ class SBProductList {
 					 */
 					$iMaxValue = $aFilterValues['max'];
 					/**
-					 * Формируем условие
+					 * Если есть минимальное и максимальное значение
 					 */
-					$sValues = 'b.attribute_value BETWEEN ' . $iMinValue .  ' and ' . $iMaxValue;
-					/**
-					 * Добавляем объединенный список условий на равенство
-					 */
-					$aFilterExtendedParams[] = $sValues;
+					if($iMinValue !== null && $iMaxValue !== null) {
+						/**
+						 * Формируем условие
+						 */
+						$sValues = 'b.attribute_value BETWEEN ' . $iMinValue .  ' and ' . $iMaxValue;
+						/**
+						 * Добавляем объединенный список условий на равенство
+						 */
+						$aFilterExtendedParams[] = $sValues;
+					} elseif($iMinValue !== null) {
+						/**
+						 * Формируем условие
+						 */
+						$sValues = 'b.attribute_value = ' . $iMinValue;
+						/**
+						 * Добавляем объединенный список условий на равенство
+						 */
+						$aFilterExtendedParams[] = $sValues;
+					}
 					/**
 					 * Счетчик
 					 */

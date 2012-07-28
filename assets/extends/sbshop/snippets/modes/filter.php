@@ -158,6 +158,8 @@ class filter_mode {
 					'[+sb.title+]' => $aFilterValue['title'],
 					'[+sb.min+]' => $aFilterValue['min'],
 					'[+sb.max+]' => $aFilterValue['max'],
+					'[+sb.min.default+]' => $aFilterValue['min'],
+					'[+sb.max.default+]' => $aFilterValue['max'],
 					'[+sb.link+]' => $modx->sbshop->getFullUrl() . $sFilterLink,
 					'[+sb.filter.id+]' => $sFilterId
 				);
