@@ -391,7 +391,11 @@ class SBFilterList {
 					 */
 					if(isset($aFilters[$sFilterId])) {
 						/**
-						 * Параметр в URL
+						 * Удаляем дубли значений
+						 */
+						$aFilters[$sFilterId] = array_unique($aFilters[$sFilterId]);
+						/**
+						 * Добавляем параметр в URL
 						 */
 						$aParamURL[$sFilterId] = $sFilterId . '::' . implode('|', $aFilters[$sFilterId]);
 					}
@@ -464,15 +468,6 @@ class SBFilterList {
 					 * Параметр в URL
 					 */
 					$aParamURL[$sFilterId] = $sFilterId . '::' . $iMinValue . '-' . $iMaxValue;
-				}
-				/**
-				 * Если есть хоть одно значение
-				 */
-				if(isset($aFilters[$sFilterId])) {
-					/**
-					 * Удаляем дубли значений
-					 */
-					$aFilters[$sFilterId] = array_unique($aFilters[$sFilterId]);
 				}
 			}
 		}
