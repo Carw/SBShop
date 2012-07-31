@@ -407,6 +407,69 @@ class SBCategory {
 		}
 		return $bResult;
 	}
+
+	/**
+	 * Получение количества товаров в разделе с учетов вложенных подразделов
+	 * @param $iCategoryId
+	 */
+	public function getCountByCategory($oCategory = false) {
+		/**
+		 * Если раздел не передан, то берем текущий
+		 */
+		if($oCategory == false) {
+			$oCategory = &$this;
+		}
+		/**
+		 * Определяем количество товаров в разделе
+		 */
+		$oCatTree = new SBCatTree($oCategory, 10);
+		/**
+		 * Массив разделов
+		 */
+		$aCategoryIds = $oCatTree->getCategoryIds() ;
+		/**
+		 * Добавляем текущий раздел
+		 */
+		$aCategoryIds[] = $oCategory->getAttribute('id');
+		/**
+		 * Получаем количество товара в разделах
+		 */
+		$iCount = $this->getCountByCatIds($aCategoryIds);
+		/**
+		 * Возвращаем количество
+		 */
+		return $iCount;
+	}
+
+
+	/**
+	 * Получение общего количества товара по идентификаторам разделов
+	 */
+	public function getCountByCatIds($aCatIds) {
+		global $modx;
+		/**
+		 * Если массив пустой
+		 */
+		if(!is_array($aCatIds) or count($aCatIds) == 0) {
+			return false;
+		}
+		/**
+		 * Список идентификаторов для запроса
+		 */
+		$sCatIds = implode(',', $aCatIds);
+		/**
+		 * Делаем запрос
+		 */
+		$rs = $modx->db->select('count(*)', $modx->getFullTableName('sbshop_products'), '  product_deleted = 0 AND product_published = 1 AND product_category in (' . $sCatIds . ')');
+		/**
+		 * Получаем количество
+		 */
+		$iCount = $modx->db->getValue($rs);
+		/**
+		 * Возвращаем результат
+		 */
+		return $iCount;
+	}
 }
 
 

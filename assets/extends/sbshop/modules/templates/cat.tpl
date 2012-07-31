@@ -12,7 +12,7 @@
 	<div class="breadcrumbs">
 		<a href="[+module.link+]">[+lang.sbshop+]</a>
 		&raquo;
-		<span>Редактирование категории</span>
+		<span>[+lang.category_edit+]</span>
 	</div>
 </div>
 <div class="sectionBody">
@@ -325,3 +325,23 @@
 		</table>
 	</td>
 </tr>
+<!--# move_form: Форма выбора нового родителя #-->
+<div class="sectionHeader">
+	<div class="breadcrumbs">
+		<a href="[+module.link+]">[+lang.sbshop+]</a>
+		&raquo;
+		<span>[+lang.category_move+]</span>
+	</div>
+</div>
+<div class="sectionBody">
+
+	<h1>[+lang.category_move+]</h1>
+
+	<form name="mutate" id="mutate" class="content" method="post" enctype="multipart/form-data" action="[+module.link+]&mode=cat&act=[+module.act+]">
+		<input type="hidden" name="catid" value="[+category.id+]" />
+
+		[+lang.category_parent_new+]:<br>
+		<input type="text" name="parid" value="">
+		<input type="submit" value="Перенести">
+	</form>
+</div>

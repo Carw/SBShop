@@ -122,6 +122,13 @@ class cat_mode {
 					$this->editCategory();
 				}
 				break;
+			case 'move':
+				$iCatId = intval($_REQUEST['catid']);
+				$this->moveCategory($iCatId);
+				if(isset($_POST['parid'])) {
+					$modx->sbshop->alertWait($this->sModuleLink);
+				}
+				break;
 			case 'pub':
 				/**
 				 * Публикация категории
@@ -359,7 +366,256 @@ class cat_mode {
 		 */
 		echo $sOutput;
 	}
-	
+
+	/**
+	 * Перенос раздела
+	 * @param $iCategoryId
+	 */
+	public function moveCategory($iCategoryId) {
+		global $modx, $_lang;
+		/**
+		 * Передано значение нового родителя
+		 */
+		if(isset($_POST['parid'])) {
+			/**
+			 * Идентификатор нового родительского раздела
+			 */
+			$iNewParentId = intval($_POST['parid']);
+			/**
+			 * Идентификатор переносимого раздела
+			 */
+			$iCategoryId = intval($_POST['catid']);
+			/**
+			 * Если раздел не пытаются перенести сам в себя
+			 */
+			if($iNewParentId != $iCategoryId) {
+				/**
+				 * Устанавливаем лимит выполнения 10 минут
+				 */
+				set_time_limit(600);
+				/**
+				 * Загружаем родительский раздел
+				 */
+				$oParentCategory = new SBCategory();
+				$oParentCategory->load($iNewParentId, true);
+				/**
+				 * Загружаем текущий раздел
+				 */
+				$oCategory = new SBCategory();
+				$oCategory->load($iCategoryId, true);
+				/**
+				 * Идентификатор нового родительского раздела
+				 */
+				$iOldParentId = $oCategory->getAttribute('parent');
+				/**
+				 * Загружаем старый раздел
+				 */
+				$oOldParentCategory = new SBCategory();
+				$oOldParentCategory->load($iOldParentId, true);
+				/**
+				 * Получаем вложенные разделы
+				 */
+				$oCatTree = new SBCatTree($oCategory, 10, true);
+				/**
+				 * Меняем родителя
+				 */
+				$oCategory->setAttribute('parent', $oParentCategory->getAttribute('id'));
+				/**
+				 * Меняем уровень вложенности
+				 */
+				$oCategory->setAttribute('level', $oParentCategory->getAttribute('level') + 1);
+				/**
+				 * Меняем путь
+				 */
+				$oCategory->setAttribute('path', $oParentCategory->getAttribute('path') . '.' . $oCategory->getAttribute('id'));
+				/**
+				 * Меняем URL
+				 */
+				$oCategory->setAttribute('url', $oParentCategory->getAttribute('url') . '/' . $oCategory->getAttribute('alias'));
+				/**
+				 * Обновляем файлы
+				 */
+				$this->updateProductList($oCategory);
+				/**
+				 * Обрабатываем вложенные разделы
+				 */
+				$aCatTree = $oCatTree->getCatTreeLevels();
+				/**
+				 * Если подразделы есть
+				 */
+				if(count($aCatTree) > 0) {
+					/**
+					 * Разбираем каждый уровень
+					 */
+					foreach($aCatTree as $iLevel => $aCatIds) {
+
+						/**
+						 * Если это первый уровень
+						 */
+						if($iLevel == 1) {
+							$iParId = $iCategoryId;
+							$iParLevel = $oCategory->getAttribute('level') + 1;
+							$sParUrl = $oCategory->getAttribute('url');
+							$sParPath = $oCategory->getAttribute('path');
+							/**
+							 * Обрабатываем каждый раздел
+							 */
+							foreach($aCatIds as $iCatId) {
+								/**
+								 * Меняем родителя
+								 */
+								$oCatTree->setAttribute($iCatId, 'parent', $iParId);
+								/**
+								 * Меняем уровень
+								 */
+								$oCatTree->setAttribute($iCatId, 'level', $iParLevel);
+								/**
+								 * Меняем путь
+								 */
+								$oCatTree->setAttribute($iCatId, 'path', $sParPath . '.' . $oCatTree->getAttribute($iCatId, 'id'));
+								/**
+								 * Меняем URL
+								 */
+								$oCatTree->setAttribute($iCatId, 'url', $sParUrl . '/' . $oCatTree->getAttribute($iCatId ,'alias'));
+								/**
+								 * Сохраняем раздел
+								 */
+								$oCatTree->saveCategory($iCatId);
+								/**
+								 * Обновляем файлы
+								 */
+								$this->updateProductList($oCatTree->getCategoryById($iCatId));
+							}
+						} else {
+							/**
+							 * Обрабатываем каждый раздел
+							 */
+							foreach($aCatIds as $iCatId) {
+								/**
+								 * Определяем родителя
+								 */
+								$iParId = $oCatTree->getAttribute($iCatId, 'parent');
+								/**
+								 * Меняем уровень
+								 */
+								$oCatTree->setAttribute($iCatId, 'level', $oCatTree->getAttribute($iParId, 'level') + 1);
+								/**
+								 * Меняем путь
+								 */
+								$oCatTree->setAttribute($iCatId, 'path', $oCatTree->getAttribute($iParId, 'path') . '.' . $oCatTree->getAttribute($iCatId, 'id'));
+								/**
+								 * Меняем URL
+								 */
+								$oCatTree->setAttribute($iCatId, 'url', $oCatTree->getAttribute($iParId, 'url') . '/' . $oCatTree->getAttribute($iCatId ,'alias'));
+								/**
+								 * Сохраняем раздел
+								 */
+								$oCatTree->saveCategory($iCatId);
+								/**
+								 * Обновляем файлы
+								 */
+								$this->updateProductList($oCatTree->getCategoryById($iCatId));
+							}
+						}
+					}
+				}
+				/**
+				 * Сохраняем текущий раздел
+				 */
+				$oCategory->save();
+				/**
+				 * Получаем массив новых родительских разделов
+				 */
+				$aCatIds = array_merge($oParentCategory->getPath(), $oOldParentCategory->getPath());
+				/**
+				 * Обрабатываем каждый раздел
+				 */
+				foreach($aCatIds as $iCatId) {
+					/**
+					 * Если идентификатор 0
+					 */
+					if($iCatId == 0) {
+						/**
+						 * Пропускаем обработку
+						 */
+						continue;
+					}
+					/**
+					 * Если это родительский раздел
+					 */
+					if($iCatId == $oParentCategory->getAttribute('id')) {
+						$oParCat = $oParentCategory;
+					} else {
+						$oParCat = new SBCategory();
+						$oParCat->load($iCatId);
+					}
+					/**
+					 * Получаем количество товара в разделах
+					 */
+					$iCount = $this->oCategory->getCountByCategory($oParCat);
+					/**
+					 * Устанавливаем количество товара для раздела
+					 */
+					$oParCat->setAttribute('count', $iCount);
+					$oParCat->save();
+				}
+			}
+		} else {
+			/**
+			 * Объединяем системный и модульный языковой массив
+			 */
+			$aLang = array_merge($_lang, $modx->sbshop->lang);
+			/**
+			 * Подготавливаем языковые плейсхолдеры
+			 */
+			$phModule = $modx->sbshop->arrayToPlaceholders($aLang,'lang.');
+			/**
+			 * Идентификатор раздела
+			 */
+			$phModule['[+category.id+]'] = $iCategoryId;
+			/**
+			 * Служебные плейсхолдеры для модуля
+			 */
+			$phModule['[+site.url+]'] = MODX_BASE_URL;
+			$phModule['[+module.link+]'] = $this->sModuleLink;
+			$phModule['[+module.act+]'] = $this->sAct;
+
+			$sOutput = str_replace(array_keys($phModule), array_values($phModule), $this->aTemplates['move_form']);
+
+			echo $sOutput;
+		}
+	}
+
+	/**
+	 * Обновление товара при переносе раздела
+	 * @param SBCategory $oCategory
+	 */
+	protected function updateProductList($oCategory) {
+		/**
+		 * Загружаем полный список товаров
+		 */
+		$oProductList = new SBProductList($oCategory->getAttribute('id'), false, false, true);
+		/**
+		 * Получаем список товаров
+		 */
+		$aProductList = $oProductList->getProductList();
+		/**
+		 * Обрабатываем каждый товар
+		 * @var SBProduct $oProduct
+		 */
+		foreach($aProductList as $oProduct) {
+			/**
+			 * Исправляем URL
+			 */
+			$oProduct->setAttribute('url', $oCategory->getAttribute('url') . '/' . $oProduct->getAttribute('alias'));
+			/**
+			 * Сохраняем товар
+			 */
+			$oProduct->save();
+		}
+
+	}
+
 	/**
 	 * Публикация категории
 	 * @param unknown_type $iCatId
@@ -574,8 +830,7 @@ class cat_mode {
 			/**
 			 * Получаем количество товара в разделах
 			 */
-			$oProductlist = new SBProductList();
-			$iCount = $oProductlist->getCountByCatIds($aCategoryIds);
+			$iCount = $this->oCategory->getCountByCatIds($aCategoryIds);
 			/**
 			 * Устанавливаем количество товара для раздела
 			 */
@@ -592,7 +847,6 @@ class cat_mode {
 			$this->editCategory();
 			return false;
 		}
-		
 	}
 	
 	/**
@@ -948,6 +1202,5 @@ class cat_mode {
 	}
 	
 }
-
 
 ?>

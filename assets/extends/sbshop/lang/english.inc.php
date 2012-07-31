@@ -34,6 +34,8 @@ return array(
 	'category_alias' => 'URL alias',
 	'category_alias_description' => 'Set the URL alias to make the Category accessible as http://example.com/weburl. This only works Friendly URLs are enabled in the site configuration.',
 	'category_content' => 'Resource content',
+	'category_move' => 'New parent ID',
+	'category_parent_new' => 'New Parent ID',
 	'category_published' => 'Published',
 	'category_published_description' => 'Check this field to have the Category published immediately after saving it.',
 	'category_tab_attributes' => 'General Attributes',

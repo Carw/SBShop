@@ -18,7 +18,7 @@ class SBProductList {
 	 * Конструктор
 	 * @param $iCatId Категория для списка
 	 */
-	public function __construct($iCatIds = false, $aProductIds = false, $iLimit = false) {
+	public function __construct($iCatIds = false, $aProductIds = false, $iLimit = false, $bDeleted = false) {
 		/**
 		 * Инициализируем основной массив 
 		 */
@@ -35,55 +35,37 @@ class SBProductList {
 			/**
 			 * Делаем загрузку списка товаров по списку категорий
 			 */
-			$this->loadListByCategoryIds($iCatIds, $iLimit);
+			$this->loadListByCategoryIds($iCatIds, $iLimit, $bDeleted);
 		} elseif($iCatIds !== false) {
 			/**
 			 * Делаем загрузку списка товаров по категории
 			 */
-			$this->loadListByCategoryId($iCatIds, $iLimit);
+			$this->loadListByCategoryId($iCatIds, $iLimit, $bDeleted);
 		}
 	}
 
 	/**
-	 * Получение количества товара по идентификаторам разделов
-	 */
-	public function getCountByCatIds($aCatIds) {
-		global $modx;
-		/**
-		 * Если массив пустой
-		 */
-		if(!is_array($aCatIds) or count($aCatIds) == 0) {
-			return false;
-		}
-		/**
-		 * Список идентификаторов для запроса
-		 */
-		$sCatIds = implode(',', $aCatIds);
-		/**
-		 * Делаем запрос
-		 */
-		$rs = $modx->db->select('count(*)', $modx->getFullTableName('sbshop_products'), '  product_deleted = 0 AND product_published = 1 AND product_category in (' . $sCatIds . ')');
-		/**
-		 * Получаем количество
-		 */
-		$iCount = $modx->db->getValue($rs);
-		/**
-		 * Возвращаем результат
-		 */
-		return $iCount;
-	}
-	
-	/**
 	 * Загрузка списка товаров в заданной категории
 	 * @param unknown_type $iCatId
 	 */
-	public function loadListByCategoryId($iCatId,$iLimit = false) {
+	public function loadListByCategoryId($iCatId, $iLimit = false, $bDeleted = false) {
 		global $modx;
 		/**
 		 * Если категория не определена, то просто выходим
 		 */
 		if(!$iCatId) {
 			$iCatId = 0;
+		}
+		/**
+		 * Если скрытые разделы не нужно показывать
+		 */
+		if(!$bDeleted) {
+			/**
+			 * Добавляем условия для исключения удаленных и неопубликованных товаров
+			 */
+			$sDeleted = ' product_deleted = 0 AND product_published = 1 AND';
+		} else {
+			$sDeleted = '';
 		}
 		/**
 		 * Количество товаров на страницу
@@ -93,7 +75,7 @@ class SBProductList {
 		/**
 		 * Получаем информацию из базы
 		 */
-		$rs = $modx->db->select('*',$modx->getFullTableName('sbshop_products'),' product_deleted = 0 AND product_published = 1 AND product_category = ' . $iCatId,'product_order',$iLimit);
+		$rs = $modx->db->select('*', $modx->getFullTableName('sbshop_products'), $sDeleted . ' product_category = ' . $iCatId, 'product_order', $iLimit);
 		$aRaws = $modx->db->makeArray($rs);
 		/**
 		 * Устанавливаем список
@@ -105,7 +87,7 @@ class SBProductList {
 	 * Загрузка полного списка товаров в заданной категории
 	 * @param unknown_type $iCatId
 	 */
-	public function loadFullListByCategoryId($iCatId,$iLimit = false) {
+	public function loadFullListByCategoryId($iCatId, $iLimit = false) {
 		global $modx;
 		/**
 		 * Если категория не определена, то просто выходим
@@ -121,7 +103,7 @@ class SBProductList {
 		/**
 		 * Получаем информацию из базы
 		 */
-		$rs = $modx->db->select('*',$modx->getFullTableName('sbshop_products'), ' product_category = ' . $iCatId,'product_order',$iLimit);
+		$rs = $modx->db->select('*',$modx->getFullTableName('sbshop_products'), ' product_category = ' . $iCatId, 'product_order', $iLimit);
 		$aRaws = $modx->db->makeArray($rs);
 		/**
 		 * Устанавливаем список
@@ -391,46 +373,6 @@ class SBProductList {
 				}
 			}
 		}
-
-
-		/**
-		 * Если есть фильтры на дополнительные параметры
-		 */
-//		if($aFilterList['extended']) {
-//			/**
-//			 * Обрабатываем основные фильтры
-//			 */
-//			foreach($aFilterList['extended'] as $sFilterKey => $aFilter) {
-//				/**
-//				 * Если есть параметр на соответствие
-//				 */
-//				if($aFilter['type'] === 'eqv') {
-//					/**
-//					 * Добавляем условие на равенство
-//					 */
-//					$aFilterExtendedParams[] = 'b.attribute_id =' . $sFilterKey . ' and b.attribute_value="' . $aFilter['eqv'] .  '"';
-//					/**
-//					 * Счетчик
-//					 */
-//					$cntExtendedFilters++;
-//				} elseif($aFilter['type'] === 'rng' or $aFilter['type'] === 'vrng') {
-//					/**
-//					 * Если установлено min и max значение
-//					 */
-//					if(isset($aFilter['min']) and isset($aFilter['max'])) {
-//						$aFilterExtendedParams[] = 'b.attribute_id =' . $sFilterKey . ' and b.attribute_value BETWEEN ' . $aFilter['min'] .  ' and ' . $aFilter['max'];
-//					} elseif (isset($aFilter['min'])) {
-//						$aFilterExtendedParams[] = 'b.attribute_id =' . $sFilterKey . ' and b.attribute_value >= ' . $aFilter['min'];
-//					} elseif (isset($aFilter['max'])) {
-//						$aFilterExtendedParams[] = 'b.attribute_id =' . $sFilterKey . ' and b.attribute_value <= ' . $aFilter['max'];
-//					}
-//					/**
-//					 * Счетчик
-//					 */
-//					$cntExtendedFilters++;
-//				}
-//			}
-//		}
 		/**
 		 * Если не установлены фильтры на расширенные параметры
 		 */
@@ -477,7 +419,7 @@ class SBProductList {
 	 * Загрузка списка товаров в заданной категории
 	 * @param unknown_type $iCatId
 	 */
-	public function loadListByCategoryIds($aCatIds,$iLimit = false) {
+	public function loadListByCategoryIds($aCatIds, $iLimit = false, $bDeleted = false) {
 		global $modx;
 		/**
 		 * Если категория не определена, то просто выходим
@@ -494,9 +436,20 @@ class SBProductList {
 			$sCatIds = $aCatIds;
 		}
 		/**
+		 * Если скрытые разделы не нужно показывать
+		 */
+		if(!$bDeleted) {
+			/**
+			 * Добавляем условия для исключения удаленных и неопубликованных товаров
+			 */
+			$sDeleted = ' product_deleted = 0 AND product_published = 1 AND';
+		} else {
+			$sDeleted = '';
+		}
+		/**
 		 * Получаем информацию из базы
 		 */
-		$rs = $modx->db->select('*',$modx->getFullTableName('sbshop_products'),' product_deleted = 0 AND product_published = 1 AND product_category in (' . $sCatIds . ')','product_order',$iLimit);
+		$rs = $modx->db->select('*',$modx->getFullTableName('sbshop_products'), $sDeleted . ' product_category in (' . $sCatIds . ')', 'product_order', $iLimit);
 		$aRaws = $modx->db->makeArray($rs);
 		/**
 		 * Устанавливаем список

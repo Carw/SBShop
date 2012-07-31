@@ -34,6 +34,8 @@ return array(
 	'category_alias' => 'Псевдоним',
 	'category_alias_description' => 'Псевдоним для URL. Можно использовать буквы, цифры и дефис.',
 	'category_content' => 'Описание раздела',
+	'category_move' => 'Перенос раздела',
+	'category_parent_new' => 'Укажите новый идентификатор родительского раздела',
 	'category_published' => 'Публиковать',
 	'category_published_description' => 'Необходимо отметить, чтобы категория была опубликована.',
 	'category_tab_attributes' => 'Стандартные параметры',

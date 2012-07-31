@@ -59,7 +59,7 @@ class filter_mode {
 		/**
 		 * Записываем основной контейнер
 		 */
-		$sOutput = $this->aTemplates['filter_outer'];
+		$sOutput = '';
 		/**
 		 * Массив для фильтров
 		 */
@@ -95,18 +95,6 @@ class filter_mode {
 			 */
 			$aValueRows = array();
 			foreach($aFilterValues as $aFilterValueId => $aFilterValue) {
-				/**
-				 * Значение фильтра активно
-				 */
-				if($aFilter['type'] === 'eqv') {
-					/**
-					 * Обрабатываем каждое выделенное значение и сравниваем с текущим
-					 */
-					//foreach()
-
-				}
-
-
 				/**
 				 * Если есть выбранные значения
 				 */
@@ -201,9 +189,14 @@ class filter_mode {
 			$aFilterRows[] = str_replace(array_keys($aRepl), array_values($aRepl), $this->aTemplates['filter_' . $aFilter['type'] . '_row']);
 		}
 		/**
-		 * Вставляем фильтры в общий контейнер
+		 * Если фильтры есть
 		 */
-		$sOutput = str_replace('[+sb.wrapper+]',implode($aFilterRows),$sOutput);
+		if(count($aFilterRows) > 0) {
+			/**
+			 * Вставляем фильтры в общий контейнер
+			 */
+			$sOutput = str_replace('[+sb.wrapper+]', implode($aFilterRows), $this->aTemplates['filter_outer']);
+		}
 		/**
 		 * Возвращаем результат
 		 */

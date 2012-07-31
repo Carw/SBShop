@@ -224,6 +224,36 @@ class SBCatTree {
 	}
 
 	/**
+	 * Получение списка параметров категории по идентификатору
+	 * @param unknown_type $iId
+	 */
+	public function getAttribute($iCategoryId, $sAttribute) {
+		if(isset($this->aCatTree[$iCategoryId])) {
+			return $this->aCatTree[$iCategoryId]->getAttribute($sAttribute);
+		}
+	}
+
+	/**
+	 * Получение списка параметров категории по идентификатору
+	 * @param unknown_type $iId
+	 */
+	public function setAttribute($iCategoryId, $sAttribute, $sValue) {
+		if(isset($this->aCatTree[$iCategoryId])) {
+			return $this->aCatTree[$iCategoryId]->setAttribute($sAttribute, $sValue);
+		}
+	}
+
+	/**
+	 * Сохранение раздела
+	 * @param $iCategoryId
+	 */
+	public function saveCategory($iCategoryId) {
+		if(isset($this->aCatTree[$iCategoryId])) {
+			return $this->aCatTree[$iCategoryId]->save();
+		}
+	}
+
+	/**
 	 * Определение является ли заданный раздел активным (не удален и опубликован) с учетом родителей
 	 */
 	public function isActive($iCategoryId) {
