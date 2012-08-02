@@ -67,6 +67,11 @@ $_3b_treebuilder = array(
 			'image'				=> 'manager/media/style/MODxCarbon/images/icons/clock_stop.png'
 		),
 		'separator3'		=> array('text' => '-'),
+		'moveFolder'		=> array(
+			'text'				=> 'Перенести',
+			'onclick'			=> "top.main.location.href = 'index.php?a=112&id=' + modid + '&mode=cat&act=move&catid=' + itemToChange",
+			'image'				=> 'manager/media/style/MODxCarbon/images/icons/page_white_go.png'
+		),
 		'deleteFolder'		=> array(
 			'text'				=> 'Удалить',
 			'onclick'			=> "top.main.location.href = 'index.php?a=112&id=' + modid + '&mode=cat&act=del&catid=' + itemToChange",
@@ -146,7 +151,6 @@ function SBShopGetFolders($parent) {
 	global $modx;
 	
 	$sql = "SELECT * FROM " . $modx->getFullTableName('sbshop_categories') . " WHERE `category_parent` = '{$parent}' ORDER BY `category_order`";
-	//var_dump($sql);
 	$cats = $modx->dbQuery($sql);
 	$return = array();
 	

@@ -476,7 +476,7 @@ if(isset($_3b_treebuilder['folderImageOpn']))
 				}
 				
 				?>
-				<td><a href="javascript:void(0);" id="Button10" class="treeButtonDisabled"' title="<?php echo $_lang['empty_recycle_bin_empty'] ; ?>"><?php echo $_style['empty_recycle_bin_empty'] ; ?></a></td>
+				<td><a href="javascript:void(0);" id="Button10" class="treeButtonDisabled"' title="<?php echo $_lang['empty_recycle_bin_empty'] ; ?>" onclick="emptyTrash();"><?php echo $_style['empty_recycle_bin_empty'] ; ?></a></td>
 			</tr>
 			</table>
 		</td>

@@ -700,11 +700,11 @@ class cat_mode {
 			/**
 			 * Помечаем на удаление
 			 */
-			$this->oCategory->setAttribute('deleted',1);
+			$this->oCategory->setAttribute('deleted', 1);
 			/**
 			 * Задаем дату модификации
 			 */
-			$this->oCategory->setAttribute('date_edit',date('Y-m-d G:i:s'));
+			$this->oCategory->setAttribute('date_edit', date('Y-m-d G:i:s'));
 			/**
 			 * Сохраняем результат
 			 */
