@@ -109,7 +109,6 @@ return array(
 	'product_options_longtitle' => 'Long title',
 	'product_options_class' => 'CSS class',
 	'product_options_image' => 'Image',
-	'product_options_notbundle' => 'Not for bundle',
 	'product_options_hidden' => 'Hidden',
 	'product_option_title' => 'Title',
 	'product_option_value' => 'Value',

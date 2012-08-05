@@ -451,11 +451,6 @@
 							</p>
 							<p>
 								<label>
-									<input type="checkbox" class="option_notbundle" name="option_notbundle[[+option.id+]]" value="[+option.id+]" [+option.notbundle.checked+]> [+lang.product_options_notbundle+]
-								</label>
-							</p>
-							<p>
-								<label>
 									<input type="checkbox" class="option_hidden" name="option_hidden[[+option.id+]]" value="[+option.id+]" [+option.hidden.checked+]> [+lang.product_options_hidden+]
 								</label>
 							</p>

@@ -110,6 +110,10 @@ class SBCatTree {
 		return $this->aCatTreeLevels;
 	}
 
+	public function getCatTreeChildren() {
+		return $this->aCatTreeChildren;
+	}
+
 	public function getChildrenById($iCategoryId) {
 		/**
 		 * Массив дочерних разделов

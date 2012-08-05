@@ -109,7 +109,6 @@ return array(
 	'product_options_longtitle' => 'Расширенный заголовок опции',
 	'product_options_class' => 'Класс стиля CSS',
 	'product_options_image' => 'Изображение',
-	'product_options_notbundle' => 'Не предназначена для комплектации',
 	'product_options_hidden' => 'Скрыть опцию',
 	'product_option_title' => 'Название опции',
 	'product_option_value' => 'Значение',

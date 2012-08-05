@@ -377,15 +377,6 @@ class prod_mode {
 				/**
 				 * Если исключение из комплектаций выбрано
 				 */
-				if ($aOption['notbundle']) {
-					/**
-					 * Настройка исключения из комплектаций
-					 */
-					$aRepl['[+option.notbundle.checked+]'] = 'checked="checked"';
-				}
-				/**
-				 * Если исключение из комплектаций выбрано
-				 */
 				if ($aOption['hidden']) {
 					/**
 					 * Настройка скрытия опции
@@ -1048,10 +1039,6 @@ class prod_mode {
 				 */
 				$iOptionId = intval($_POST['option_id'][$i]);
 				/**
-				 * Не состоит в комплектации
-				 */
-				$iNotbundle = isset($_POST['option_notbundle'][$iOptionId]) ? true : false;
-				/**
 				 * Опция скрыта
 				 */
 				$iHidden = isset($_POST['option_hidden'][$iOptionId]) ? true : false;
@@ -1095,7 +1082,6 @@ class prod_mode {
 				$aOptionData = array(
 					'title' => htmlspecialchars($_POST['option_name'][$i], ENT_QUOTES),
 					'longtitle' => htmlspecialchars($_POST['option_longname'][$iOptionId], ENT_QUOTES),
-					'notbundle' => $iNotbundle,
 					'hidden' => $iHidden,
 					'class' => htmlspecialchars($_POST['option_class'][$iOptionId], ENT_QUOTES),
 					'image' => htmlspecialchars($_POST['option_image'][$iOptionId], ENT_QUOTES),
