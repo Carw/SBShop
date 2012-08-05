@@ -363,7 +363,7 @@ class categories_mode {
 		/**
 		 * Формируем список товаров
 		 */
-		$sOutput = $this->getProductList($aProducts);
+		$sOutput = $this->getProductList($aProducts, true);
 		/**
 		 * Отдаем результат
 		 */
@@ -373,7 +373,7 @@ class categories_mode {
 	/**
 	 * Формирование списка товаров
 	 */
-	public function getProductList($aProducts) {
+	public function getProductList($aProducts, $bInnerList = false) {
 		global $modx;
 		/**
 		 * Если есть записи
@@ -481,12 +481,21 @@ class categories_mode {
 						/**
 						 * Формируем ряд
 						 */
-						$sAttrRows .= str_replace(array_keys($aAttrRepl), array_values($aAttrRepl), $this->aTemplates['attribute_row']);
+						if($bInnerList) {
+							$sAttrRows .= str_replace(array_keys($aAttrRepl), array_values($aAttrRepl), $this->aTemplates['attribute_inner_row']);
+						} else {
+							$sAttrRows .= str_replace(array_keys($aAttrRepl), array_values($aAttrRepl), $this->aTemplates['attribute_row']);
+						}
+
 					}
 					/**
 					 * Вставляем параметры в контейнер
 					 */
-					$aProductData['attributes'] = str_replace('[+sb.wrapper+]', $sAttrRows, $this->aTemplates['attribute_outer']);
+					if($bInnerList) {
+						$aProductData['attributes'] = str_replace('[+sb.wrapper+]', $sAttrRows, $this->aTemplates['attribute_inner_outer']);
+					} {
+						$aProductData['attributes'] = str_replace('[+sb.wrapper+]', $sAttrRows, $this->aTemplates['attribute_outer']);
+					}
 					/**
 					 * Вызов плагинов до вставки данных по товару
 					 */
@@ -512,15 +521,27 @@ class categories_mode {
 					 * Если товар в наличии
 					 */
 					if($oProduct->getAttribute('existence')) {
-						$aRows[] = str_replace(array_keys($aRepl),array_values($aRepl),$this->aTemplates['product_item']);
+						if($bInnerList) {
+							$aRows[] = str_replace(array_keys($aRepl),array_values($aRepl),$this->aTemplates['product_inner_item']);
+						} else {
+							$aRows[] = str_replace(array_keys($aRepl),array_values($aRepl),$this->aTemplates['product_item']);
+						}
 					} else {
-						$aRows[] = str_replace(array_keys($aRepl),array_values($aRepl),$this->aTemplates['product_absent_item']);
+						if($bInnerList) {
+							$aRows[] = str_replace(array_keys($aRepl),array_values($aRepl),$this->aTemplates['product_inner_absent_item']);
+						} else {
+							$aRows[] = str_replace(array_keys($aRepl),array_values($aRepl),$this->aTemplates['product_absent_item']);
+						}
 					}
 				}
 				/**
 				 * Вставляем ряды в шаблон группы
 				 */
-				$aGroupRows[] = str_replace('[+sb.wrapper+]', implode('', $aRows), $this->aTemplates['product_row']);
+				if($bInnerList) {
+					$aGroupRows[] = str_replace('[+sb.wrapper+]', implode('', $aRows), $this->aTemplates['product_inner_row']);
+				} else {
+					$aGroupRows[] = str_replace('[+sb.wrapper+]', implode('', $aRows), $this->aTemplates['product_row']);
+				}
 			}
 			/**
 			 * Информация о текущей категории
@@ -543,9 +564,17 @@ class categories_mode {
 			/**
 			 * Делаем замену плейсхолдеров в контейнере
 			 */
-			$sOutput = str_replace(array_keys($aRepl), array_values($aRepl), $this->aTemplates['product_list']);
+			if($bInnerList) {
+				$sOutput = str_replace(array_keys($aRepl), array_values($aRepl), $this->aTemplates['product_inner_list']);
+			} {
+				$sOutput = str_replace(array_keys($aRepl), array_values($aRepl), $this->aTemplates['product_list']);
+			}
 		} elseif($this->oCategory->oFilterList->getFilterSelected()) {
-			$sOutput = $this->aTemplates['products_absent'];
+			if($bInnerList) {
+				$sOutput = $this->aTemplates['products_inner_absent'];
+			} else {
+				$sOutput = $this->aTemplates['products_absent'];
+			}
 		}
 		return $sOutput;
 	}

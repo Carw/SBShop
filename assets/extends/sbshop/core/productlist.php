@@ -548,6 +548,14 @@ class SBProductList {
 	}
 
 	/**
+	 * Получение количества товаров
+	 * @return int
+	 */
+	public function getCount() {
+		return count($this->aProductList);
+	}
+
+	/**
 	 * Получение списка товаров
 	 */
 	public function getProductList() {
