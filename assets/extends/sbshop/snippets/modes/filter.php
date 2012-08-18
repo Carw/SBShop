@@ -166,11 +166,11 @@ class filter_mode {
 				 * Добавляем выделение для активного значения
 				 */
 				if($aFilterValueId == 'all' and !isset($aFilterSelected[$sFilterId])) {
-					$aRepl['[+sb.style+]'] = 'active';
+					$aRepl['[+sb.class+]'] = 'active';
 					$aRepl['[+sb.checked+]'] = 'checked="checked"';
 					$aRepl['[+sb.selected+]'] = 'selected="selected"';
 				} elseif((is_array($aFilterSelected[$sFilterId]) and in_array($aFilterValueId, $aFilterSelected[$sFilterId]))) {
-					$aRepl['[+sb.style+]'] = 'active';
+					$aRepl['[+sb.class+]'] = 'active';
 					$aRepl['[+sb.checked+]'] = 'checked="checked"';
 					$aRepl['[+sb.selected+]'] = 'selected="selected"';
 				}

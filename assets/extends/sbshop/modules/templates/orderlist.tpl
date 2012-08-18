@@ -130,7 +130,7 @@
 </div>
 <!--# product_row: Шаблон конкретного товара #-->
 <div class="prod">
-	<span class="title">[+sb.title+] [+sb.bundle.title+]</span>
+	<span class="title"><a href="/magazin[+sb.url+]" target="_blank">[+sb.title+]</a> [+sb.bundle.title+]</span>
 	<span class="price">
 		<small>[+sb.quantity+] x</small> [+sb.price.format+] = <span class="summ">[+sb.summ.format+] руб</span>
 	</span>

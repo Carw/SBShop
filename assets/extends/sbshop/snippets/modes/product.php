@@ -426,6 +426,8 @@ class product_mode {
 			 * Вставляем в общий контейнер
 			 */
 			$aReplBlocks['[+sb.options+]'] = str_replace('[+sb.wrapper+]', $sOptions, $this->aTemplates['options_outer']);
+		} else {
+			$aReplBlocks['[+sb.options+]'] = '';
 		}
 		/**
 		 * Переменная для комплектаций

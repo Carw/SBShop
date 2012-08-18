@@ -445,8 +445,7 @@ class SBOrder {
 		/**
 		 * Если не указана комплектация
 		 */
-		$oProduct->getBundleById($aOrderInfo['bundle']);
-		if(!isset($aOrderInfo['bundle']) or $aOrderInfo['bundle'] == 'base') {
+		if(!isset($aOrderInfo['bundle']) or $aOrderInfo['bundle'] === 'base') {
 			/**
 			 * Рассчитываем стоимость - сумма основной стоимости и стоимости опций
 			 */
@@ -468,14 +467,14 @@ class SBOrder {
 				/**
 				 * Определяем стоимость по факту - товар + опции
 				 */
-				$fPrice = $oProduct->getAttribute('price_full') + $oProduct->getPriceByOptions($aBundle['options']);
-			} elseif(substr($aBundle['price'],0,1) === '+') {
+				$fPrice = $oProduct->getAttribute('price_full') + $oProduct->getPriceByOptions($aBundle['options']) + $aOrderInfo['options_price'];
+			} elseif(substr($aBundle['price'], 0, 1) === '+') {
 				/**
-				 * Если первый символ - "+"
+				 * Если первый символ "+", суммируем стоимость самого товара, всех включенных и дополнительных опций.
 				 */
-				$fPrice = $oProduct->getAttribute('price_full') + substr($aBundle['price'], 1);
+				$fPrice = $oProduct->getAttribute('price_full') + substr($aBundle['price'], 1) + $aOrderInfo['options_price'];
 			} else {
-				$fPrice = $aBundle['price'];
+				$fPrice = $aBundle['price'] + $aOrderInfo['options_price'];
 			}
 			/**
 			 * Обработка надбавки

@@ -50,7 +50,7 @@ class SBBreadcrumbs {
 		/**
 		 * Устанавливаем первое звено "хлебных крошек"
 		 */
-		$this->aBreadcrumbs[] = array(
+		$this->aBreadcrumbs[0] = array(
 			'title' => $sHomeTitle,
 			'longtitle' => $sHomeTitle,
 			'url' => $sStartUrl
@@ -62,7 +62,7 @@ class SBBreadcrumbs {
 		/**
 		 * Разбиваем путь на набор идентификаторов
 		 */
-		$aIds = explode('.',$sPath);
+		$aIds = explode('.', $sPath);
 		/**
 		 * Если в пути есть документы
 		 */
@@ -70,7 +70,7 @@ class SBBreadcrumbs {
 			/**
 			 * Делаем запрос на информацию о категориях
 			 */
-			$rs = $modx->db->select('category_title, category_longtitle, category_url',$modx->getFullTableName('sbshop_categories'),'category_id in (' . implode(',',$aIds) . ')');
+			$rs = $modx->db->select('category_id, category_title, category_longtitle, category_url',$modx->getFullTableName('sbshop_categories'),'category_id in (' . implode(',', $aIds) . ')');
 			/**
 			 * Переводим результат в массив
 			 */
@@ -91,12 +91,16 @@ class SBBreadcrumbs {
 				/**
 				 * Записываем информацию о категории
 				 */
-				$this->aBreadcrumbs[] = array(
+				$this->aBreadcrumbs[array_search($aItem['category_id'], $aIds)] = array(
 					'title' => $aItem['category_title'],
 					'longtitle' => $aItem['category_longtitle'],
 					'url' => $aItem['category_url']
 				);
 			}
+			/**
+			 * Сортируем порядок крошек
+			 */
+			ksort($this->aBreadcrumbs);
 			/**
 			 * Если передан экземпляр товара, то добавляем информацию о нем
 			 */

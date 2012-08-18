@@ -135,6 +135,10 @@ return array(
 	'product_bundle_description' => 'Описание:',
 	'product_bundle_base' => 'Базовая комплектация',
 	/**
+	 * Прайс
+	 */
+	'price_title' => 'Прайс на товары',
+	/**
 	 * Регистрация клиента
 	 */
 	'customer_fullname' => 'Фамилия, Имя, Отчество',

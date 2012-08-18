@@ -8,11 +8,11 @@
  *
  * SBShop - Интернет-магазин на MODx
  *
- * Экшен сниппета: Вывод данных в виде полного прайса
+ * Экшен сниппета: Поиск товара
  *
  */
 
-class price_mode {
+class search_mode {
 
 	public $aCategories; // массив категорий
 	public $aProducts; // массив категорий
@@ -25,7 +25,7 @@ class price_mode {
 		/**
 		 * Получаем шаблон
 		 */
-		$aTemplates = $modx->sbshop->getSnippetTemplate('price');
+		$aTemplates = $modx->sbshop->getSnippetTemplate('search');
         /**
 		 * Получаем список всех категорий
 		 */

@@ -135,6 +135,10 @@ return array(
 	'product_bundle_description' => 'Description',
 	'product_bundle_base' => 'Base bundle',
 	/**
+	 * Прайс
+	 */
+	'price_title' => 'Price',
+	/**
 	 * Регистрация клиента
 	 */
 	'customer_fullname' => 'Full Name',
