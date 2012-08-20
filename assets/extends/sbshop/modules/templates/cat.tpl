@@ -56,6 +56,9 @@
 					<tr style="height: 24px;"><td width="100" align="left"><span class="warning">[+lang.category_alias+]</span></td>
 						<td><input name="alias" type="text" maxlength="255" value="[+category.alias+]" class="inputBox" onchange="documentDirty=true;" spellcheck="true" />
 						&nbsp;&nbsp;<img src="[+style.icons_tooltip_over+]" onmouseover="this.src='[+style.icons_tooltip+]';" onmouseout="this.src='[+style.icons_tooltip_over+]';" alt="[+lang.category_alias_description+]" onclick="alert(this.alt);" style="cursor:help;" /></td></tr>
+					<tr style="height: 24px;"><td width="100" align="left"><span class="warning">[+lang.category_favorite+]</span></td>
+						<td><input name="favorite" type="text" maxlength="255" value="[+category.favorite+]" class="inputBox" onchange="documentDirty=true;" spellcheck="false" />
+						&nbsp;&nbsp;<img src="[+style.icons_tooltip_over+]" onmouseover="this.src='[+style.icons_tooltip+]';" onmouseout="this.src='[+style.icons_tooltip_over+]';" alt="[+lang.category_favorite_description+]" onclick="alert(this.alt);" style="cursor:help;" /></td></tr>
 					<tr style="height: 24px;"><td width="100" align="left"><span class="warning">[+lang.category_published+]</span></td>
 						<td><input name="published" type="checkbox" maxlength="255" value="1" class="inputBox" onchange="documentDirty=true;" spellcheck="true" [+category.published+] />
 						&nbsp;&nbsp;<img src="[+style.icons_tooltip_over+]" onmouseover="this.src='[+style.icons_tooltip+]';" onmouseout="this.src='[+style.icons_tooltip_over+]';" alt="[+lang.category_published_description+]" onclick="alert(this.alt);" style="cursor:help;" /></td></tr>

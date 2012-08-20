@@ -47,6 +47,7 @@ class SBCategory {
 			'path' => null, // путь раздела
 			'level' => null, // уровень вложенности
 			'url' => null, // URL раздела
+			'favorite' => null, // список избранных товаров
 		);
 		/**
 		 * Устанавливаем ключи параметров категории
@@ -471,6 +472,5 @@ class SBCategory {
 		return $iCount;
 	}
 }
-
 
 ?>

@@ -40,6 +40,8 @@ return array(
 	'category_published_description' => 'Check this field to have the Category published immediately after saving it.',
 	'category_tab_attributes' => 'General Attributes',
 	'category_tab_filter' => 'Filters',
+	'category_favorite' => 'Favorite Products',
+	'category_favorite_description' => 'List of Favorite Products',
 	'category_filter' => 'Filters Management',
 	'category_filter_type_evq' => 'Exact Match',
 	'category_filter_type_rng' => 'Range Match',

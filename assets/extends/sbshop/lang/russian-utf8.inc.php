@@ -40,6 +40,8 @@ return array(
 	'category_published_description' => 'Необходимо отметить, чтобы категория была опубликована.',
 	'category_tab_attributes' => 'Стандартные параметры',
 	'category_tab_filter' => 'Фильтр',
+	'category_favorite' => 'Избранные товары',
+	'category_favorite_description' => 'Список идентификаторов избранных товаров, перечисленных через запятую',
 	'category_filter' => 'Управление фильтрами',
 	'category_filter_type_evq' => 'Точное соответствие',
 	'category_filter_type_rng' => 'Диапазон значений',

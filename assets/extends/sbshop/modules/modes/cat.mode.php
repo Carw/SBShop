@@ -962,7 +962,7 @@ class cat_mode {
 		 * Проверяем заголовок. Он должен быть.
 		 */
 		if(strlen($modx->db->escape($_POST['title'])) > 0) {
-			$this->oCategory->setAttribute('title',$modx->db->escape($_POST['title']));
+			$this->oCategory->setAttribute('title', $modx->db->escape($_POST['title']));
 		} else {
 			$this->sError = $modx->sbshop->lang['category_error_title'];
 			$bError = true;
@@ -970,7 +970,37 @@ class cat_mode {
 		/**
 		 * Добавляем расширенный заголовок.
 		 */
-		$this->oCategory->setAttribute('longtitle',$modx->db->escape($_POST['longtitle']));
+		$this->oCategory->setAttribute('longtitle', $modx->db->escape($_POST['longtitle']));
+		/**
+		 * Если список избранных товаров установлен
+		 */
+		if($_POST['favorite']) {
+			/**
+			 * Разбиваем список на массив
+			 */
+			$aFavoriteList = explode(',', $_POST['favorite']);
+			/**
+			 * Обрабатываем каждый идентификатор
+			 */
+			$cnt = count($aFavoriteList);
+			for($i = 0; $i < $cnt; $i++) {
+				if(intval($aFavoriteList[$i]) > 0) {
+					$aFavoriteList[$i] = intval($aFavoriteList[$i]);
+				} else {
+					unset($aFavoriteList[$i]);
+				}
+			}
+			/**
+			 * Устанавливаем список
+			 */
+			$this->oCategory->setAttribute('favorite', implode(',', $aFavoriteList));
+		} else {
+			/**
+			 * Устанавливаем пустой список
+			 */
+			$this->oCategory->setAttribute('favorite', '');
+		}
+
 		/**
 		 * Категория опубликована?
 		 */

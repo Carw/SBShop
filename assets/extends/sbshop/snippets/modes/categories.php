@@ -92,7 +92,6 @@ class categories_mode {
 
 	/**
 	 * Вывод информации для вложенных категорий
-	 * @todo Нужно сделать учет вложенности по разделам еще, я его временно убил
 	 */
 	public function outputInnerCat() {
 		global $modx;
@@ -338,24 +337,43 @@ class categories_mode {
 			return '';
 		}
 		/**
-		 * Получаем список вложенных разделов
+		 * Текущий раздел
 		 */
-		$aCatIds = $this->oCatTree->getChildrenById($iCatId);
+		$oCategory = $this->oCatTree->getCategoryById($iCatId);
 		/**
-		 * Если вложенные разделы есть
+		 * Если есть список избранных товаров
 		 */
-		if($aCatIds) {
+		$sFavoriteList = $oCategory->getAttribute('favorite');
+		if($sFavoriteList) {
 			/**
-			 * Добавляем текущий раздел
+			 * Разбиваем список
 			 */
-			array_unshift($aCatIds, $iCatId);
+			$aFavoriteList = explode(',', $sFavoriteList);
+			/**
+			 * Получаем список товаров
+			 */
+			$oProducts = new SBProductList(false, $aFavoriteList, $iLimit);
 		} else {
-			$aCatIds = $iCatId;
+			/**
+			 * Получаем список вложенных разделов
+			 */
+			$aCatIds = $this->oCatTree->getChildrenById($iCatId);
+			/**
+			 * Если вложенные разделы есть
+			 */
+			if($aCatIds) {
+				/**
+				 * Добавляем текущий раздел
+				 */
+				array_unshift($aCatIds, $iCatId);
+			} else {
+				$aCatIds = $iCatId;
+			}
+			/**
+			 * Получаем список товаров
+			 */
+			$oProducts = new SBProductList($aCatIds, false, $iLimit);
 		}
-		/**
-		 * Получаем список товаров
-		 */
-		$oProducts = new SBProductList($aCatIds, false, $iLimit);
 		/**
 		 * Получение списка товаров
 		 */
