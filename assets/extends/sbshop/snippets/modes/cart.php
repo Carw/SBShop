@@ -142,7 +142,7 @@ class cart_mode {
 								/**
 								 * Заносим в общий массив значений переводя все значения в числа
 								 */
-								$aParams['sboptions'][intval($sOptKey)] = intval($sOptVal);
+								$aParams['options'][intval($sOptKey)] = intval($sOptVal);
 							}
 						} else {
 							$sVal = 'base';
@@ -157,15 +157,15 @@ class cart_mode {
 				/**
 				 * Если установлены опции
 				 */
-				if($_POST['sbprod']['sboptions']) {
+				if($_POST['sbprod']['options']) {
 					/**
 					 * Обрабатываем опции
 					 */
-					foreach ($_POST['sbprod']['sboptions'] as $sOptKey => $sOptVal) {
+					foreach ($_POST['sbprod']['options'] as $sOptKey => $sOptVal) {
 						/**
 						 * Заносим в общий массив значений переводя все значения в числа
 						 */
-						$aParams['sboptions'][intval($sOptKey)] = intval($sOptVal);
+						$aParams['options'][intval($sOptKey)] = intval($sOptVal);
 					}
 				}
 				/**
@@ -262,11 +262,11 @@ class cart_mode {
 			/**
 			 * Обрабатываем товары
 			 */
-			foreach ($aIds as $iSetId) {
+			foreach ($aIds as $sSetId) {
 				/**
 				 * Получаем товар из списка заказа
 				 */
-				$oProduct = $modx->sbshop->oOrder->getProduct($iSetId);
+				$oProduct = $modx->sbshop->oOrder->getProduct($sSetId);
 				/**
 				 * Получаем параметры товара
 				 */
@@ -278,7 +278,7 @@ class cart_mode {
 				/**
 				 * Получаем информацию о количестве и прочих условиях заказа товара
 				 */
-				$aOrderInfo = $modx->sbshop->oOrder->getOrderSetInfo($iSetId);
+				$aOrderInfo = $modx->sbshop->oOrder->getOrderSetInfo($sSetId);
 				/**
 				 * Прибавляем количество товара
 				 */
@@ -286,7 +286,7 @@ class cart_mode {
 				/**
 				 * Делаем рассчет цены товара
 				 */
-				$aOrderInfo['price'] = $modx->sbshop->oOrder->getProductPriceBySetId($iSetId);
+				$aOrderInfo['price'] = $modx->sbshop->oOrder->getProductPriceBySetId($sSetId);
 				/**
 				 * Добавляем плейсхолдеры информации заказа
 				 */
@@ -294,13 +294,13 @@ class cart_mode {
 				/**
 				 * Идентификатор набора товара
 				 */
-				$aRowData['set_id'] = $iSetId;
+				$aRowData['set_id'] = $sSetId;
 				/**
 				 * Если установлены опции в товаре
 				 */
 				$aOptions = array();
-				if(isset($aOrderInfo['sboptions']) and count($aOrderInfo['sboptions']) > 0) {
-					foreach ($aOrderInfo['sboptions'] as $sOptKeyId => $sOptValId) {
+				if(isset($aOrderInfo['options']) and count($aOrderInfo['options']) > 0) {
+					foreach ($aOrderInfo['options'] as $sOptKeyId => $sOptValId) {
 						/**
 						 * Получаем название опции и значения по идентификаторам
 						 */
@@ -344,7 +344,7 @@ class cart_mode {
 				 * Запускаем плагины перед вставкой данных по товару в корзину
 				 */
 				$PlOut = $modx->invokeEvent('OnSBShopCartProductPrerender', array(
-					'iSetId' => $iSetId,
+					'sSetId' => $sSetId,
 					'aRowData' => $aRowData
 				));
 				/**

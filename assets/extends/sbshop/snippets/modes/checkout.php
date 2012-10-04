@@ -370,7 +370,7 @@ class checkout_mode {
 						/**
 						 * Если эта опция была выбрана
 						 */
-						if(isset($aOrderInfo['sboptions'][intval($sPersonalOption)])) {
+						if(isset($aOrderInfo['options']['ext'][intval($sPersonalOption)])) {
 							/**
 							 * Название опции
 							 */
@@ -378,11 +378,11 @@ class checkout_mode {
 							/**
 							 * Значение опции
 							 */
-							$iOptVal = $aOrderInfo['sboptions'][intval($sPersonalOption)];
+							$iOptVal = $aOrderInfo['options']['ext'][intval($sPersonalOption)]['value_id'];
 							/**
 							 * Удаляем опцию из массива выбранных
 							 */
-							unset($aOrderInfo['sboptions'][intval($sPersonalOption)]);
+							unset($aOrderInfo['options']['ext'][intval($sPersonalOption)]);
 							/**
 							 * Плейсхолдеры для опций в коплектации
 							 */
@@ -453,7 +453,7 @@ class checkout_mode {
 							/**
 							 * Удаляем опцию из массива выбранных
 							 */
-							unset($aOrderInfo['sboptions'][$iOptKey]);
+							unset($aOrderInfo['options']['ext'][$iOptKey]);
 							/**
 							 * Плейсхолдеры для опций в коплектации
 							 */
@@ -505,34 +505,12 @@ class checkout_mode {
 				 * Если установлены опции в товаре
 				 */
 				$aOptions = array();
-				if(isset($aOrderInfo['sboptions']) and count($aOrderInfo['sboptions']) > 0) {
-					foreach ($aOrderInfo['sboptions'] as $sOptKeyId => $sOptValId) {
-						/**
-						 * Получаем название опции и значения по идентификаторам
-						 */
-						$aOptionData = $oProduct->oOptions->getNamesByNameIdAndValId($sOptKeyId,$sOptValId);
-						/**
-						 * Убираем переносы строки у названия
-						 */
-						$aOptionData['title'] = str_replace('<br>', '', $aOptionData['title']);
+				if(isset($aOrderInfo['options']['ext']) and count($aOrderInfo['options']['ext']) > 0) {
+					foreach ($aOrderInfo['options']['ext'] as $sOptKeyId => $aOption) {
 						/**
 						 * Готовим плейсхолдеры
 						 */
-						$aOptRepl = $modx->sbshop->arrayToPlaceholders($aOptionData);
-						/**
-						 * Разделитель между опцией и значением
-						 */
-						$aOptRepl['[+sb.separator+]'] = $modx->sbshop->config['option_separator'];
-						/**
-						 * Если значение находится в списке скрываемых
-						 */
-						if(in_array($sOptValId, $modx->sbshop->config['hide_option_values'])) {
-							/**
-							 * Очищаем разделитель и значение
-							 */
-							$aOptRepl['[+sb.value+]'] = '';
-							$aOptRepl['[+sb.separator+]'] = '';
-						}
+						$aOptRepl = $modx->sbshop->arrayToPlaceholders($aOption);
 						/**
 						 * Вставляем в шаблон и добавляем ряд
 						 */

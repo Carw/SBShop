@@ -56,7 +56,11 @@ class update_mode {
 		 * Обновление формата хранения изображений и привьюшек для товаров
 		 */
 		//$this->updateImages();
-		
+		/**
+		 * Обновление списка заказов 21.08.12
+		 */
+		//$this->updateOrderlist();
+
 		echo '<p>Если вы ожидали, что здесь скрывается автоматическое обновление, то зря. Для работы необхожимо раскомментировать необходимую строку у режима модуля "update".</p>';
 
 	}
@@ -493,6 +497,167 @@ class update_mode {
 			);
 			if($modx->db->update($aUpd, $modx->getFullTableName('sbshop_orders'),'order_id = ' . $aRaw['order_id'])) {
 				echo('<pre>Обновлен заказ номер: ' . $aRaw['order_id'] . '</pre>');
+			}
+		}
+	}
+
+	/**
+	 * Изменение списка заказов, упрощение хранимой информации
+	 */
+	protected function updateOrderlist() {
+		global $modx;
+		/**
+		 * Загружаем список всех заказов
+		 */
+		$rs = $modx->db->select('*', $modx->getFullTableName('sbshop_orders'), '', '', 10000);
+		$aRaws = $modx->db->makeArray($rs);
+		/**
+		 * Обрабатываем каждую запись
+		 */
+		foreach ($aRaws as $aRaw) {
+			/**
+			 * Заказ
+			 * @var SBOrder $oOrder
+			 */
+			$oOrder = new SBOrder($aRaw);
+			/**
+			 * Измененный список товаров в заказе
+			 */
+			$aProductsNew = array();
+			/**
+			 * Получаем список товаров
+			 */
+			$aProducts = $oOrder->getProducts();
+			/**
+			 * Если товары есть
+			 */
+			if(is_array($aProducts) and count($aProducts) > 0) {
+				/**
+				 * Обрабатываем каждый товар
+				 */
+				foreach($aProducts as $sSetId => $aOrderData) {
+					/**
+					 * @var SBProduct $oProduct
+					 */
+					$oProduct = $aOrderData['product'];
+					unset($aOrderData['product']);
+					$aProductsNew[$sSetId] = array(
+						'title' => $oProduct->getAttribute('title'),
+						'quantity' => $aOrderData['quantity'],
+						'price' => $oOrder->getProductPriceBySetId($sSetId)
+					);
+					/**
+					 * Если комплектация установлена
+					 */
+					if(isset($aOrderData['bundle'])) {
+						if($aOrderData['bundle'] !== 'base' and $aOrderData['bundle'] !== 'personal') {
+							$aBundle = $oProduct->getBundleById($aOrderData['bundle']);
+							$aProductsNew[$sSetId]['title'] .= ' - ' . $aBundle['title'];
+						}
+					}
+					/**
+					 * Если есть опции
+					 */
+					if(isset($aOrderData['sboptions'])) {
+						$aOptions = array();
+						/**
+						 * Опции, относящиеся к базовой комплектации
+						 */
+						if(isset($aOrderData['bundle'])) {
+							/**
+							 * Комплектация
+							 */
+							$aBundle = $oProduct->getBundleById($aOrderData['bundle']);
+							/**
+							 * Получаем базовый список опций
+							 */
+							$aBaseOptions = $oProduct->getBaseBundle();
+							/**
+							 * Если дополнительные опции установлены
+							 */
+							if(isset($aBundle['options'])) {
+								/**
+								 * Добавляем опции в общий список
+								 */
+								$aBaseOptions += $aBundle['options'];
+							}
+						} else {
+							/**
+							 * Берем базовые опции
+							 */
+							$aBaseOptions = $oProduct->getBaseBundle();
+						}
+						/**
+						 * Делаем пустой массив, если список базовых значений отсутствует
+						 */
+						if($aBaseOptions === null) {
+							$aBaseOptions = array();
+						}
+						if($aOrderData['sboptions'] === null) {
+							$aOrderData['sboptions'] = array();
+						}
+						/**
+						 * Добавляем базовые значения к опциям
+						 */
+						$aOrderData['sboptions'] = $aBaseOptions + $aOrderData['sboptions'];
+						/**
+						 * Обрабатываем каждую
+						 */
+						foreach($aOrderData['sboptions'] as $sKey => $sVal) {
+							/**
+							 * Получаем информацию об опции
+							 */
+							$aOption = $oProduct->oOptions->getNamesByNameIdAndValId($sKey, $sVal);
+							/**
+							 * Добавляем в массив для заказа
+							 */
+							$aTmpOption = array(
+								'value_id' => $sVal,
+								'price' => $oProduct->getPriceByOptions(array($sKey => $sVal))
+							);
+							/**
+							 * Если значение опции скрываемое
+							 */
+							if(in_array($sVal, $modx->sbshop->config['hide_option_values'])) {
+								$aTmpOption['title'] = $aOption['title'];
+							} else {
+								$aTmpOption['title'] = $aOption['title'] . $modx->sbshop->config['option_separator'] . ' ' . $aOption['value'];
+							}
+							/**
+							 * Если опция входит в базовую комплектацию
+							 */
+							if($aBaseOptions[$sKey] === $sVal) {
+								/**
+								 * Добавляем информацию о базовых опциях к заказу
+								 */
+								unset($aTmpOption['price']);
+								$aOptions['base'][$sKey] = $aTmpOption;
+							} else {
+								/**
+								 * Добавляем информацию о базовых опциях к заказу
+								 */
+								$aOptions['ext'][$sKey] = $aTmpOption;
+							}
+							$aProductsNew[$sSetId]['options'] = $aOptions;
+						}
+					}
+				}
+			} else {
+				/**
+				 * Товаров нет. Нужно сделать обработку по SetId
+				 */
+			}
+			/**
+			 * Делаем обновление
+			 */
+			$aUpd = array(
+				'order_products' => base64_encode(serialize($aProductsNew))
+			);
+			/**
+			 * Обновляем
+			 */
+			if($modx->db->update($aUpd, $modx->getFullTableName('sbshop_orders'), 'order_id = ' . $aRaw['order_id'])) {
+				echo '<p>Обновлен список товаров в заказе № ' . $aRaw['order_id'] . '</p>';
 			}
 		}
 	}

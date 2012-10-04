@@ -229,135 +229,169 @@ class SBOrder {
 	 * @param bool $aParams
 	 * @return string
 	 */
-	public function addProduct($iProductId,$aParams = false) {
+	public function addProduct($iProductId, $aParams = false) {
+		global $modx;
 		/**
 		 * Если передан массив значений
 		 */
 		if(is_array($aParams)) {
 			/**
-			 * Загружаем заказанный товар
+			 * Получаем из списка нужный товар
 			 */
-			$oProduct = new SBProduct();
-			$oProduct->load($iProductId);
+			$oProduct = $this->oProductList->getProductById($iProductId);
+			/**
+			 * Если товара нет в списке
+			 */
+			if(!$oProduct) {
+				/**
+				 * Загружаем
+				 */
+				$oProduct = new SBProduct();
+				$oProduct->load($iProductId);
+				/**
+				 * Добавляем в список
+				 */
+				$this->oProductList->addProduct($oProduct);
+			}
 			/**
 			 * Начальное значение сета - идентификатор товара
 			 */
-			$sSet = $iProductId;
+			$sSetId = $iProductId;
 			/**
-			 * Добавляем товар
+			 * Если такой товар уже есть в списке
 			 */
-			$aParams['product'] = $oProduct;
-			/**
-			 * Если передана индивидуальная комплектация, но нет значений
-			 */
-			if(isset($aParams['bundle']) and ($aParams['bundle'] === 'base' or $aParams['bundle'] === 'personal') and !isset($aParams['sboptions'])) {
+			if(isset($this->aProducts[$sSetId])) {
 				/**
-				 * Удаляем индивидуальную комплектацию
+				 * Просто прибавляем количество товара
 				 */
-				unset($aParams['bundle']);
-			}
-			/**
-			 * Если передана комплектация или опции
-			 * @todo Здесь нужно все значительно упростить благодаря полной прозраности типа комплектации
-			 */
-			if(isset($aParams['bundle']) or (isset($aParams['sboptions']) and count($aParams['sboptions']) > 0)) {
+				$this->aProducts[$sSetId]['quantity'] += $aParams['quantity'];
+			} else {
 				/**
-				 * Переменная для сбора идентификатора
+				 * Опции, относящиеся к базовой комплектации
+				 */
+				if(isset($aParams['bundle'])) {
+					/**
+					 * Комплектация
+					 */
+					$aBundle = $oProduct->getBundleById($aParams['bundle']);
+					/**
+					 * Получаем базовый список опций
+					 */
+					$aBaseOptions = $oProduct->getBaseBundle();
+					/**
+					 * Если дополнительные опции установлены
+					 */
+					if(isset($aBundle['options'])) {
+						/**
+						 * Добавляем опции в общий список
+						 */
+						$aBaseOptions += $aBundle['options'];
+					}
+				} else {
+					/**
+					 * Берем базовые опции
+					 */
+					$aBaseOptions = $oProduct->getBaseBundle();
+				}
+				/**
+				 * Массив опций товара
+				 */
+				$aOptions = array();
+				/**
+				 * Массив значений для сета
 				 */
 				$aOptionRows = array();
 				/**
-				 * Переменная для сбора стоимости дополнительных опций
+				 * Если опции есть
 				 */
-				$iPrice = 0;
-				/**
-				 * Если установлена комплектация
-				 */
-				if(isset($aParams['bundle']) and $aParams['bundle'] !== 'base' and $aParams['bundle'] !== 'personal') {
+				if(isset($aParams['options'])) {
 					/**
-					 * Получаем список опций в комплектации
+					 * Обрабатываем каждую опцию
 					 */
-					$aBundleParams = $oProduct->getBundleOptions($aParams['bundle']);
-					/**
-					 * Если есть заказанные опции
-					 */
-					$aBundleOptions = array();
-					if(is_array($aParams['sboptions']) and count($aParams['sboptions']) > 0) {
+					foreach($aParams['options'] as $sKey => $sVal) {
 						/**
-						 * Определяем какие дополнительны опции были заказаны
+						 * Получаем информацию об опции
 						 */
-						$aBundleOptions = array_diff_assoc($aParams['sboptions'],$aBundleParams);
+						$aOption = $oProduct->oOptions->getNamesByNameIdAndValId($sKey, $sVal);
 						/**
-						 * Объединяем массивы значений
+						 * Добавляем в массив для заказа
 						 */
-						$aParams['sboptions'] = $aBundleParams + $aParams['sboptions'];
+						$aTmpOption = array(
+							'value_id' => $sVal,
+							'price' => $oProduct->getPriceByOptions(array($sKey => $sVal))
+						);
 						/**
-						 * Получаем стоимость опций
+						 * Если значение опции скрываемое
 						 */
-						$iPrice = $oProduct->getPriceByOptions($aBundleOptions);
-					} else {
-						$aParams['sboptions'] = $aBundleParams;
+						if(in_array($sVal, $modx->sbshop->config['hide_option_values'])) {
+							$aTmpOption['title'] = $aOption['title'];
+						} else {
+							$aTmpOption['title'] = $aOption['title'] . $modx->sbshop->config['option_separator'] . ' ' . $aOption['value'];
+						}
 						/**
-						 * Стоимость опций равна 0
+						 * Если значение опции не равно 'null'
 						 */
-						$iPrice = 0;
+						if($oProduct->oOptions->getValueByNameIdAndValId($sKey, $sVal) !== 'null') {
+							/**
+							 * Если опция входит в базовую комплектацию
+							 */
+							if($aBaseOptions[$sKey] === $sVal) {
+								/**
+								 * Добавляем информацию о базовых опциях к заказу
+								 */
+								unset($aTmpOption['price']);
+								$aOptions['base'][$sKey] = $aTmpOption;
+							} else {
+								/**
+								 * Добавляем информацию о базовых опциях к заказу
+								 */
+								$aOptions['ext'][$sKey] = $aTmpOption;
+							}
+							/**
+							 * Добавляем значение
+							 */
+							$aOptionRows[] = $sKey . ':' . $sVal;
+						}
 					}
-				} else {
 					/**
-					 * Получаем значение стоимости опций
+					 * Формируем новый идентификатор сета
 					 */
-					$iPrice = $oProduct->getPriceByOptions($aParams['sboptions']);
+					$sSetId .= '.' . implode('.', $aOptionRows);
 				}
 				/**
-				 * Обрабатываем каждую опцию
+				 * Массив значений товара для заказа
 				 */
-				foreach ($aParams['sboptions'] as $iKey => $iVal) {
+				$aParamsAdd = array(
 					/**
-					 * Если значение опции не равно 'null'
+					 * Заголовок
 					 */
-					if($oProduct->oOptions->getValueByNameIdAndValId($iKey,$iVal) != 'null') {
-						/**
-						 * Добавляем значение
-						 */
-						$aOptionRows[] = $iKey . ':' . $iVal;
-					} else {
-						/**
-						 * Удаляем опцию из списка
-						 */
-						unset($aParams['sboptions'][$iKey]);
-					}
-				}
-				/**
-				 * Формируем новый идентификатор
-				 */
-				$sSet .= '.' . implode('.', $aOptionRows);
-				/**
-				 * Добавляем дополнительную стоимость в настройки заказа
-				 */
-				$this->aProducts[$sSet]['options_price'] = $iPrice;
-			}
-			/**
-			 * Обрабатываем каждое значение
-			 */
-			foreach ($aParams as $sKey => $sVal) {
-				/**
-				 * Если параметр - quantity (количество) и он установлен
-				 */
-				if($sKey == 'quantity' and isset($this->aProducts[$sSet]['quantity'])) {
+					'title' => $oProduct->getAttribute('title'),
 					/**
-					 * Суммируем имеющееся значение
+					 * Количество
 					 */
-					$this->aProducts[$sSet]['quantity'] += $sVal;
-				} else {
+					'quantity' => $aParams['quantity'],
 					/**
-					 * Добавляем параметры
+					 * Комплектация
 					 */
-					$this->aProducts[$sSet][$sKey] = $sVal;
-				}
+					'bundle' => $aParams['bundle'],
+					/**
+					 * Опции
+					 */
+					'options' => $aOptions
+				);
+				/**
+				 * Добавляем товар в список
+				 */
+				$this->aProducts[$sSetId] = $aParamsAdd;
+				/**
+				 * Полная стоимость
+				 */
+				$this->aProducts[$sSetId]['price'] = $this->getProductPriceBySetId($sSetId);
 			}
 			/**
 			 * Возвращаем сет товара
 			 */
-			return $sSet;
+			return $sSetId;
 		}
 	}
 
@@ -410,19 +444,40 @@ class SBOrder {
 	 * Получить товар из корзины по идентификатору
 	 * @param <type> $iId
 	 */
-	public function getProduct($iSetId) {
+	public function getProduct($sSetId) {
 		/**
 		 * Получаем чистый идентификатор без примесей опций
 		 */
-		$iProductId = $this->getProductIdBySetId($iSetId);
+		$iProductId = $this->getProductIdBySetId($sSetId);
 		/**
-		 * Получаем товар
+		 * Получаем товар из списка
 		 */
-		return $this->oProductList->getProductById($iProductId);
+		$oProduct = $this->oProductList->getProductById($iProductId);
+		/**
+		 * Если товара нет в списке
+		 */
+		if(!$this->oProductList->getProductById($iProductId)) {
+			/**
+			 * Загружаем товар по идентификатору
+			 */
+			$oProduct = new SBProduct();
+			$oProduct->load($iProductId);
+			/**
+			 * Добавляем в список
+			 */
+			$this->oProductList->addProduct($oProduct);
+		}
+		/**
+		 * Возвращаем товар
+		 */
+		return $oProduct;
 	}
 
-	public function getOrderSetInfo($iSetId) {
-		return $this->aProducts[$iSetId];
+	/**
+	 * Получение информации о товаре по SetId
+	 */
+	public function getOrderSetInfo($sSetId) {
+		return $this->aProducts[$sSetId];
 	}
 
 	/**
@@ -432,34 +487,51 @@ class SBOrder {
 		return $this->aProducts;
 	}
 
-	public function getProductPriceBySetId($iSetId) {
+	/**
+	 * Получение стоимости сета
+	 * @param $sSetId
+	 * @return float
+	 */
+	public function getProductPriceBySetId($sSetId) {
 		global $modx;
 		/**
 		 * Получаем товар
 		 */
-		$oProduct = $this->getProduct($iSetId);
+		$oProduct = $this->getProduct($sSetId);
 		/**
 		 * Информация о заказе
 		 */
-		$aOrderInfo = $this->getOrderSetInfo($iSetId);
+		$aOrderInfo = $this->aProducts[$sSetId];
+		/**
+		 * Идентификатор комплектации
+		 */
+		$sBundleId = $aOrderInfo['bundle'];
+		/**
+		 * Массив опций
+		 */
+		$aOptions = $this->getOptionsBySetId($sSetId);
+		/**
+		 * Стоимость опций
+		 */
+		$iPriceOptions = $oProduct->getPriceByOptions($aOptions);
 		/**
 		 * Если не указана комплектация
 		 */
-		if(!isset($aOrderInfo['bundle']) or $aOrderInfo['bundle'] === 'base') {
+		if(!isset($sBundleId) or $sBundleId === 'base') {
 			/**
 			 * Рассчитываем стоимость - сумма основной стоимости и стоимости опций
 			 */
-			$fPrice = $oProduct->getAttribute('price_full') + $aOrderInfo['options_price'];
-		} elseif ($aOrderInfo['bundle'] === 'personal') {
+			$fPrice = $oProduct->getAttribute('price_full') + $iPriceOptions;
+		} elseif ($sBundleId === 'personal') {
 			/**
 			 * Индивидуальная комплектация. Суммируем цену товара и опций
 			 */
-			$fPrice = $oProduct->getAttribute('price_full') + $aOrderInfo['options_price'];
+			$fPrice = $oProduct->getAttribute('price_full') + $iPriceOptions;
 		} else {
 			/**
 			 * Любая другая комплектация. Берем стоимость комплектации
 			 */
-			$aBundle = $oProduct->getBundleById($aOrderInfo['bundle']);
+			$aBundle = $oProduct->getBundleById($sBundleId);
 			/**
 			 * Если стоимость пустая
 			 */
@@ -467,14 +539,17 @@ class SBOrder {
 				/**
 				 * Определяем стоимость по факту - товар + опции
 				 */
-				$fPrice = $oProduct->getAttribute('price_full') + $oProduct->getPriceByOptions($aBundle['options']) + $aOrderInfo['options_price'];
+				$fPrice = $oProduct->getAttribute('price_full') + $oProduct->getPriceByOptions($aBundle['options']) + $iPriceOptions;
 			} elseif(substr($aBundle['price'], 0, 1) === '+') {
 				/**
 				 * Если первый символ "+", суммируем стоимость самого товара, всех включенных и дополнительных опций.
 				 */
-				$fPrice = $oProduct->getAttribute('price_full') + substr($aBundle['price'], 1) + $aOrderInfo['options_price'];
+				$fPrice = $oProduct->getAttribute('price_full') + substr($aBundle['price'], 1) + $iPriceOptions;
 			} else {
-				$fPrice = $aBundle['price'] + $aOrderInfo['options_price'];
+				/**
+				 * Суммируем стоимость
+				 */
+				$fPrice = $aBundle['price'] + $iPriceOptions;
 			}
 			/**
 			 * Обработка надбавки
@@ -532,20 +607,20 @@ class SBOrder {
 
 	/**
 	 * Получение количества товара в позиции по идентификатору
-	 * @param  $iSetId
+	 * @param  $sSetId
 	 * @return
 	 */
-	public function getProductQuantityBySetId($iSetId) {
-		return $this->aProducts[$iSetId]['quantity'];
+	public function getProductQuantityBySetId($sSetId) {
+		return $this->aProducts[$sSetId]['quantity'];
 	}
 
 	/**
 	 * Получение суммы позиции по идентификатору
-	 * @param  $iSetId
+	 * @param  $sSetId
 	 * @return
 	 */
-	public function getProductSummBySetId($iSetId) {
-		return $this->getProductPriceBySetId($iSetId) * $this->getProductQuantityBySetId($iSetId);
+	public function getProductSummBySetId($sSetId) {
+		return $this->aProducts[$sSetId]['price'] * $this->aProducts[$sSetId]['quantity'];
 	}
 
 	/**
@@ -578,8 +653,8 @@ class SBOrder {
 			/**
 			 * Обрабатываем каждую позицию из идентификаторов товара
 			 */
-			foreach ($aProductSetIds as $iSetId) {
-				$aResPrices[$iSetId] = $this->getProductPriceBySetId($iSetId) * $this->getProductQuantityBySetId($iSetId);
+			foreach ($aProductSetIds as $sSetId) {
+				$aResPrices[$sSetId] = $this->getProductPriceBySetId($sSetId) * $this->getProductQuantityBySetId($sSetId);
 			}
 			$fPrice = array_sum($aResPrices);
 		}
@@ -610,8 +685,44 @@ class SBOrder {
 		}
 	}
 
-	public function getProductIdBySetId($iSetId) {
-		return intval($iSetId);
+	/**
+	 * Получение идентификатора товара в сете
+	 * @param $sSetId
+	 * @return int
+	 */
+	public function getProductIdBySetId($sSetId) {
+		return intval($sSetId);
+	}
+
+	/**
+	 * Получение идентификаторов опций из сета
+	 * @param $sSetId
+	 * @return array
+	 */
+	public function getOptionsBySetId($sSetId) {
+		/**
+		 * Конечный массив опций
+		 */
+		$aSetOptions = array();
+		/**
+		 * Строка с опциями
+		 */
+		$sSetOptions = substr($sSetId, strpos($sSetId, '.') + 1);
+		/**
+		 * Разделяем опции
+		 */
+		$aOptions = explode('.', $sSetOptions);
+		/**
+		 * Обрабатываем каждую опцию
+		 */
+		foreach($aOptions as $sOption) {
+			list($sKey, $sValue) = explode(':', $sOption);
+			$aSetOptions[$sKey] = $sValue;
+		}
+		/**
+		 * Возвращаем массив опций
+		 */
+		return $aSetOptions;
 	}
 
 	/**
@@ -733,11 +844,11 @@ class SBOrder {
 			/**
 			 * Устанавливаем время создания заказа
 			 */
-			$this->setAttribute('date_add',date('Y-m-d G:i:s'));
+			$this->setAttribute('date_add', date('Y-m-d G:i:s'));
 			/**
 			 * Определяем IP пользователя
 			 */
-			$this->setAttribute('ip',$modx->sbshop->GetIp());
+			$this->setAttribute('ip', $modx->sbshop->GetIp());
 			/**
 			 * Установка статуса заказа "в процессе заказа" - статус 0
 			 */
@@ -746,7 +857,7 @@ class SBOrder {
 			/**
 			 * Устанавливаем время создания заказа
 			 */
-			$this->setAttribute('date_edit',date('Y-m-d G:i:s'));
+			$this->setAttribute('date_edit', date('Y-m-d G:i:s'));
 		}
 		/**
 		 * Если есть заказанные товары
@@ -770,19 +881,18 @@ class SBOrder {
 			/**
 			 * Это новый заказ. Заносим в базу и если все получилось...
 			 */
-			if($modx->db->insert($aData,$modx->getFullTableName('sbshop_orders'))) {
+			if($modx->db->insert($aData, $modx->getFullTableName('sbshop_orders'))) {
 				/**
 				 * Устанавливаем идентификатор заказа
 				 */
-				$this->setAttribute('id',$modx->db->getInsertId());
+				$this->setAttribute('id', $modx->db->getInsertId());
 			}
 		} else {
-			$modx->db->update($aData,$modx->getFullTableName('sbshop_orders'),'order_id='.$this->getAttribute('id'));
+			$modx->db->update($aData,$modx->getFullTableName('sbshop_orders'), 'order_id=' . $this->getAttribute('id'));
 		}
 		/**
 		 * Заносим информацию в сессию
 		 */
-
 		$this->setSession();
 	}
 	
@@ -809,20 +919,6 @@ class SBOrder {
 		 * десериализуем данные из JSON
 		 */
 		$this->aProducts = unserialize(base64_decode($sParams));
-		/**
-		 * Если товары есть в списке
-		 */
-		if($this->aProducts) {
-			/**
-			 * Обрабатываем каждый товар в заказе
-			 */
-			foreach ($this->aProducts as $aProduct) {
-				/**
-				 * Добавляем товар в список товаров
-				 */
-				$this->oProductList->addProduct($aProduct['product']);
-			}
-		}
 		/**
 		 * Возвращаем результат
 		 */

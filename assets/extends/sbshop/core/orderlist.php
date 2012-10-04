@@ -31,7 +31,7 @@ class SBOrderList {
 		/**
 		 * Загружаем список по заданному статусу
 		 */
-		$this->loadOrdersByStatusIds($aStatusIds,$sWhere);
+		$this->loadOrdersByStatusIds($aStatusIds, $sWhere);
 	}
 
 	/**
@@ -39,7 +39,7 @@ class SBOrderList {
 	 * @param <type> $iStatus
 	 */
 	public function loadOrdersByStatusId($iStatus = 10, $sWhere = '', $sSort='date_edit') {
-		return $this->loadOrdersByStatusIds(array($iStatus), $sWhere = '', $sSort);
+		return $this->loadOrdersByStatusIds(array($iStatus), $sWhere, $sSort);
 	}
 
 	/**
@@ -67,7 +67,7 @@ class SBOrderList {
 		/**
 		 * Делаем запрос
 		 */
-		$rs = $modx->db->select('*',$modx->getFullTableName('sbshop_orders'),'order_status in (' . implode(',',$iStatusIds) . ')' . $sWhere,'order_' . $sSort);
+		$rs = $modx->db->select('*', $modx->getFullTableName('sbshop_orders'), 'order_status in (' . implode(',', $iStatusIds) . ')' . $sWhere, 'order_' . $sSort);
 		$aRaws = $modx->db->makeArray($rs);
 		/**
 		 * Устанавливаем список заказов

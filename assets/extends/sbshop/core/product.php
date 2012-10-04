@@ -66,6 +66,14 @@ class SBProduct {
 		 */
 		$this->aProductDataKeys = array_keys($this->aProductData);
 		/**
+		 * Базовая комплектация
+		 */
+		$this->aBaseBundle = array();
+		/**
+		 * Индивидуальная комплектация
+		 */
+		$this->aPersonalBundle = array();
+		/**
 		 * Изображения
 		 */
 		$this->aImages = array();
@@ -397,6 +405,15 @@ class SBProduct {
 			 * Возвращаем стоимость 0
 			 */
 			return 0;
+		}
+		/**
+		 * Если есть расширенные опции
+		 */
+		if(isset($aOptions['ext'])) {
+			/**
+			 * Берем только расширенные опции
+			 */
+			$aOptions = $aOptions['ext'];
 		}
 		/**
 		 * Обрабатываем каждую опцию

@@ -102,6 +102,12 @@ class product_mode {
 				'[+sb.image.big+]' => $aBigImages[$i]
 			);
 			/**
+			 * Если это первый пункт
+			 */
+			if($i==0) {
+				$aReplImages['[+sb.class+]'] = 'active';
+			}
+			/**
 			 * Вставляем миниатюру в шаблон
 			 */
 			$sImages .= str_replace(array_keys($aReplImages), array_values($aReplImages), $this->aTemplates['thumbs_row']);

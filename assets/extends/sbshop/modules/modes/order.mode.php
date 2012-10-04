@@ -43,7 +43,7 @@ class order_mode {
 			/**
 			 * Задаем набор статусов, которые относятся к активным
 			 */
-			$this->aStatuses = array(10,20,25);
+			$this->aStatuses = array(10, 20, 25);
 		} else {
 			/**
 			 * Задаем определенный статус
@@ -129,7 +129,7 @@ class order_mode {
 					/**
 					 * Формируем дату
 					 */
-					$iDateNext = mktime($aDateNext[0],$aDateNext[1],0,$aDateNext[2],$aDateNext[3],$aDateNext[4]);
+					$iDateNext = mktime($aDateNext[0], $aDateNext[1], 0, $aDateNext[2], $aDateNext[3], $aDateNext[4]);
 					/**
 					 * Формируем дату
 					 */
@@ -257,25 +257,27 @@ class order_mode {
 				 */
 				foreach ($aIds as $iSetId) {
 					/**
-					 * Получаем товар из списка заказа
+					 * Идентификатор товара
 					 */
-					$oProduct = $oOrder->getProduct($iSetId);
+					$iProductId = intval($iSetId);
 					/**
-					 * Получаем параметры товара
+					 * Загружаем товар
 					 */
-					$aProduct = $oProduct->getAttributes();
-					/**
-					 * Плесхолдеры параметров товара
-					 */
-					$aProductRepl = $modx->sbshop->arrayToPlaceholders($aProduct);
+					$oProduct = new SBProduct();
+					$oProduct->load($iProductId);
 					/**
 					 * Получаем информацию о количестве и прочих условиях заказа товара
 					 */
 					$aOrderInfo = $oOrder->getOrderSetInfo($iSetId);
 					/**
-					 * Делаем рассчет цены товара
+					 * Если товар есть
 					 */
-					$aOrderInfo['price'] = $oOrder->getProductPriceBySetId($iSetId);
+					if($oProduct->getAttribute('url') !== null) {
+						$aOrderInfo['url'] = $oProduct->getAttribute('url');
+						$aOrderInfo['sku'] = $oProduct->getAttribute('sku');
+					} else {
+						$aOrderInfo['url'] = '';
+					}
 					/**
 					 * Общая сумма за товар
 					 */
@@ -283,41 +285,7 @@ class order_mode {
 					/**
 					 * Добавляем плейсхолдеры информации заказа
 					 */
-					$aProductRepl = array_merge($aProductRepl, $modx->sbshop->arrayToPlaceholders($aOrderInfo));
-					/**
-					 * Если установлена комплектация
-					 */
-					if(isset($aOrderInfo['bundle'])) {
-						switch ($aOrderInfo['bundle']) {
-							case 'base':
-								/**
-								 * Записываем в плейсхолдер пометку базовой комплектации
-								 */
-								$aProductRepl['[+sb.bundle.title+]'] = $modx->sbshop->lang['order_base_bundle'];
-							break;
-							case 'personal':
-								/**
-								 * Записываем в плейсхолдер пометку персональной комплектации
-								 */
-								$aProductRepl['[+sb.bundle.title+]'] = $modx->sbshop->lang['order_personal_bundle'];
-							break;
-							default:
-								/**
-								 * Получаем комплектацию по идентификатору
-								 */
-								$aBundle = $oProduct->getBundleById($aOrderInfo['bundle']);
-								/**
-								 * Записываем название комплектации в плейсхолдер
-								 */
-								$aProductRepl['[+sb.bundle.title+]'] = $aBundle['title'];
-							break;
-						}
-					} else {
-						/**
-						 * Записываем в плейсхолдер пометку базовой комплектации
-						 */
-						$aProductRepl['[+sb.bundle.title+]'] = $modx->sbshop->lang['order_base_bundle'];
-					}
+					$aProductRepl = $modx->sbshop->arrayToPlaceholders($aOrderInfo);
 					/**
 					 * Идентификатор набора товара
 					 */
@@ -326,36 +294,28 @@ class order_mode {
 					 * Если установлены опции в товаре
 					 */
 					$aOptions = array();
-					if(isset($aOrderInfo['sboptions']) and count($aOrderInfo['sboptions']) > 0) {
-						foreach ($aOrderInfo['sboptions'] as $sOptKeyId => $sOptValId) {
-							/**
-							 * Создаем плейсхолдеры
-							 */
-							$aOptRepl = $modx->sbshop->arrayToPlaceholders($oProduct->oOptions->getNamesByNameIdAndValId($sOptKeyId,$sOptValId));
-							/**
-							 * Разделитель между опцией и значением
-							 */
-							$aOptRepl['[+sb.separator+]'] = $modx->sbshop->config['option_separator'];
-							/**
-							 * Если значение находится в списке скрываемых
-							 */
-							if(in_array($sOptValId, $modx->sbshop->config['hide_option_values'])) {
-								/**
-								 * Очищаем разделитель и значение
-								 */
-								$aOptRepl['[+sb.value+]'] = '';
-								$aOptRepl['[+sb.separator+]'] = '';
-							}
-							$aOptions[] = str_replace(array_keys($aOptRepl), array_values($aOptRepl), $this->aTemplates['product_option_row']);
-						}
+					if(isset($aOrderInfo['options']['ext']) and count($aOrderInfo['options']['ext']) > 0) {
 						/**
-						 * Объединяем ряды и вставляем в контейнер
+						 * Разбираем каждую дополнительную опцию
 						 */
-						$sOptions = str_replace('[+sb.wrapper+]', implode($this->aTemplates['product_option_separator'], $aOptions), $this->aTemplates['product_option_outer']);
-						$aProductRepl['[+sb.options+]'] = $sOptions;
+						foreach($aOrderInfo['options']['ext'] as $aOption) {
+							/**
+							 * Готовим плейсхолдеры
+							 */
+							$aRepl = $modx->sbshop->arrayToPlaceholders($aOption);
+							/**
+							 * Добавляем опцию
+							 */
+							$aOptions[] = str_replace(array_keys($aRepl), array_values($aRepl), $this->aTemplates['product_option_row']);
+						}
+						$aOrderInfo['options'] = str_replace('[+sb.wrapper+]', implode($this->aTemplates['product_option_separator'], $aOptions), $this->aTemplates['product_option_outer']);
 					} else {
-						$aProductRepl['[+sb.options+]'] = '';
+						$aOrderInfo['options'] = '';
 					}
+					/**
+					 * Плейсхолдеры для товара
+					 */
+					$aProductRepl = $modx->sbshop->arrayToPlaceholders($aOrderInfo);
 					/**
 					 * Вставляем данные в шаблон
 					 */

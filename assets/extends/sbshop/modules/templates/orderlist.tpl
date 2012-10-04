@@ -87,7 +87,7 @@
 						<div class="content">
 							[+sb.products+]
 							<p align="right">
-								Общая сумма: <span class="total">[+sb.price.format+]</span> руб
+								Общая сумма: <span class="total">[+sb.price.format+] [+sb.currency+]</span>
 							</p>
 						</div>
 						<h2>Параметры заказа</h2>
@@ -130,9 +130,9 @@
 </div>
 <!--# product_row: Шаблон конкретного товара #-->
 <div class="prod">
-	<span class="title"><a href="/magazin[+sb.url+]" target="_blank">[+sb.title+]</a> [+sb.bundle.title+]</span>
+	<span class="title"><a href="/magazin[+sb.url+]" target="_blank">[+sb.title+]</a></span>
 	<span class="price">
-		<small>[+sb.quantity+] x</small> [+sb.price.format+] = <span class="summ">[+sb.summ.format+] руб</span>
+		<small>[+sb.quantity+] x</small> [+sb.price.format+] = <span class="summ">[+sb.summ.format+] [+sb.currency+]</span>
 	</span>
 	[+sb.sku+]
 	<br>
@@ -141,7 +141,7 @@
 <!--# product_option_outer: Контейнер списка опций для заказанного товара #-->
 <span class="optlist">[+sb.wrapper+]</span>
 <!--# product_option_row: Шаблон конкретной опции заказанного товара #-->
-[+sb.title+][+sb.separator+] [+sb.value+]
+[+sb.title+]
 <!--# product_option_separator: Шаблон конкретной опции заказанного товара #-->
 ,&nbsp;
 <!--# action_outer: Контейнер для статуса заказа #-->

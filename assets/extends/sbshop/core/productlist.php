@@ -612,6 +612,8 @@ class SBProductList {
 	public function getProductById($iProductId) {
 		if(isset ($this->aProductList[$iProductId])) {
 			return $this->aProductList[$iProductId];
+		} else {
+			return null;
 		}
 	}
 
