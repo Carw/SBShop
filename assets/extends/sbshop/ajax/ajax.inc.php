@@ -32,7 +32,7 @@ class SBAjax {
 		/**
 		 * Если такой метод есть в классе
 		 */
-		if(method_exists($this,$sMethodName)) {
+		if(method_exists($this, $sMethodName)) {
 			/**
 			 * Вызываем
 			 */
@@ -452,6 +452,65 @@ class SBAjax {
 			 */
 			$this->aResult['error'] = $modx->sbshop->lang['product_image_delete_error'];
 		}
+	}
+
+	protected function ordEdAjax() {
+		/**
+		 * Данные заказа
+		 */
+		$aOrderData = json_decode($_POST['products'], true);
+		/**
+		 * Используемые сеты
+		 */
+		$aSetIdsNew = array_keys($aOrderData['products']);
+		/**
+		 * Загружаем заказ
+		 */
+		$iOrderId = intval($aOrderData['orderId']);
+		$oOrder = new SBOrder();
+		$oOrder->loadById($iOrderId);
+		/**
+		 * Получение списка товаров в заказе
+		 */
+		$aSetIds = $oOrder->getProductSetIds();
+		/**
+		 * Обрабатываем каждый сет
+		 */
+		foreach($aSetIds as $sSetId) {
+			/**
+			 * Если сет есть в новом наборе
+			 */
+			if(in_array($sSetId, $aSetIdsNew)) {
+				/**
+				 * Готовим данные для редактирования
+				 */
+				$aEditProduct = $aOrderData['products'][$sSetId];
+				$aEditOptions = $aEditProduct['options'];
+				/**
+				 * Форматируем стоимость
+				 */
+				$aEditProduct['price'] = str_replace(' ', '', $aEditProduct['price']);
+				unset($aEditProduct['options']);
+				/**
+				 * Редактируем товар
+				 */
+				$oOrder->editProduct($sSetId, $aEditProduct, $aEditOptions);
+			} else {
+				/**
+				 * Удаляем товар из заказа
+				 */
+				$oOrder->deleteProduct($sSetId);
+			}
+		}
+		/**
+		 * Сохраняем
+		 */
+		$oOrder->save();
+		/**
+		 * Здесь нужно будет приготовить измененный заказ и убрать перезагрузку страницы
+		 */
+		//$this->aResult['html'] = '!!!';
+		$this->aResult['success'] = true;
 	}
 
 	public function result() {

@@ -396,11 +396,130 @@ class SBOrder {
 	}
 
 	/**
+	 * Изменение параметров товара
+	 * @param $sSetId
+	 * @param $aProduct Новые данные товара
+	 * @param $aOptions Новые данные опций
+	 * @return bool
+	 */
+	public function editProduct($sSetId, $aProduct = false, $aOptionsNew = false) {
+		/**
+		 * Проверяем наличие сета
+		 */
+		if(!$this->isProductExist($sSetId)) {
+			return false;
+		}
+		/**
+		 * Если переданы данные на товар
+		 */
+		if($aProduct) {
+			/**
+			 * Если есть заголовок
+			 */
+			if(isset($aProduct['title'])) {
+				$this->aProducts[$sSetId]['title'] = $aProduct['title'];
+			}
+			/**
+			 * Если есть стоимость
+			 */
+			if(isset($aProduct['price'])) {
+				$this->aProducts[$sSetId]['price'] = floatval($aProduct['price']);
+			}
+			/**
+			 * Если есть количество
+			 */
+			if(isset($aProduct['quantity'])) {
+				$this->aProducts[$sSetId]['quantity'] = intval($aProduct['quantity']);
+			}
+		}
+		/**
+		 * Если переданы данные на опции
+		 */
+		if($aOptionsNew) {
+			/**
+			 * Если есть расширенные опции
+			 */
+			if(isset($this->aProducts[$sSetId]['options']['ext'])) {
+				/**
+				 * Обрабатываем имеющиеся опции
+				 */
+				foreach($this->aProducts[$sSetId]['options']['ext'] as $sKey => $aOption) {
+					/**
+					 * Если опция есть в новом списке
+					 */
+					if(isset($aOptionsNew[$sKey])) {
+						/**
+						 * Если значение не совпадает
+						 */
+						if($aOption['value_id'] != $aOptionsNew[$sKey]['value_id']) {
+							/**
+							 * Заменяем значения
+							 */
+							$this->aProducts[$sSetId]['options']['ext'][$sKey] = array(
+								'value_id' => intval($aOptionsNew['value_id']),
+								'title' => $aOptionsNew['title'],
+								'price' => $aOptionsNew['price']
+							);
+						}
+						/**
+						 * Убираем опцию из нового списка
+						 */
+						unset($aOptionsNew[$sKey]);
+					} else {
+						/**
+						 * Удаляем опцию
+						 */
+						unset($this->aProducts[$sSetId]['options']['ext'][$sKey]);
+					}
+				}
+			}
+			/**
+			 * Очищаем опции, установленные вручную ранее
+			 */
+			unset($this->aProducts[$sSetId]['options']['man']);
+			/**
+			 * Обрабатываем оставшиеся новые опции в списке
+			 */
+			foreach($aOptionsNew as $sKey => $aOption) {
+
+				/**
+				 * Если первая буква n
+				 */
+				if(substr($sKey, 0, 1) === 'n') {
+					/**
+					 * Добавляем новую опцию в ручной список
+					 */
+					$cnt = count($this->aProducts[$sSetId]['options']['man']);
+					$this->aProducts[$sSetId]['options']['man'][$cnt]['title'] = $aOption['title'];
+					/**
+					 * Если установлена цена
+					 */
+					if(isset($aOption['price'])) {
+						$this->aProducts[$sSetId]['options']['man'][$cnt]['price'] = $aOption['price'];
+					}
+				} else {
+					/**
+					 * Добавляем новую опцию
+					 */
+					$this->aProducts[$sSetId]['options']['ext'][$sKey] = array(
+						'value_id' => $aOption['value_id'],
+						'title' => $aOption['title'],
+						'price' => $aOption['price']
+					);
+				}
+			}
+		} else {
+			unset($this->aProducts[$sSetId]['options']);
+		}
+	}
+
+	/**
 	 * Установка параметров покупаемых товаров в заказе
-	 * @param unknown_type $iProductId
+	 * XXX нужно пересмотреть этот метод
+	 * @param unknown_type $sSetId
 	 * @param unknown_type $aProducts
 	 */
-	public function setProduct($iProductId,$aParams = false) {
+	public function setProduct($sSetId, $aParams = false) {
 		/**
 		 * Если передан массив значений
 		 */
@@ -408,7 +527,7 @@ class SBOrder {
 			/**
 			 * Если товар существует
 			 */
-			if($this->isProductExist($iProductId)) {
+			if($this->isProductExist($sSetId)) {
 				/**
 				 * Обрабатываем каждое значение
 				 */
@@ -417,17 +536,17 @@ class SBOrder {
 					/**
 					 * Добавляем параметры
 					 */
-					$this->aProducts[$iProductId][$sKey] = $sVal;
+					$this->aProducts[$sSetId][$sKey] = $sVal;
 				}
 			}
 			/**
 			 * Если количество товара равно 0
 			 */
-			if($this->aProducts[$iProductId]['quantity'] == 0) {
+			if($this->aProducts[$sSetId]['quantity'] == 0) {
 				/**
 				 * Удаляем товар из корзины
 				 */
-				$this->deleteProduct($iProductId);
+				$this->deleteProduct($sSetId);
 			}
 		}
 	}
@@ -633,10 +752,6 @@ class SBOrder {
 		 */
 		$aProductSetIds = $this->getProductSetIds();
 		/**
-		 * Список идентификаторов товаров
-		 */
-		$aProductIds = $this->getProductIds();
-		/**
 		 * Если заказанных товаров нет
 		 */
 		if(count($aProductSetIds) == 0) {
@@ -645,7 +760,7 @@ class SBOrder {
 			/**
 			 * Загружаем список заказанных товаров
 			 */
-			$this->oProductList = new SBProductList('',$aProductIds);
+			//$this->oProductList = new SBProductList('', $aProductIds);
 			/**
 			 * Инициализируем массив для суммарной стоимости товаров
 			 */
@@ -654,7 +769,7 @@ class SBOrder {
 			 * Обрабатываем каждую позицию из идентификаторов товара
 			 */
 			foreach ($aProductSetIds as $sSetId) {
-				$aResPrices[$sSetId] = $this->getProductPriceBySetId($sSetId) * $this->getProductQuantityBySetId($sSetId);
+				$aResPrices[$sSetId] = $this->getProductSummBySetId($sSetId);
 			}
 			$fPrice = array_sum($aResPrices);
 		}
@@ -726,30 +841,30 @@ class SBOrder {
 	}
 
 	/**
-	 * Удаление товара по идентификатору
+	 * Удаление товара по идентификатору сета
 	 * @param <type> $iProductId
 	 */
-	public function deleteProduct($iProductId) {
-		$this->deleteProducts(array($iProductId));
+	public function deleteProduct($sSetId) {
+		$this->deleteProducts(array($sSetId));
 	}
 
 	/**
 	 * Удаление выбранных товаров из корзины
 	 * @param <type> $aProductIds
 	 */
-	public function deleteProducts($aProductIds) {
+	public function deleteProducts($sSetIds) {
 		/**
 		 * Обрабатываем каждый идентификатор
 		 */
-		foreach ($aProductIds as $iProductId) {
+		foreach ($sSetIds as $sSetId) {
 			/**
 			 * Если указанный товар есть в корзине
 			 */
-			if(isset($this->aProducts[$iProductId])) {
+			if(isset($this->aProducts[$sSetId])) {
 				/**
 				 * Удаляем информацию о товаре в заказе
 				 */
-				unset($this->aProducts[$iProductId]);
+				unset($this->aProducts[$sSetId]);
 			}
 		}
 	}

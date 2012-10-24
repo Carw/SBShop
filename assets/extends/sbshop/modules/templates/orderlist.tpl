@@ -2,14 +2,16 @@
 <style type="text/css">
 @import "[+site.url+]assets/libs/dyndatetime/css/calendar-blue.css";
 </style>
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 <script type="text/javascript">
 	if(typeof(jQuery) == "undefined") {
-		document.write("<scr" + "ipt type=\"text/javascript\" src=\"' . MODX_SITE_URL . 'assets/libs/javascript/jquery-1.3.2.min.js\"></scr" + "ipt>");
+		document.write("<scr" + "ipt type=\"text/javascript\" src=\"' . MODX_SITE_URL . 'assets/libs/javascript/jquery-1.7.2.min.js\"></scr" + "ipt>");
 	}
 </script>
 <script type="text/javascript" src="[+site.url+]assets/libs/dyndatetime/jquery.dynDateTime.js"></script>
 <script type="text/javascript" src="[+site.url+]assets/libs/dyndatetime/lang/calendar-ru-my.js"></script>
+<script type="text/javascript" src="[+site.url+]assets/libs/javascript/jquery.autocomplete.js"></script>
+<script type="text/javascript" src="[+site.url+]assets/libs/javascript/jquery.json-2.3.min.js"></script>
 <script type="text/javascript" src="[+site.url+]assets/extends/sbshop/modules/templates/js/orderlist.js"></script>
 
 <div class="sectionHeader">
@@ -49,6 +51,16 @@
 		[+sb.wrapper+]
 	</table>
 </div>
+<div id="popup">
+	<a href="#" class="close btn">X</a>
+	<div class="h"></div>
+	<div class="info"></div>
+</div>
+<div id="opacity"></div>
+<script type="text/javascript">
+	var OrderData = $.parseJSON('[+sb.jsdata+]');
+	var ProdData = $.parseJSON('[+sb.jsdatanew+]');
+</script>
 <!--# order_row: Шаблон для вывода конкретного заказа #-->
 <tr class="order status[+sb.status+]">
 	<td>
@@ -84,10 +96,13 @@
 					</td>
 					<td class="col">
 						<h2>Содержание заказа</h2>
-						<div class="content">
+						<div class="content order-[+sb.id+]">
 							[+sb.products+]
 							<p align="right">
 								Общая сумма: <span class="total">[+sb.price.format+] [+sb.currency+]</span>
+							</p>
+							<p>
+								<input class="order_edit" data="[+sb.id+]" type="button" name="sb_edit" value="Редактировать заказ">
 							</p>
 						</div>
 						<h2>Параметры заказа</h2>
@@ -130,6 +145,7 @@
 </div>
 <!--# product_row: Шаблон конкретного товара #-->
 <div class="prod">
+	<input type="hidden" class="setid" value="[+sb.set_id+]" />
 	<span class="title"><a href="/magazin[+sb.url+]" target="_blank">[+sb.title+]</a></span>
 	<span class="price">
 		<small>[+sb.quantity+] x</small> [+sb.price.format+] = <span class="summ">[+sb.summ.format+] [+sb.currency+]</span>

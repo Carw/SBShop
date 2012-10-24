@@ -298,13 +298,17 @@ class SBShop {
 			$sCurrentUrl = iconv("Windows-1251", "UTF-8", $sCurrentUrl);
 		}
 		/**
+		 * Формируем полный адрес
+		 */
+		$sFullUrl = "http://" . $_SERVER['HTTP_HOST'] . $sCurrentUrl;
+		/**
 		 * Разбираем
 		 */
-		$aCurrentUrl = parse_url($sCurrentUrl);
+		$aCurrentUrl = parse_url($sFullUrl);
 		/**
 		 * Параметры запроса
 		 */
-		parse_str($aCurrentUrl['query'],$this->aUrlQueries);
+		parse_str($aCurrentUrl['query'], $this->aUrlQueries);
 		/**
 		 * Текущий адрес
 		 */

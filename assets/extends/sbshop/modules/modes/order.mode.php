@@ -89,6 +89,14 @@ class order_mode {
 		 */
 		$aOrderList = $oOrderList->getOrderList();
 		/**
+		 * Данные товара для JS-скрипта
+		 */
+		$aJsOrderData = array();
+		/**
+		 * Данные товаров для использования в редактировании
+		 */
+		$aJsProductsData = array();
+		/**
 		 * Вызов плагинов до вставки общих данных по товару
 		 */
 		$PlOut = $modx->sbshop->invokeEvent('OnSBShopOrderListPrerender', array(
@@ -179,10 +187,6 @@ class order_mode {
 			 */
 			$aOrderRepl = $modx->sbshop->arrayToPlaceholders($oOrder->getAttributes());
 			/**
-			 * Ссылка на заказ
-			 */
-			$aOrderRepl['[+sb.link+]'] = $this->sModuleLink . '&mode=order&act=show&orderid=' . $oOrder->getAttribute('id');
-			/**
 			 * Статус товара
 			 */
 			$aOrderRepl['[+sb.status.txt+]'] = $modx->sbshop->lang['order_status_' . $oOrder->getAttribute('status')];
@@ -255,11 +259,11 @@ class order_mode {
 				/**
 				 * Обрабатываем товары
 				 */
-				foreach ($aIds as $iSetId) {
+				foreach ($aIds as $sSetId) {
 					/**
 					 * Идентификатор товара
 					 */
-					$iProductId = intval($iSetId);
+					$iProductId = intval($sSetId);
 					/**
 					 * Загружаем товар
 					 */
@@ -268,7 +272,54 @@ class order_mode {
 					/**
 					 * Получаем информацию о количестве и прочих условиях заказа товара
 					 */
-					$aOrderInfo = $oOrder->getOrderSetInfo($iSetId);
+					$aOrderInfo = $oOrder->getOrderSetInfo($sSetId);
+					/**
+					 * Добавляем данные о товаре для JS-скрипта
+					 */
+					$aJsOrderData[$sSetId] = $aOrderInfo;
+					/**
+					 * Получаем список опций товара
+					 */
+					$aOptions = $oProduct->oOptions->getOptionNames();
+					/**
+					 * Обрабатываем каждый товар
+					 */
+					$aJsProductsData[$oProduct->getAttribute('id')] = array(
+						'title' => $oProduct->getAttribute('title'),
+						'price' => $oProduct->getFullPrice()
+					);
+
+					foreach($aOptions as $sOptionKey => $aOption) {
+						/**
+						 * Получаем значения
+						 */
+						$aValues = $oProduct->oOptions->getValuesByOptionName($sOptionKey);
+						/**
+						 * Обрабатываем каждое значение
+						 */
+						foreach($aValues as $aValue) {
+							/**
+							 * Если значение не равно 'null'
+							 */
+							if($aValue['value'] !== 'null') {
+								/**
+								 * Если значение опции скрываемое
+								 */
+								if(in_array($aValue['id'], $modx->sbshop->config['hide_option_values'])) {
+									$sOptionTitle = $aOption['title'];
+								} else {
+									$sOptionTitle = $aOption['title'] . $modx->sbshop->config['option_separator'] . ' ' . $aValue['title'];
+								}
+								/**
+								 * Получаем информацию по
+								 */
+								$aJsProductsData[$oProduct->getAttribute('id')]['options'][$aOption['id']][$aValue['id']] = array(
+									'title' => $sOptionTitle,
+									'price' => $oProduct->getPriceByOptions(array($aOption['id'] => $aValue['id']))
+								);
+							}
+						}
+					}
 					/**
 					 * Если товар есть
 					 */
@@ -277,28 +328,29 @@ class order_mode {
 						$aOrderInfo['sku'] = $oProduct->getAttribute('sku');
 					} else {
 						$aOrderInfo['url'] = '';
+						$aOrderInfo['sku'] = '';
 					}
 					/**
 					 * Общая сумма за товар
 					 */
-					$aOrderInfo['summ'] = $oOrder->getProductSummBySetId($iSetId);
+					$aOrderInfo['summ'] = $aOrderInfo['price'];
 					/**
-					 * Добавляем плейсхолдеры информации заказа
+					 * Массив опций для JS-скрипта
 					 */
-					$aProductRepl = $modx->sbshop->arrayToPlaceholders($aOrderInfo);
+					$aJsOrderDataOptions = array();
+					$aJsOrderDataOptions['ext'] = array();
 					/**
-					 * Идентификатор набора товара
-					 */
-					$aProductRepl['[+sb.set_id+]'] = $iSetId;
-					/**
-					 * Если установлены опции в товаре
+					 * Массив опций для товара
 					 */
 					$aOptions = array();
+					/**
+					 * Если установлены расширенные опции
+					 */
 					if(isset($aOrderInfo['options']['ext']) and count($aOrderInfo['options']['ext']) > 0) {
 						/**
 						 * Разбираем каждую дополнительную опцию
 						 */
-						foreach($aOrderInfo['options']['ext'] as $aOption) {
+						foreach($aOrderInfo['options']['ext'] as $iKey => $aOption) {
 							/**
 							 * Готовим плейсхолдеры
 							 */
@@ -307,8 +359,51 @@ class order_mode {
 							 * Добавляем опцию
 							 */
 							$aOptions[] = str_replace(array_keys($aRepl), array_values($aRepl), $this->aTemplates['product_option_row']);
+							/**
+							 * Для скрипта
+							 */
+							$aJsOrderDataOptions['ext'][$iKey] = array(
+								'title' => $aOption['title'],
+								'price' => $aOption['price'],
+								'valuid' => $aOption['value_id']
+							);
 						}
+					}
+					/**
+					 * Если есть опции добавленные вручную
+					 */
+					if(isset($aOrderInfo['options']['man'])) {
+						/**
+						 * Разбираем каждую дополнительную опцию
+						 */
+						foreach($aOrderInfo['options']['man'] as $iKey => $aOption) {
+							/**
+							 * Плейсхолдеры
+							 */
+							$aRepl = array(
+								'[+sb.title+]' => $aOption['title'],
+							);
+							/**
+							 * Добавляем опцию
+							 */
+							$aOptions[] = str_replace(array_keys($aRepl), array_values($aRepl), $this->aTemplates['product_option_row']);
+							/**
+							 * Для скрипта
+							 */
+							$aJsOrderDataOptions['man'][$iKey] = array(
+								'title' => $aOption['title']
+							);
+						}
+					}
+					/**
+					 * Если опции есть
+					 */
+					if(count($aOptions)> 0) {
 						$aOrderInfo['options'] = str_replace('[+sb.wrapper+]', implode($this->aTemplates['product_option_separator'], $aOptions), $this->aTemplates['product_option_outer']);
+						/**
+						 * Добавляем опции к данным для JS-скрипта
+						 */
+						$aJsOrderData[$sSetId]['options'] = $aJsOrderDataOptions;
 					} else {
 						$aOrderInfo['options'] = '';
 					}
@@ -316,6 +411,10 @@ class order_mode {
 					 * Плейсхолдеры для товара
 					 */
 					$aProductRepl = $modx->sbshop->arrayToPlaceholders($aOrderInfo);
+					/**
+					 * Идентификатор набора товара
+					 */
+					$aProductRepl['[+sb.set_id+]'] = $sSetId;
 					/**
 					 * Вставляем данные в шаблон
 					 */
@@ -371,10 +470,12 @@ class order_mode {
 			$aOrderRows[] = str_replace(array_keys($aOrderRepl), array_values($aOrderRepl), $this->aTemplates['order_row']);
 		}
 		/**
-		 * Плейсхолдеры для вставки в контенер
+		 * Плейсхолдеры для вставки в контейнер
 		 */
 		$phModule = array(
 			'[+sb.wrapper+]' => implode('', $aOrderRows),
+			'[+sb.jsdata+]' => json_encode($aJsOrderData),
+			'[+sb.jsdatanew+]' => json_encode($aJsProductsData),
 			/**
 			 * Служебные плейсхолдеры для модуля
 			 */
@@ -389,7 +490,7 @@ class order_mode {
 		/**
 		 * Объединяем плейсхолдеры с языковыми
 		 */
-		$phModule = array_merge($phModule,$phLang);
+		$phModule = array_merge($phModule, $phLang);
 		/**
 		 * Определяем выделенный статус
 		 */
