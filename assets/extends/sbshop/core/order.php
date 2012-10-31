@@ -990,6 +990,12 @@ class SBOrder {
 			}
 		}
 		/**
+		 * Вызов плагинов после обработки добавляемого товара
+		 */
+		$modx->invokeEvent('OnSBShopBeforeOrderSave', array(
+			'oOrder' => $modx->sbshop->oOrder
+		));
+		/**
 		 * Если установлен идентификатор заказа
 		 */
 		if($this->getAttribute('id') == null) {
@@ -1002,9 +1008,21 @@ class SBOrder {
 				 */
 				$this->setAttribute('id', $modx->db->getInsertId());
 			}
+			/**
+			 * Вызов плагинов после обработки добавляемого товара
+			 */
+			$modx->invokeEvent('OnSBShopOrderCreate', array(
+				'oOrder' => $modx->sbshop->oOrder
+			));
 		} else {
 			$modx->db->update($aData,$modx->getFullTableName('sbshop_orders'), 'order_id=' . $this->getAttribute('id'));
 		}
+		/**
+		 * Вызов плагинов после обработки добавляемого товара
+		 */
+		$modx->invokeEvent('OnSBShopAfterOrderSave', array(
+			'oOrder' => $modx->sbshop->oOrder
+		));
 		/**
 		 * Заносим информацию в сессию
 		 */
