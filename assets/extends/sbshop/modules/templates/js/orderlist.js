@@ -187,8 +187,11 @@ function editActions() {
 		var ajaxData = $.ajax({
 			type: 'POST',
 			url: '/assets/extends/sbshop/ajax/ajax.module.php',
-			data: 'm=ordEd&products=' + $.toJSON(saveData),
-			success: function(data) {
+			data: {
+				'm': 'ordEd',
+				'order': saveData
+			},
+			success: function(result) {
 				/**
 				 * Здесь должна быть обработка полученной обновленной инормации
 				 */

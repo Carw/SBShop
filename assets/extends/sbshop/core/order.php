@@ -20,7 +20,7 @@ class SBOrder {
 	/**
 	 * @var SBProductList
 	 */
-	protected $oProductList; // список товаров, которые лежат в корзине
+	public $oProductList; // список товаров, которые лежат в корзине
 	
 	public function __construct($aParam = false) {
 		/**
@@ -451,14 +451,14 @@ class SBOrder {
 						/**
 						 * Если значение не совпадает
 						 */
-						if($aOption['value_id'] != $aOptionsNew[$sKey]['value_id']) {
+						if(intval($aOption['value_id']) != intval($aOptionsNew[$sKey]['value_id'])) {
 							/**
 							 * Заменяем значения
 							 */
 							$this->aProducts[$sSetId]['options']['ext'][$sKey] = array(
-								'value_id' => intval($aOptionsNew['value_id']),
-								'title' => $aOptionsNew['title'],
-								'price' => $aOptionsNew['price']
+								'value_id' => intval($aOptionsNew[$sKey]['value_id']),
+								'title' => $aOptionsNew[$sKey]['title'],
+								'price' => $aOptionsNew[$sKey]['price']
 							);
 						}
 						/**
@@ -648,9 +648,17 @@ class SBOrder {
 			$fPrice = $oProduct->getAttribute('price_full') + $iPriceOptions;
 		} else {
 			/**
-			 * Любая другая комплектация. Берем стоимость комплектации
+			 * Любая другая комплектация. Берем информацию о комплектации
 			 */
 			$aBundle = $oProduct->getBundleById($sBundleId);
+			/**
+			 * Корректируем список опций с учетом опций, вошедших в комплектацию
+			 */
+			$aOptions = array_diff_assoc($aOptions, $aBundle['options']);
+			/**
+			 * Вычисляем стоимость опций
+			 */
+			$iPriceOptions = $oProduct->getPriceByOptions($aOptions);
 			/**
 			 * Если стоимость пустая
 			 */
@@ -832,7 +840,7 @@ class SBOrder {
 		 */
 		foreach($aOptions as $sOption) {
 			list($sKey, $sValue) = explode(':', $sOption);
-			$aSetOptions[$sKey] = $sValue;
+			$aSetOptions[intval($sKey)] = intval($sValue);
 		}
 		/**
 		 * Возвращаем массив опций

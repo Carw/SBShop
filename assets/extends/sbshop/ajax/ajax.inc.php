@@ -458,7 +458,7 @@ class SBAjax {
 		/**
 		 * Данные заказа
 		 */
-		$aOrderData = json_decode($_POST['products'], true);
+		$aOrderData = $_POST['order'];
 		/**
 		 * Используемые сеты
 		 */

@@ -540,7 +540,17 @@ class update_mode {
 					 * @var SBProduct $oProduct
 					 */
 					$oProduct = $aOrderData['product'];
+					/**
+					 * Добавляем товар в список заказа
+					 */
+					$oOrder->oProductList->addProduct($oProduct);
+					/**
+					 * Удаляем информацию о заказе, чтобы освободить немного памяти
+					 */
 					unset($aOrderData['product']);
+					/**
+					 * Формируем данные нового заказа
+					 */
 					$aProductsNew[$sSetId] = array(
 						'title' => $oProduct->getAttribute('title'),
 						'quantity' => $aOrderData['quantity'],

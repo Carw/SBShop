@@ -288,7 +288,7 @@ class SBProductList {
 						/**
 						 * Добавляем объединенный список условий на равенство
 						 */
-						$aFilterExtendedParams[] = 'b.attribute_id =' . $sFilterKey . ' and b.attribute_value in(' . implode(',' ,$aValues) .  ')';
+						$aFilterExtendedParams[] = 'b.attribute_id =' . $sFilterKey . ' and b.attribute_value in(' . implode(',' , $aValues) .  ')';
 						/**
 						 * Счетчик
 						 */
@@ -387,7 +387,7 @@ class SBProductList {
 			/**
 			 * Получаем информацию из базы с учетом фильтров только по основным параметрам
 			 */
-			$rs = $modx->db->select('*', $modx->getFullTableName('sbshop_products'), ' product_deleted = 0 AND product_published = 1 AND product_category = ' . $iCatId . $sFilter,'product_order',$iLimit);
+			$rs = $modx->db->select('*', $modx->getFullTableName('sbshop_products'), ' product_deleted = 0 AND product_published = 1 AND product_category = ' . $iCatId . $sFilter, 'product_order', $iLimit);
 			$aRaws = $modx->db->makeArray($rs);
 		} else {
 			/**
@@ -470,7 +470,7 @@ class SBProductList {
 		/**
 		 * Получаем информацию из базы
 		 */
-		$rs = $modx->db->select('*',$modx->getFullTableName('sbshop_products'),' product_deleted = 0 AND product_published = 1','product_order',$iLimit);
+		$rs = $modx->db->select('*', $modx->getFullTableName('sbshop_products'), ' product_deleted = 0 AND product_published = 1', 'product_order');
 		$aRaws = $modx->db->makeArray($rs);
 		/**
 		 * Устанавливаем список

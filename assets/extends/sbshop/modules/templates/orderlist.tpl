@@ -11,7 +11,6 @@
 <script type="text/javascript" src="[+site.url+]assets/libs/dyndatetime/jquery.dynDateTime.js"></script>
 <script type="text/javascript" src="[+site.url+]assets/libs/dyndatetime/lang/calendar-ru-my.js"></script>
 <script type="text/javascript" src="[+site.url+]assets/libs/javascript/jquery.autocomplete.js"></script>
-<script type="text/javascript" src="[+site.url+]assets/libs/javascript/jquery.json-2.3.min.js"></script>
 <script type="text/javascript" src="[+site.url+]assets/extends/sbshop/modules/templates/js/orderlist.js"></script>
 
 <div class="sectionHeader">

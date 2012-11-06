@@ -54,9 +54,19 @@ class yml_mode {
 			 */
 			$aCatRepl = $modx->sbshop->arrayToPlaceholders($oCategory->getAttributes());
 			/**
-			 * Добавляем строку
+			 * Если это вложенный раздел
 			 */
-			$sCategories .= str_replace(array_keys($aCatRepl), array_values($aCatRepl), $aTemplates['yml_category']);
+			if($oCategory->getAttribute('parent') == 0) {
+				/**
+				 * Добавляем строку
+				 */
+				$sCategories .= str_replace(array_keys($aCatRepl), array_values($aCatRepl), $aTemplates['yml_category']);
+			} else {
+				/**
+				 * Добавляем строку
+				 */
+				$sCategories .= str_replace(array_keys($aCatRepl), array_values($aCatRepl), $aTemplates['yml_category_inner']);
+			}
 		}
 		/**
 		 * Добавляем в список основных плейсхолдеров информацию о категориях
@@ -74,6 +84,7 @@ class yml_mode {
 		$sProducts = '';
 		/**
 		 * Обрабатываем каждый товар
+		 * @var SBProduct $oProduct
 		 */
 		foreach ($aProducts as $oProduct) {
 			/**
@@ -92,6 +103,24 @@ class yml_mode {
 				} else {
 					$aProdRepl['[+sb.existence+]'] = 'false';
 				}
+				/**
+				 * Получаем список изображений
+				 */
+				$aImages = $oProduct->getAllImages();
+				/**
+				 * Список изображений
+				 */
+				$sImages = '';
+				/**
+				 * Обрабатываем изображения
+				 */
+				foreach($aImages as $aImage) {
+					$sImages .= str_replace('[+sb.image+]', $aImage['x480'], $aTemplates['yml_image']);
+				}
+				/**
+				 * Добавляем изображения в плейсхолдеры товара
+				 */
+				$aProdRepl['[+sb.images+]'] = $sImages;
 				/**
 				 * Получаем список видимых характеристик товара
 				 */
@@ -133,12 +162,12 @@ class yml_mode {
 					/**
 					 * Плейсхолдер параметра для товара
 					 */
-					$aProdRepl['[+sb.param.' . mb_strtolower($aVal['title'],'UTF-8') . '+]'] = $aVal['value'];
+					$aProdRepl['[+sb.param.' . mb_strtolower($aVal['title'], 'UTF-8') . '+]'] = $aVal['value'];
 				}
 				/**
 				 * Добавляем изображения
 				 */
-				$aProdRepl = array_merge($aProdRepl,$modx->sbshop->multiarrayToPlaceholders($oProduct->getAllImages(),'num','sb.image.'));
+				$aProdRepl = array_merge($aProdRepl,$modx->sbshop->multiarrayToPlaceholders($oProduct->getAllImages(), 'num', 'sb.image.'));
 				/**
 				 * Добавляем товар
 				 */
