@@ -451,11 +451,11 @@ class product_mode {
 			/**
 			 * Обрабатываем каждую запись
 			 */
-			foreach ($aBundles as $iBundleId => $aBundle) {
+			foreach ($aBundles as $sBundleId => $aBundle) {
 				/**
 				 * Добавляем идентификатор в плейсхолдеры
 				 */
-				$aBundle['id'] = $iBundleId;
+				$aBundle['id'] = $sBundleId;
 				/**
 				 * Массив опций в комплектации
 				 */
@@ -476,25 +476,9 @@ class product_mode {
 				 */
 				$aBundle['options.js'] = json_encode($aBundleOptions);
 				/**
-				 * Если стоимость пустая
-				 */
-				if($aBundle['price'] === '') {
-					/**
-					 * Определяем стоимость по факту - товар + опции
-					 */
-					$aBundle['price_full'] = $modx->sbshop->oGeneralProduct->getAttribute('price_full') + $modx->sbshop->oGeneralProduct->getPriceByOptions($aBundle['options']);
-				} elseif(substr($aBundle['price'],0,1) === '+') {
-					/**
-					 * Если первый символ - "+"
-					 */
-					$aBundle['price_full'] = $modx->sbshop->oGeneralProduct->getAttribute('price_full') + substr($aBundle['price'], 1);
-				} else {
-					$aBundle['price_full'] = $aBundle['price'];
-				}
-				/**
 				 * Обработка надбавки
 				 */
-				$aBundle['price_full'] = $modx->sbshop->setPriseIncrement($aBundle['price_full'], $aBundle['price_add']);
+				$aBundle['price_full'] = $modx->sbshop->oGeneralProduct->getPriceByBundle($sBundleId);
 				/**
 				 * Делаем набор плейсхолдеров
 				 */

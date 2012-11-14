@@ -149,6 +149,10 @@
 	<span class="price">
 		<small>[+sb.quantity+] x</small> [+sb.price.format+] = <span class="summ">[+sb.summ.format+] [+sb.currency+]</span>
 	</span>
+	<div class="bundle">
+		<span class="bundletitle">Комплектация: [+sb.bundle+]</span>
+		[+sb.bundleoptions+]
+	</div>
 	[+sb.sku+]
 	<br>
 	[+sb.options+]
@@ -165,3 +169,7 @@
 <option value="[+sb.value+]">[+sb.title+]</option>
 <!--# action_option_selected: Активный статус заказа #-->
 <option value="[+sb.value+]" selected="selected">[+sb.title+]</option>
+<!--# bundleoptions_outer: Шаблон контейнера опций для комплектации #-->
+<ul class="bundleoptions">[+sb.wrapper+]</ul>
+<!--# bundleoptions_inner: Шаблон опции для комплектации #-->
+<li>[+sb.title+]</li>

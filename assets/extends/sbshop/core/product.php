@@ -388,6 +388,42 @@ class SBProduct {
 	}
 
 	/**
+	 * Рассчет стоимости комплектации по идентификатору с учетом надбавки
+	 * @param $sBundleId
+	 */
+	public function getPriceByBundle($sBundleId) {
+		global $modx;
+		/**
+		 * Данные комплектации
+		 */
+		$aBundle = $this->getBundleById($sBundleId);
+		/**
+		 * Если стоимость пустая
+		 */
+		if($aBundle['price'] === '') {
+			/**
+			 * Определяем стоимость по факту - товар + опции
+			 */
+			$iPrice = $this->getAttribute('price_full') + $this->getPriceByOptions($aBundle['options']);
+		} elseif(substr($aBundle['price'], 0, 1) === '+') {
+			/**
+			 * Если первый символ - "+"
+			 */
+			$iPrice = $this->getAttribute('price_full') + substr($aBundle['price'], 1);
+		} else {
+			$iPrice = $aBundle['price'];
+		}
+		/**
+		 * Обработка надбавки
+		 */
+		$iPrice = $modx->sbshop->setPriseIncrement($iPrice, $aBundle['price_add']);
+		/**
+		 * Возвращаем результат
+		 */
+		return $iPrice;
+	}
+
+	/**
 	 * Рассчет стоимости опций по переданному массиву
 	 * @param <type> $aOptions
 	 */

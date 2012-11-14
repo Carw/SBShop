@@ -437,7 +437,7 @@ class checkout_mode {
 					/**
 					 * Получаем данные по комплектации
 					 */
-					$aBundle = $oProduct->getBundleById($aOrderInfo['bundle']);
+					$aBundle = $oProduct->getBundleById($aOrderInfo['bundle']['id']);
 					/**
 					 * Массив опций в комплектации
 					 */

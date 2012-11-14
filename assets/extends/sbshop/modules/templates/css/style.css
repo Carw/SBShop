@@ -628,6 +628,23 @@ input[type="button"]:hover, input[type="submit"]:hover {
 	font-weight: bold;
 }
 
+.order .prod .bundletitle {
+	font-size: 10px;
+	margin-left: 5px;
+	border-bottom: 1px dashed;
+	cursor: pointer;
+}
+
+.order .prod .bundleoptions {
+	display: none;
+	font-size: 10px;
+}
+
+.order .prod .bundleoptions li {
+	list-style: circle;
+	list-style-image: none;
+}
+
 .order .prod .optlist {
 	font-size: 10px;
 	color: #302f2f;

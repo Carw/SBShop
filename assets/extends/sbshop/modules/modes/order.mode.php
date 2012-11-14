@@ -141,7 +141,7 @@ class order_mode {
 					/**
 					 * Формируем дату
 					 */
-					$aOrderList[$sKey]->setAttribute('date_next',date('Y-m-d G:i:s', $iDateNext));
+					$aOrderList[$sKey]->setAttribute('date_next', date('Y-m-d G:i:s', $iDateNext));
 					/**
 					 * Устанавливаем новый статус
 					 */
@@ -288,7 +288,41 @@ class order_mode {
 						'title' => $oProduct->getAttribute('title'),
 						'price' => $oProduct->getFullPrice()
 					);
-
+					/**
+					 * Добавляем комплектацию
+					 */
+					$aOrderInfo['bundle'] = $aOrderInfo['bundle']['title'];
+					/**
+					 * Если установлены базовые опции, которые входят в комплектацию
+					 */
+					if(isset($aOrderInfo['options']['base']) and count($aOrderInfo['options']['base']) > 0) {
+						/**
+						 * Опции для комплектации
+						 */
+						$aBundleOptions = array();
+						/**
+						 * Разбираем каждую дополнительную опцию
+						 */
+						foreach($aOrderInfo['options']['base'] as $iKey => $aOption) {
+							/**
+							 * Готовим плейсхолдеры
+							 */
+							$aRepl = $modx->sbshop->arrayToPlaceholders($aOption);
+							/**
+							 * Добавляем опцию
+							 */
+							$aBundleOptions[] = str_replace(array_keys($aRepl), array_values($aRepl), $this->aTemplates['bundleoptions_inner']);
+						}
+						/**
+						 * Вставляем опции в контейнер
+						 */
+						$aOrderInfo['bundleoptions'] = str_replace('[+sb.wrapper+]', implode('', $aBundleOptions), $this->aTemplates['bundleoptions_outer']);
+					} else {
+						$aOrderInfo['bundleoptions'] = '';
+					}
+					/**
+					 * Обрабатываем опции
+					 */
 					foreach($aOptions as $sOptionKey => $aOption) {
 						/**
 						 * Получаем значения
@@ -331,9 +365,13 @@ class order_mode {
 						$aOrderInfo['sku'] = '';
 					}
 					/**
+					 * Стоимость одного товара
+					 */
+					$aOrderInfo['price'] = $aOrderInfo['full_price'];
+					/**
 					 * Общая сумма за товар
 					 */
-					$aOrderInfo['summ'] = $aOrderInfo['price'];
+					$aOrderInfo['summ'] = $oOrder->getProductSummBySetId($sSetId);;
 					/**
 					 * Массив опций для JS-скрипта
 					 */

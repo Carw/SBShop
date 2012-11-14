@@ -562,6 +562,9 @@ class update_mode {
 					if(isset($aOrderData['bundle'])) {
 						if($aOrderData['bundle'] !== 'base' and $aOrderData['bundle'] !== 'personal') {
 							$aBundle = $oProduct->getBundleById($aOrderData['bundle']);
+							/**
+							 * XXX Исправить!
+							 */
 							$aProductsNew[$sSetId]['title'] .= ' - ' . $aBundle['title'];
 						}
 					}

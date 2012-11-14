@@ -119,6 +119,10 @@ $(document).ready(function(){
 		$('#opacity').addClass('active');
 	});
 
+	$('.bundletitle').click(function(){
+		$(this).parent().find('.bundleoptions').toggle('active');
+	});
+
 });
 
 function popupActions() {
