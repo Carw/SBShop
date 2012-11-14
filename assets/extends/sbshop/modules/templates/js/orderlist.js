@@ -64,7 +64,7 @@ $(document).ready(function(){
 				order.title +
 				'<a href="#" class="product_del">Удалить</a>' +
 				'<div class="quantity">Количество: <input type="text" class="pquantity" value="' + order.quantity + '" /></div>' +
-				'<div class="price">Цена: <input type="text" class="pprice" value="' + order.price + '" /></div>' +
+				'<div class="price">Цена: <input type="text" class="pprice" value="' + order.full_price + '" /></div>' +
 			'</div>';
 			/**
 			 * Опции
@@ -180,7 +180,7 @@ function editActions() {
 
 			products[setId] = {
 				'title': pTitle,
-				'price': pPrice,
+				'full_price': pPrice,
 				'quantity': pQuantity,
 				'options': options
 			};

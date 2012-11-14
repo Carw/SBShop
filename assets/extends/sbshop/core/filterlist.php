@@ -65,6 +65,16 @@ class SBFilterList {
 	}
 
 	/**
+	 * Удалить все фильтры
+	 */
+	public function clear() {
+		$this->aFilterList = array(
+			'general' => array(),
+			'extended' => array(),
+		);
+	}
+
+	/**
 	 * Получить настройку фильтра по его идентификатору
 	 * @return void
 	 */

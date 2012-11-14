@@ -148,14 +148,15 @@
 	<span class="title"><a href="/magazin[+sb.url+]" target="_blank">[+sb.title+]</a></span>
 	<span class="price">
 		<small>[+sb.quantity+] x</small> [+sb.price.format+] = <span class="summ">[+sb.summ.format+] [+sb.currency+]</span>
-	</span>
-	<div class="bundle">
-		<span class="bundletitle">Комплектация: [+sb.bundle+]</span>
-		[+sb.bundleoptions+]
-	</div>
-	[+sb.sku+]
-	<br>
-	[+sb.options+]
+    </span>
+	<div class="inner">
+	    <div class="bundle">
+	        <span class="bundletitle">Комплектация: [+sb.bundle+]</span>
+	        [+sb.bundleoptions+]
+		</div>
+	    [+sb.sku+]
+	    [+sb.options+]
+    </div>
 </div>
 <!--# product_option_outer: Контейнер списка опций для заказанного товара #-->
 <span class="optlist">[+sb.wrapper+]</span>

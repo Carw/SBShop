@@ -628,9 +628,16 @@ input[type="button"]:hover, input[type="submit"]:hover {
 	font-weight: bold;
 }
 
+.order .prod .inner {
+	margin-left: 10px;
+}
+
+.order .prod .bundle {
+	margin-bottom: 5px;
+}
+
 .order .prod .bundletitle {
 	font-size: 10px;
-	margin-left: 5px;
 	border-bottom: 1px dashed;
 	cursor: pointer;
 }

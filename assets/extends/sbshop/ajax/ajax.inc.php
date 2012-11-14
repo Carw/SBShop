@@ -489,7 +489,7 @@ class SBAjax {
 				/**
 				 * Форматируем стоимость
 				 */
-				$aEditProduct['price'] = str_replace(' ', '', $aEditProduct['price']);
+				$aEditProduct['full_price'] = str_replace(' ', '', $aEditProduct['full_price']);
 				unset($aEditProduct['options']);
 				/**
 				 * Редактируем товар

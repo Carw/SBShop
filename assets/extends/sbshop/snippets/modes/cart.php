@@ -75,6 +75,10 @@ class cart_mode {
 			 * Сохраняем результат
 			 */
 			$modx->sbshop->oOrder->save();
+			/**
+			 * Заносим информацию в сессию
+			 */
+			$modx->sbshop->oOrder->setSession();
 		}
 		
 	}
@@ -448,6 +452,10 @@ class cart_mode {
 		 * Сохраняем результат
 		 */
 		$modx->sbshop->oOrder->save();
+		/**
+		 * Заносим информацию в сессию
+		 */
+		$modx->sbshop->oOrder->setSession();
 	}
 }
 

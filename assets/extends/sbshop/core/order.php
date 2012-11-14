@@ -505,8 +505,8 @@ class SBOrder {
 			/**
 			 * Если есть стоимость
 			 */
-			if(isset($aProduct['price'])) {
-				$this->aProducts[$sSetId]['price'] = floatval($aProduct['price']);
+			if(isset($aProduct['full_price'])) {
+				$this->aProducts[$sSetId]['full_price'] = floatval($aProduct['full_price']);
 			}
 			/**
 			 * Если есть количество
@@ -1057,10 +1057,6 @@ class SBOrder {
 		$modx->invokeEvent('OnSBShopAfterOrderSave', array(
 			'oOrder' => $modx->sbshop->oOrder
 		));
-		/**
-		 * Заносим информацию в сессию
-		 */
-		$this->setSession();
 	}
 	
 	/**

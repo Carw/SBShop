@@ -165,6 +165,10 @@ class checkout_mode {
 			 * Сохраняем информацию
 			 */
 			$modx->sbshop->oOrder->save();
+			/**
+			 * Заносим информацию в сессию
+			 */
+			$modx->sbshop->oOrder->setSession();
 		}
 	}
 
@@ -730,6 +734,10 @@ class checkout_mode {
 			 * Сохраняем данные заказа
 			 */
 			$modx->sbshop->oOrder->save();
+			/**
+			 * Заносим информацию в сессию
+			 */
+			$modx->sbshop->oOrder->setSession();
 			/**
 			 * Редирект на следующий шаг
 			 */

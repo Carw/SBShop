@@ -1128,6 +1128,11 @@ class cat_mode {
 			 */
 			$this->oCategory->setAttribute('options',$sOptions);
 		}
+
+		/**
+		 * Очищаем список фильтров
+		 */
+		$this->oCategory->oFilterList->clear();
 		/**
 		 * Если есть включенные фильтры
 		 */
