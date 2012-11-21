@@ -50,7 +50,7 @@ class clearbin_mode {
 			/**
 			 * Правило для запроса
 			 */
-			$aCatPaths[] = 'category_path LIKE "' . $aRow['category_path'] . '.%"';
+			$aCatPaths[] = 'category_path LIKE "' . $aRow['category_path'] . '.' . $aRow['category_id'] . '.%"';
 		}
 		/**
 		 * Если есть удаляемые разделы

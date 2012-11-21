@@ -60,6 +60,10 @@ class update_mode {
 		 * Обновление списка заказов 21.08.12
 		 */
 		//$this->updateOrderlist();
+		/**
+		 * Обновление списка заказов 19.11.12
+		 */
+		//$this->updateOrderlist2();
 
 		echo '<p>Если вы ожидали, что здесь скрывается автоматическое обновление, то зря. Для работы необхожимо раскомментировать необходимую строку у режима модуля "update".</p>';
 
@@ -672,6 +676,99 @@ class update_mode {
 			if($modx->db->update($aUpd, $modx->getFullTableName('sbshop_orders'), 'order_id = ' . $aRaw['order_id'])) {
 				echo '<p>Обновлен список товаров в заказе № ' . $aRaw['order_id'] . '</p>';
 			}
+		}
+	}
+
+	/**
+	 * Изменение списка заказов, доработка формата хранения
+	 */
+	protected function updateOrderlist2() {
+		global $modx;
+		/**
+		 * Массив товаров
+		 */
+		$aProductsData = array();
+		/**
+		 * Загружаем список всех заказов
+		 */
+		$rs = $modx->db->select('*', $modx->getFullTableName('sbshop_orders'), '', '', 10000);
+		$aRaws = $modx->db->makeArray($rs);
+		/**
+		 * Обрабатываем каждую запись
+		 */
+		foreach ($aRaws as $aRaw) {
+			/**
+			 * Заказ
+			 * @var SBOrder $oOrder
+			 */
+			$oOrder = new SBOrder($aRaw);
+			/**
+			 * Получаем список товаров
+			 */
+			$aProducts = $oOrder->getProducts();
+
+			foreach($aProducts as $sSetId => $aProduct) {
+				/**
+				 * Получаем товар
+				 */
+				$iProductId = $oOrder->getProductIdBySetId($sSetId);
+				if(isset($aProductsData[$iProductId])) {
+					$oProduct = $aProductsData[$iProductId];
+				} else {
+					$oProduct = new SBProduct();
+					$oProduct->load($iProductId);
+					$aProductsData[$iProductId] = $oProduct;
+				}
+				$aProductEdit = array();
+				/**
+				 * Если установлена комплектация
+				 */
+				if(isset($aProduct['bundle'])) {
+					/**
+					 * Базовая
+					 */
+					if($aProduct['bundle'] === 'base') {
+						$aProductEdit['bundle'] = array(
+								'id' => 'base',
+								'title' => 'Базовая комплектация'
+						);
+					} elseif($aProduct['bundle'] === 'personal') {
+						$aProductEdit['bundle'] = array(
+							'id' => 'personal',
+							'title' => 'Индивидуальная комплектация'
+						);
+					} else {
+						$aBundle = $oProduct->getBundleById($aProduct['bundle']);
+						$aProductEdit['bundle'] = array(
+							'id' => $aProduct['bundle'],
+							'title' => $aBundle['title']
+						);
+					}
+				} else {
+					$aProductEdit['bundle'] = array(
+						'id' => 'base',
+						'title' => 'Базовая комплектация'
+					);
+				}
+				/**
+				 * Стоимость
+				 */
+				if($aProduct['price'] > $aProduct['price_full']) {
+					$aProductEdit['price_full'] = $aProduct['price'];
+				}
+				/**
+				 * Редактируем
+				 */
+				$oOrder->editProduct($sSetId, $aProductEdit);
+			}
+			/**
+			 * Информация об обновляемом заказе
+			 */
+			echo '<p>Обновлен список товаров в заказе № ' . $oOrder->getAttribute('id') . '</p>';
+			/**
+			 * Сохраняем заказ
+			 */
+			$oOrder->save();
 		}
 	}
 

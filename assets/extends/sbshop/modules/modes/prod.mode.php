@@ -175,16 +175,16 @@ class prod_mode {
 		/**
 		 * Подготавливаем языковые плейсхолдеры
 		 */
-		$phLang = $modx->sbshop->arrayToPlaceholders($aLang,'lang.');
+		$phLang = $modx->sbshop->arrayToPlaceholders($aLang, 'lang.');
 		/**
 		 * Подготавливаем стилевые плейсхолдеры
 		 */
-		$phStyle = $modx->sbshop->arrayToPlaceholders($_style,'style.');
+		$phStyle = $modx->sbshop->arrayToPlaceholders($_style, 'style.');
 		/**
 		 * Подготавливаем плейсхолдеры данных продукта
 		 */
 		$aModule = $this->oProduct->getGeneralAttributes();
-		$phModule = $modx->sbshop->arrayToPlaceholders($aModule,'product.');
+		$phModule = $modx->sbshop->arrayToPlaceholders($aModule, 'product.');
 		/**
 		 * Специально устанавливаем плейсхолдер для галочки опубликованности
 		 */
@@ -733,7 +733,7 @@ class prod_mode {
 		 * Если текущий раздел не загружен
 		 */
 		if($this->oCategory->getAttribute('id') != $iBaseCatId) {
-			$this->oCategory->load($iBaseCatId);
+			$this->oCategory->load($iBaseCatId, true);
 		}
 		/**
 		 * Получаем массив родительских разделов
@@ -765,7 +765,7 @@ class prod_mode {
 				 * Загружаем нужный раздел
 				 */
 				$oCategory = new SBCategory();
-				$oCategory->load($iCatId);
+				$oCategory->load($iCatId, true);
 			}
 			/**
 			 * Если товар новый и опубликован
@@ -835,12 +835,8 @@ class prod_mode {
 			/**
 			 * Загружаем информацию о категории
 			 */
-			$oCategory = new SBCategory();
-			$oCategory->load($iCategoryId,true);
-			/**
-			 * Добавляем информацию о категории для текущего товара
-			 */
-			$this->oCategory = $oCategory;
+			$this->oCategory = new SBCategory();
+			$this->oCategory->load($iCategoryId, true);
 		} else {
 			$this->sError = $modx->sbshop->lang['product_error_category'];
 			$bError = true;
@@ -884,7 +880,7 @@ class prod_mode {
 			/**
 			 * Это не новый товар, можно смело формировать URL
 			 */
-			$sUrl = $oCategory->getAttribute('url') . '/' . $sAlias;
+			$sUrl = $this->oCategory->getAttribute('url') . '/' . $sAlias;
 			/**
 			 * Устанавливаем параметр URL
 			 */

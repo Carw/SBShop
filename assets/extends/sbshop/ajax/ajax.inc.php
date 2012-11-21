@@ -487,9 +487,15 @@ class SBAjax {
 				$aEditProduct = $aOrderData['products'][$sSetId];
 				$aEditOptions = $aEditProduct['options'];
 				/**
+				 * Если опции не установлены
+				 */
+				if(!is_array($aEditOptions)) {
+					$aEditOptions = array();
+				}
+				/**
 				 * Форматируем стоимость
 				 */
-				$aEditProduct['full_price'] = str_replace(' ', '', $aEditProduct['full_price']);
+				$aEditProduct['price_full'] = str_replace(' ', '', $aEditProduct['price_full']);
 				unset($aEditProduct['options']);
 				/**
 				 * Редактируем товар

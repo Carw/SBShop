@@ -367,7 +367,7 @@ class order_mode {
 					/**
 					 * Стоимость одного товара
 					 */
-					$aOrderInfo['price'] = $aOrderInfo['full_price'];
+					$aOrderInfo['price'] = $aOrderInfo['price_full'];
 					/**
 					 * Общая сумма за товар
 					 */

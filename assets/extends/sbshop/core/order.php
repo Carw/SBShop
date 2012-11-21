@@ -449,7 +449,7 @@ class SBOrder {
 				/**
 				 * Полная стоимость товара
 				 */
-				'full_price' => $this->getProductPriceBySetId($sSetId, $aParams['bundle']),
+				'price_full' => $this->getProductPriceBySetId($sSetId, $aParams['bundle']),
 			);
 			/**
 			 * Добавляем опции
@@ -505,8 +505,8 @@ class SBOrder {
 			/**
 			 * Если есть стоимость
 			 */
-			if(isset($aProduct['full_price'])) {
-				$this->aProducts[$sSetId]['full_price'] = floatval($aProduct['full_price']);
+			if(isset($aProduct['price_full'])) {
+				$this->aProducts[$sSetId]['price_full'] = floatval($aProduct['price_full']);
 			}
 			/**
 			 * Если есть количество
@@ -514,85 +514,96 @@ class SBOrder {
 			if(isset($aProduct['quantity'])) {
 				$this->aProducts[$sSetId]['quantity'] = intval($aProduct['quantity']);
 			}
+			/**
+			 * Если есть количество
+			 */
+			if(isset($aProduct['bundle'])) {
+				$this->aProducts[$sSetId]['bundle'] = $aProduct['bundle'];
+			}
 		}
 		/**
 		 * Если переданы данные на опции
 		 */
-		if($aOptionsNew) {
+		if(is_array($aOptionsNew)) {
 			/**
-			 * Если есть расширенные опции
+			 * Если список параметров пуст
 			 */
-			if(isset($this->aProducts[$sSetId]['options']['ext'])) {
+			if(count($aOptionsNew) == 0) {
+				unset($this->aProducts[$sSetId]['options']);
+			} else {
 				/**
-				 * Обрабатываем имеющиеся опции
+				 * Если есть расширенные опции
 				 */
-				foreach($this->aProducts[$sSetId]['options']['ext'] as $sKey => $aOption) {
+				if(isset($this->aProducts[$sSetId]['options']['ext'])) {
 					/**
-					 * Если опция есть в новом списке
+					 * Обрабатываем имеющиеся опции
 					 */
-					if(isset($aOptionsNew[$sKey])) {
+					foreach($this->aProducts[$sSetId]['options']['ext'] as $sKey => $aOption) {
 						/**
-						 * Если значение не совпадает
+						 * Если опция есть в новом списке
 						 */
-						if(intval($aOption['value_id']) != intval($aOptionsNew[$sKey]['value_id'])) {
+						if(isset($aOptionsNew[$sKey])) {
 							/**
-							 * Заменяем значения
+							 * Если значение не совпадает
 							 */
-							$this->aProducts[$sSetId]['options']['ext'][$sKey] = array(
-								'value_id' => intval($aOptionsNew[$sKey]['value_id']),
-								'title' => $aOptionsNew[$sKey]['title'],
-								'price' => $aOptionsNew[$sKey]['price']
-							);
+							if(intval($aOption['value_id']) != intval($aOptionsNew[$sKey]['value_id'])) {
+								/**
+								 * Заменяем значения
+								 */
+								$this->aProducts[$sSetId]['options']['ext'][$sKey] = array(
+									'value_id' => intval($aOptionsNew[$sKey]['value_id']),
+									'title' => $aOptionsNew[$sKey]['title'],
+									'price' => $aOptionsNew[$sKey]['price']
+								);
+							}
+							/**
+							 * Убираем опцию из нового списка
+							 */
+							unset($aOptionsNew[$sKey]);
+						} else {
+							/**
+							 * Удаляем опцию
+							 */
+							unset($this->aProducts[$sSetId]['options']['ext'][$sKey]);
 						}
+					}
+				}
+				/**
+				 * Очищаем опции, установленные вручную ранее
+				 */
+				unset($this->aProducts[$sSetId]['options']['man']);
+				/**
+				 * Обрабатываем оставшиеся новые опции в списке
+				 */
+				foreach($aOptionsNew as $sKey => $aOption) {
+
+					/**
+					 * Если первая буква n
+					 */
+					if(substr($sKey, 0, 1) === 'n') {
 						/**
-						 * Убираем опцию из нового списка
+						 * Добавляем новую опцию в ручной список
 						 */
-						unset($aOptionsNew[$sKey]);
+						$cnt = count($this->aProducts[$sSetId]['options']['man']);
+						$this->aProducts[$sSetId]['options']['man'][$cnt]['title'] = $aOption['title'];
+						/**
+						 * Если установлена цена
+						 */
+						if(isset($aOption['price'])) {
+							$this->aProducts[$sSetId]['options']['man'][$cnt]['price'] = $aOption['price'];
+						}
 					} else {
 						/**
-						 * Удаляем опцию
+						 * Добавляем новую опцию
 						 */
-						unset($this->aProducts[$sSetId]['options']['ext'][$sKey]);
+						$this->aProducts[$sSetId]['options']['ext'][$sKey] = array(
+							'value_id' => $aOption['value_id'],
+							'title' => $aOption['title'],
+							'price' => $aOption['price']
+						);
 					}
 				}
 			}
-			/**
-			 * Очищаем опции, установленные вручную ранее
-			 */
-			unset($this->aProducts[$sSetId]['options']['man']);
-			/**
-			 * Обрабатываем оставшиеся новые опции в списке
-			 */
-			foreach($aOptionsNew as $sKey => $aOption) {
-
-				/**
-				 * Если первая буква n
-				 */
-				if(substr($sKey, 0, 1) === 'n') {
-					/**
-					 * Добавляем новую опцию в ручной список
-					 */
-					$cnt = count($this->aProducts[$sSetId]['options']['man']);
-					$this->aProducts[$sSetId]['options']['man'][$cnt]['title'] = $aOption['title'];
-					/**
-					 * Если установлена цена
-					 */
-					if(isset($aOption['price'])) {
-						$this->aProducts[$sSetId]['options']['man'][$cnt]['price'] = $aOption['price'];
-					}
-				} else {
-					/**
-					 * Добавляем новую опцию
-					 */
-					$this->aProducts[$sSetId]['options']['ext'][$sKey] = array(
-						'value_id' => $aOption['value_id'],
-						'title' => $aOption['title'],
-						'price' => $aOption['price']
-					);
-				}
-			}
-		} else {
-			unset($this->aProducts[$sSetId]['options']);
 		}
 	}
 
@@ -773,7 +784,7 @@ class SBOrder {
 	 * @return
 	 */
 	public function getProductSummBySetId($sSetId) {
-		return $this->aProducts[$sSetId]['full_price'] * $this->aProducts[$sSetId]['quantity'];
+		return $this->aProducts[$sSetId]['price_full'] * $this->aProducts[$sSetId]['quantity'];
 	}
 
 	/**
