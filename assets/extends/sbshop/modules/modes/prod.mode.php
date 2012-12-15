@@ -1148,18 +1148,71 @@ class prod_mode {
 		 */
 		if($_POST['bundle_base_settings']) {
 			/**
+			 * Разделяем набор значений
+			 */
+			$aBundleBaseOptions = explode(',', $_POST['bundle_base_settings']);
+			/**
+			 * Обработанные значения
+			 */
+			$aBundleBaseOptionsReady = array();
+			/**
+			 * Обрабатываем каждую
+			 */
+			$cnt = count($aBundleBaseOptions);
+			for($i=0; $i < $cnt; $i++) {
+				/**
+				 * Разбиваем ключ и значение
+				 */
+				list($sKey, $sVal) = explode(':', $aBundleBaseOptions[$i]);
+				/**
+				 * Переводим значения к числам
+				 */
+				$iKey = intval($sKey);
+				$iVal = intval($sVal);
+				/**
+				 * Получаем данные опции
+				 */
+				$aBundleBaseOptionsData = $this->oProduct->oOptions->getValueByNameIdAndValId($iKey, $iVal);
+				/**
+				 * Если такой опции не существует
+				 */
+				if(isset($aBundleBaseOptionsData)) {
+					$aBundleBaseOptionsReady[] = $iKey . ':' . $iVal;
+				}
+			}
+			/**
 			 * Добавляем информацию о базовой комплектации
 			 */
-			$this->oProduct->setAttribute('base_bundle', htmlspecialchars($_POST['bundle_base_settings'], ENT_QUOTES));
+			$this->oProduct->setAttribute('base_bundle', implode(',', $aBundleBaseOptionsReady));
 		}
 		/**
 		 * Если есть информация об индивидуальной комплектации
 		 */
 		if($_POST['personal_bundle_settings']) {
-			/**
-			 * Добавляем информацию о базовой комплектации
-			 */
-			$this->oProduct->setAttribute('personal_bundle', htmlspecialchars($_POST['personal_bundle_settings'], ENT_QUOTES));
+            /**
+             * Разбираем указанные опции
+             */
+            $aPersonalOptions = explode(',', $_POST['personal_bundle_settings']);
+            /**
+             * Обрабатываем каждую
+             */
+            $cnt = count($aPersonalOptions);
+            for($i=0; $i < $cnt; $i++) {
+                /**
+                 * Получаем данные опции
+                 */
+                $aPersonalOptionData = $this->oProduct->oOptions->getOptionNameByNameId(intval($aPersonalOptions[$i]));
+                /**
+                 * Если такой опции не существует
+                 */
+                if(!isset($aPersonalOptionData)) {
+                    unset($aPersonalOptions[$i]);
+                }
+            }
+            /**
+             * Добавляем информацию о базовой комплектации
+             */
+            $this->oProduct->setAttribute('personal_bundle', implode(',', $aPersonalOptions));
 		}
 		/**
 		 * Установка комплектаций
@@ -1185,12 +1238,50 @@ class prod_mode {
 				$sPriceAdd = str_replace(array(',', ' '), array('.', ''), trim($_POST['bundle_price_add'][$i]));
 				$fPriceAdd = htmlspecialchars($sPriceAdd, ENT_QUOTES);
 				/**
+				 * Определяем значения
+				 */
+
+				$sBundleTitle = htmlspecialchars($_POST['bundle_name'][$i], ENT_QUOTES);
+				$sBundleDescription = htmlspecialchars($_POST['bundle_description'][$i], ENT_QUOTES);
+				/**
+				 * Разделяем набор опций
+				 */
+				$aBundleOptions = explode(',', $_POST['bundle_settings'][$i]);
+				/**
+				 * Обработанные опции
+				 */
+				$aBundleOptionsReady = array();
+				/**
+				 * Обрабатываем каждую
+				 */
+				$cnt = count($aBundleOptions);
+				for($j=0; $j < $cnt; $j++) {
+					/**
+					 * Разбиваем ключ и значение
+					 */
+					list($sKey, $sVal) = explode(':', $aBundleOptions[$j]);
+					/**
+					 * Переводим значения к числам
+					 */
+					$iKey = intval($sKey);
+					$iVal = intval($sVal);
+					/**
+					 * Получаем данные опции
+					 */
+					$aBundleOptionsData = $this->oProduct->oOptions->getValueByNameIdAndValId($iKey, $iVal);
+					/**
+					 * Если такой опции не существует
+					 */
+					if(isset($aBundleOptionsData)) {
+						$aBundleOptionsReady[] = $iKey . ':' . $iVal;
+					}
+				}
+				/**
 				 * Добавляем комплектацию
 				 */
-				$this->oProduct->addBundle(htmlspecialchars($_POST['bundle_name'][$i], ENT_QUOTES), htmlspecialchars($_POST['bundle_settings'][$i], ENT_QUOTES), $fPrice, htmlspecialchars($_POST['bundle_description'][$i], ENT_QUOTES), false, $fPriceAdd);
+				$this->oProduct->addBundle($sBundleTitle, implode(',', $aBundleOptionsReady), $fPrice, $sBundleDescription, false, $fPriceAdd);
 			}
 		}
-
 		return !$bError;
 	}
 }

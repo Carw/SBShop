@@ -40,6 +40,11 @@ $(document).ready(function(){
 
 	$('.order_edit').click(function(){
 		/**
+		 * Выравниваем положение
+		 */
+		var top = $(window).scrollTop();
+		$('#popup').css({'top': top});
+		/**
 		 * Разбираем данные для отображения
 		 */
 		var orderId = $(this).attr('data');
@@ -64,7 +69,7 @@ $(document).ready(function(){
 				order.title +
 				'<a href="#" class="product_del">Удалить</a>' +
 				'<div class="quantity">Количество: <input type="text" class="pquantity" value="' + order.quantity + '" /></div>' +
-				'<div class="price">Цена: <input type="text" class="pprice" value="' + order.price + '" /></div>' +
+				'<div class="price">Цена: <input type="text" class="pprice" value="' + order.price_full + '" /></div>' +
 			'</div>';
 			/**
 			 * Опции
@@ -199,6 +204,10 @@ function editActions() {
 				/**
 				 * Здесь должна быть обработка полученной обновленной инормации
 				 */
+                /*if(window.confirm(result)) {
+                    window.location.reload();
+                }*/
+
 				window.location.reload();
 			}
 		});

@@ -1,12 +1,12 @@
 <!--# product: Общий шаблон редактирования товара #-->
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
 <script type="text/javascript">
 	if(typeof(jQuery) == "undefined") {
 		document.write("<scr" + "ipt type=\"text/javascript\" src=\"' . MODX_SITE_URL . 'assets/libs/javascript/jquery-1.3.2.min.js\"></scr" + "ipt>");
 	}
 </script>
 <script type="text/javascript" src="[+site.url+]assets/libs/javascript/jquery.dragsort-0.4.3.min.js"></script>
-<script type="text/javascript" src="[+site.url+]assets/extends/sbshop/modules/templates/js/product.js?ver=0.3.1"></script>
+<script type="text/javascript" src="[+site.url+]assets/extends/sbshop/modules/templates/js/product.js?ver=0.3.2"></script>
 <link href="[+site.url+]assets/libs/javascript/css/fileuploader.css" rel="stylesheet" type="text/css">
 <script type="text/javascript" src="[+site.url+]assets/libs/javascript/fileuploader.js"></script>
 
@@ -356,7 +356,7 @@
 				</td>
 				<td class="actions">
 					<div class="bundledel">
-						<input type="image" class="bundle_del" style="width: auto;" src="/manager/media/style/MODxCarbon/images/icons/delete.png">
+						<!--input type="image" class="bundle_del" style="width: auto;" src="/manager/media/style/MODxCarbon/images/icons/delete.png"-->
 					</div>
 				</td>
 			</tr>

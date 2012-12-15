@@ -178,7 +178,7 @@ class product_mode {
 					/**
 					 * Массив значений
 					 */
-					$aValues = $modx->sbshop->oGeneralProduct->oOptions->getValuesByOptionName($aOption['title']);
+                    $aValues = $modx->sbshop->oGeneralProduct->oOptions->getValuesByOptionName($aOption['title']);
 					/**
 					 * Если есть только одно значение
 					 */
@@ -285,7 +285,9 @@ class product_mode {
 			 * Вставляем в общий контейнер
 			 */
 			$aReplBlocks['[+sb.personal_bundle+]'] = str_replace('[+sb.bundle.options+]', $sOptions, $this->aTemplates['personal_bundle']);
-		}
+		} else {
+            $aReplBlocks['[+sb.personal_bundle+]'] = '';
+        }
 		/**
 		 * Переменная для опций
 		 */
@@ -581,7 +583,7 @@ class product_mode {
 			/**
 			 * Делаем вставку в контенер для опций
 			 */
-			$sBaseBundleRepl = str_replace('[+sb.wrapper+]', implode('',$aBaseBundleOptions), $this->aTemplates['bundle_option_outer']);
+			$sBaseBundleRepl = str_replace('[+sb.wrapper+]', implode('', $aBaseBundleOptions), $this->aTemplates['bundle_option_outer']);
 		} else {
 			$sBaseBundleRepl = '';
 		}

@@ -576,7 +576,7 @@ class SBShop {
 					/**
 					 * Если адрес совпадает с базовым
 					 */
-					if($sVal == $this->sBaseUrl) {
+					if($sVal == $this->sBaseUrl and $modx->documentIdentifier !== null) {
 						/**
 						 * Мы слегка его корректируем
 						 */

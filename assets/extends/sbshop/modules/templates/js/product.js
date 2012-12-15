@@ -86,6 +86,18 @@ file_delete = function(){
 }
 
 $(document).ready(function(){
+	/**
+	 * Если при вводе заголовка нажали Enter, то вызываем добавление опции
+	 */
+	$('#new_option_name').keypress(function(e){
+		if(e.which === 13) {
+			$("#new_option_add").trigger('click');
+			e.preventDefault();
+			e.cancelBubble = true;
+			return false;
+		}
+	});
+
 	// обработка клика на кнопку добавления новой опции
 	$("#new_option_add").click(function(){
 		/**
@@ -189,6 +201,18 @@ $(document).ready(function(){
 		return false;
 	});
 
+	/**
+	 * Если при вводе заголовка нажали Enter, то вызываем добавление комплектации
+	 */
+	$('#new_bundle_name').keypress(function(e){
+		if(e.which === 13) {
+			$("#new_bundle_add").trigger('click');
+			e.preventDefault();
+			e.cancelBubble = true;
+			return false;
+		}
+	});
+
 	// обработка клика на кнопку добавления новой комплектации
 	$("#new_bundle_add").click(function(){
 		/**
@@ -207,7 +231,7 @@ $(document).ready(function(){
 		}
 		a.find("h3.title").text(title);
 		a.find('.bundle_name').val(title);
-		a.find('input.bundle_del').click(function(){
+		a.find('.bundle_del').click(function(e){
 			$(this).parents('tr.bundle').remove();
 			bundle_reinit();
 			return false;
@@ -226,6 +250,7 @@ $(document).ready(function(){
 			dragSelectorExclude: '.bundle_base',
 			placeHolderTemplate: '<tr class="bundle"><td class="dragHandle"><div>&nbsp;</div></td><td></td></tr>'
 		});
+
 		bundle_reinit();
 		return false;
 	});

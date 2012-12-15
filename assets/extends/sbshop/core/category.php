@@ -232,7 +232,7 @@ class SBCategory {
 	 * @param $iCategoryId
 	 * @return unknown_type
 	 */
-	public function load($iCategoryId = false,$bDeleted = false) {
+	public function load($iCategoryId = false, $bDeleted = false) {
 		global $modx;
 		/**
 		 * Делаем проверку на передачу численного значения 
@@ -251,7 +251,7 @@ class SBCategory {
 		/**
 		 * Запрос информации из базы
 		 */
-		$rs = $modx->db->select('*',$modx->getFullTableName('sbshop_categories'),$sDeleted . 'category_id='.$iCategoryId);
+		$rs = $modx->db->select('*', $modx->getFullTableName('sbshop_categories'), $sDeleted . 'category_id=' . $iCategoryId);
 		$aData = $modx->db->makeArray($rs);
 		/**
 		 * Если есть такая категория
@@ -261,7 +261,7 @@ class SBCategory {
 			 * Подготавливаем основные параметры и заносим в массив
 			 */
 			foreach ($aData[0] as $sKey => $sVal) {
-				$sKey = str_replace('category_','',$sKey);
+				$sKey = str_replace('category_', '', $sKey);
 				$this->aCategoryData[$sKey] = $sVal;
 			}
 			/**

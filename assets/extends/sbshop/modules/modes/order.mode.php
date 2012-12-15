@@ -268,7 +268,7 @@ class order_mode {
 					 * Загружаем товар
 					 */
 					$oProduct = new SBProduct();
-					$oProduct->load($iProductId);
+					$oProduct->load($iProductId, true);
 					/**
 					 * Получаем информацию о количестве и прочих условиях заказа товара
 					 */
